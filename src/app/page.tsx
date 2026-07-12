@@ -359,7 +359,7 @@ export default function Home() {
         </section>
 
         {/* Right pane */}
-        <main className="flex-1 min-w-0">
+        <main className="flex-1 min-w-0 overflow-y-auto">
           {selectedWorksheet ? (
             <WorksheetDetail
               entry={selectedWorksheet}
@@ -499,8 +499,8 @@ function WorksheetsEmptyState({
   onCreate: (type: WorksheetType) => void;
 }) {
   return (
-    <div className="h-full flex items-center justify-center p-6">
-      <div className="max-w-lg w-full text-center">
+    <div className="min-h-full flex items-center justify-center p-6">
+      <div className="max-w-2xl w-full text-center">
         <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
           <FileText className="h-7 w-7" />
         </div>

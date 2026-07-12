@@ -37,6 +37,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { downloadJsonBackup, importFromJson, type ImportResult } from "@/lib/worksheet-export";
 import {
   shouldShowReminder,
@@ -61,6 +69,30 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Activity,
   HeartPulse,
 };
+
+// Group worksheet types by module for the dropdown menu
+const WORKSHEET_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
+  {
+    label: "General",
+    types: WORKSHEET_TYPES.filter((t) => ["chain-analysis", "missing-links"].includes(t.id)),
+  },
+  {
+    label: "Distress Tolerance",
+    types: WORKSHEET_TYPES.filter((t) => ["pros-cons", "radical-acceptance", "crisis-survival-tracker"].includes(t.id)),
+  },
+  {
+    label: "Emotion Regulation",
+    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary"].includes(t.id)),
+  },
+  {
+    label: "Interpersonal",
+    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation"].includes(t.id)),
+  },
+  {
+    label: "Mindfulness",
+    types: WORKSHEET_TYPES.filter((t) => ["walking-middle-path"].includes(t.id)),
+  },
+];
 
 interface Props {
   entries: WorksheetEntry[];
@@ -257,28 +289,43 @@ export function WorksheetList({
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-1.5">
-          {WORKSHEET_TYPES.map((type) => {
-            const Icon = ICONS[type.icon] ?? FileText;
-            return (
-              <Button
-                key={type.id}
-                variant="outline"
-                size="sm"
-                onClick={() => onCreate(type.id)}
-                className="justify-start h-auto py-2 px-2.5"
-              >
-                <Icon className={cn("h-4 w-4 mr-2 shrink-0", type.color)} />
-                <div className="text-left min-w-0">
-                  <div className="text-xs font-medium">New {type.shortName}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">
-                    {type.reference}
-                  </div>
-                </div>
-                <Plus className="h-3 w-3 ml-auto shrink-0 opacity-50" />
+        <div className="space-y-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="default" size="sm" className="w-full">
+                <Plus className="h-3.5 w-3.5 mr-1.5" />
+                New worksheet
               </Button>
-            );
-          })}
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-72 max-h-[400px] overflow-y-auto">
+              {WORKSHEET_GROUPS.map((group) => (
+                <React.Fragment key={group.label}>
+                  <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    {group.label}
+                  </DropdownMenuLabel>
+                  {group.types.map((type) => {
+                    const Icon = ICONS[type.icon] ?? FileText;
+                    return (
+                      <DropdownMenuItem
+                        key={type.id}
+                        onClick={() => onCreate(type.id)}
+                        className="cursor-pointer py-2"
+                      >
+                        <Icon className={cn("h-4 w-4 mr-2 shrink-0", type.color)} />
+                        <div className="min-w-0">
+                          <div className="text-xs font-medium">{type.shortName}</div>
+                          <div className="text-[10px] text-muted-foreground truncate">
+                            {type.description.slice(0, 50)}...
+                          </div>
+                        </div>
+                      </DropdownMenuItem>
+                    );
+                  })}
+                  <DropdownMenuSeparator />
+                </React.Fragment>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
