@@ -21,6 +21,15 @@ import {
   Download,
   Upload,
   GitCompare,
+  MessageSquareText,
+  SearchCheck,
+  FlipHorizontal,
+  HeartHandshake,
+  ShieldCheck,
+  Target,
+  Smile,
+  Activity,
+  HeartPulse,
 } from "lucide-react";
 import {
   Tooltip,
@@ -42,6 +51,15 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   CalendarRange,
   GitMerge,
   Unplug,
+  MessageSquareText,
+  SearchCheck,
+  FlipHorizontal,
+  HeartHandshake,
+  ShieldCheck,
+  Target,
+  Smile,
+  Activity,
+  HeartPulse,
 };
 
 interface Props {

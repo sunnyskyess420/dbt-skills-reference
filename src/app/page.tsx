@@ -16,7 +16,7 @@ import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -554,12 +554,112 @@ function WorksheetsEmptyState({
           </button>
           <button
             onClick={() => onCreate("missing-links")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors sm:col-span-2"
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
           >
             <Unplug className="h-5 w-5 text-orange-600 dark:text-orange-400 mb-2" />
             <div className="text-sm font-medium">Missing-Links Analysis (Behavior Analysis)</div>
             <div className="text-[11px] text-muted-foreground mt-1">
               Why didn&apos;t you use a skill you already knew? Find the specific gap and plan to close it.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("dear-man-script")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <MessageSquareText className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
+            <div className="text-sm font-medium">DEAR MAN Script</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Write out a full interpersonal effectiveness script before a difficult conversation.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("check-the-facts")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <SearchCheck className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Check the Facts</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Does your emotion and its intensity fit the situation? Walk through the facts.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("opposite-action")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <FlipHorizontal className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Opposite Action</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Do the opposite of what your emotion urges — all the way, repeated.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("radical-acceptance")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <HeartHandshake className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
+            <div className="text-sm font-medium">Radical Acceptance Practice</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Guided steps for accepting a reality you cannot change.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("crisis-survival-tracker")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <ShieldCheck className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
+            <div className="text-sm font-medium">Crisis Survival Skills Tracker</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              After a crisis, check off which skills you used and what worked.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("values-to-actions")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Target className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Values to Action Steps</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Turn a value into a concrete weekly action. Build a life worth living.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("pleasant-events-diary")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Smile className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Pleasant Events Diary</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Track one pleasant activity per day. Rate emotion before and after.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("emotion-diary")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Activity className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Emotion Diary (Single Emotion)</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Track one emotion across a week: triggers, intensity, what worked.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("dialectics-practice")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <GitMerge className="h-5 w-5 text-violet-600 dark:text-violet-400 mb-2" />
+            <div className="text-sm font-medium">Dialectics Practice</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Find the synthesis in a specific relationship conflict.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("self-validation")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <HeartPulse className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
+            <div className="text-sm font-medium">Self-Validation Practice</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Practice the 6 levels of validation on yourself.
             </div>
           </button>
         </div>

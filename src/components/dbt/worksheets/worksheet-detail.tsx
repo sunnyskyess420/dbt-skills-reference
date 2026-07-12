@@ -34,6 +34,16 @@ import { ProsConsForm } from "./pros-cons-form";
 import { DiaryCardForm } from "./diary-card-form";
 import { WalkingMiddlePathForm } from "./walking-middle-path-form";
 import { MissingLinksForm } from "./missing-links-form";
+import { DearManScriptForm } from "./dear-man-script-form";
+import { CheckTheFactsForm } from "./check-the-facts-form";
+import { OppositeActionForm } from "./opposite-action-form";
+import { RadicalAcceptanceForm } from "./radical-acceptance-form";
+import { CrisisSurvivalTrackerForm } from "./crisis-survival-tracker-form";
+import { ValuesToActionsForm } from "./values-to-actions-form";
+import { PleasantEventsDiaryForm } from "./pleasant-events-diary-form";
+import { EmotionDiaryForm } from "./emotion-diary-form";
+import { DialecticsPracticeForm } from "./dialectics-practice-form";
+import { SelfValidationForm } from "./self-validation-form";
 import { DiaryCardSummary } from "./diary-card-summary";
 import { exportToPdf } from "@/lib/worksheet-pdf";
 import {
@@ -254,6 +264,36 @@ export function WorksheetDetail({
           )}
           {entry.type === "missing-links" && (
             <MissingLinksForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "dear-man-script" && (
+            <DearManScriptForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "check-the-facts" && (
+            <CheckTheFactsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "opposite-action" && (
+            <OppositeActionForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "radical-acceptance" && (
+            <RadicalAcceptanceForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "crisis-survival-tracker" && (
+            <CrisisSurvivalTrackerForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "values-to-actions" && (
+            <ValuesToActionsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "pleasant-events-diary" && (
+            <PleasantEventsDiaryForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "emotion-diary" && (
+            <EmotionDiaryForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "dialectics-practice" && (
+            <DialecticsPracticeForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "self-validation" && (
+            <SelfValidationForm entry={entry} onChange={onChangeData} />
           )}
 
           <div className="mt-12 pt-6 border-t text-xs text-muted-foreground print:mt-6">

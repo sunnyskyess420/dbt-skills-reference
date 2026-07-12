@@ -84,13 +84,23 @@ export function importFromJson(jsonString: string): ImportResult {
         skipped++;
         continue;
       }
-      // Validate type
+      // Validate type — accept any valid WorksheetType
       const validTypes: WorksheetType[] = [
         "chain-analysis",
         "pros-cons",
         "diary-card",
         "walking-middle-path",
         "missing-links",
+        "dear-man-script",
+        "check-the-facts",
+        "opposite-action",
+        "radical-acceptance",
+        "crisis-survival-tracker",
+        "values-to-actions",
+        "pleasant-events-diary",
+        "emotion-diary",
+        "dialectics-practice",
+        "self-validation",
       ];
       if (!validTypes.includes(entry.type)) {
         skipped++;

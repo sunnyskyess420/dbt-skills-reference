@@ -406,10 +406,313 @@ export function exportToPdf(entry: WorksheetEntry) {
     case "missing-links":
       generateMissingLinks(doc, entry);
       break;
+    case "dear-man-script":
+      generateDearManScript(doc, entry);
+      break;
+    case "check-the-facts":
+      generateCheckTheFacts(doc, entry);
+      break;
+    case "opposite-action":
+      generateOppositeAction(doc, entry);
+      break;
+    case "radical-acceptance":
+      generateRadicalAcceptance(doc, entry);
+      break;
+    case "crisis-survival-tracker":
+      generateCrisisSurvivalTracker(doc, entry);
+      break;
+    case "values-to-actions":
+      generateValuesToActions(doc, entry);
+      break;
+    case "pleasant-events-diary":
+      generatePleasantEventsDiary(doc, entry);
+      break;
+    case "emotion-diary":
+      generateEmotionDiary(doc, entry);
+      break;
+    case "dialectics-practice":
+      generateDialecticsPractice(doc, entry);
+      break;
+    case "self-validation":
+      generateSelfValidation(doc, entry);
+      break;
   }
 
   writeFooter(doc, entry);
   save(doc, entry);
+}
+
+// ============ New worksheet generators ============
+
+function generateDearManScript(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The situation");
+  writeKeyValue(doc, "Relationship", data.relationship);
+  writeKeyValue(doc, "Objective", data.objective);
+  writeKeyValue(doc, "Priority", data.priority);
+
+  writeSectionTitle(doc, 2, "DEAR MAN script");
+  writeKeyValue(doc, "D - Describe", data.describe);
+  writeKeyValue(doc, "E - Express", data.express);
+  writeKeyValue(doc, "A - Assert", data.assert);
+  writeKeyValue(doc, "R - Reinforce", data.reinforce);
+  writeKeyValue(doc, "M - stay Mindful", data.mindfulPlan);
+  writeKeyValue(doc, "A - Appear confident", data.appearConfident);
+  writeKeyValue(doc, "N - Negotiate", data.negotiate);
+
+  writeSectionTitle(doc, 3, "Relationship & self-respect");
+  writeKeyValue(doc, "GIVE", data.givePlan);
+  writeKeyValue(doc, "FAST", data.fastPlan);
+
+  writeSectionTitle(doc, 4, "Rehearsal");
+  writeKeyValue(doc, "Anticipated response", data.anticipatedResponse);
+  writeKeyValue(doc, "Response to resistance", data.myResponseToResistance);
+}
+
+function generateCheckTheFacts(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The emotion");
+  writeKeyValue(doc, "Emotion", data.emotion);
+  writeKeyValue(doc, "Intensity", String(data.intensity ?? 0) + " / 5");
+
+  writeSectionTitle(doc, 2, "What happened");
+  writeKeyValue(doc, "Prompting event", data.promptingEvent);
+
+  writeSectionTitle(doc, 3, "Your interpretation");
+  writeKeyValue(doc, "My interpretation", data.interpretation);
+  writeKeyValue(doc, "Alternative interpretations", data.alternativeInterpretations);
+
+  writeSectionTitle(doc, 4, "Threat assessment");
+  writeKeyValue(doc, "Threat I'm assuming", data.threatAssumed);
+  writeKeyValue(doc, "Is the threat real?", data.threatReal);
+
+  writeSectionTitle(doc, 5, "Does the emotion fit?");
+  writeKeyValue(doc, "Does it fit the facts?", data.intensityFits);
+
+  writeSectionTitle(doc, 6, "What to do");
+  writeKeyValue(doc, "If it doesn't fit - skill to use", data.skillToUse);
+  writeKeyValue(doc, "If it does fit - problem solving", data.problemSolving);
+  writeKeyValue(doc, "Notes", data.notes);
+}
+
+function generateOppositeAction(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The emotion and its urge");
+  writeKeyValue(doc, "Emotion", data.emotion);
+  writeKeyValue(doc, "Intensity", String(data.intensity ?? 0) + " / 5");
+  writeKeyValue(doc, "Action urge", data.actionUrge);
+
+  writeSectionTitle(doc, 2, "Does it fit the facts?");
+  writeKeyValue(doc, "Does the emotion fit?", data.fitsFacts);
+  writeKeyValue(doc, "Is the intensity appropriate?", data.intensityAppropriate);
+
+  writeSectionTitle(doc, 3, "The opposite action");
+  writeKeyValue(doc, "What is the opposite action?", data.oppositeAction);
+  writeKeyValue(doc, "Body language", data.bodyLanguage);
+  writeKeyValue(doc, "All the way", data.allTheWay);
+
+  writeSectionTitle(doc, 4, "Plan to repeat");
+  writeKeyValue(doc, "How many times / how often?", data.timesToRepeat);
+  writeKeyValue(doc, "Obstacles", data.obstacles);
+  writeKeyValue(doc, "My plan", data.plan);
+}
+
+function generateRadicalAcceptance(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "What I am accepting");
+  writeKeyValue(doc, "What I am accepting", data.whatIAmAccepting);
+
+  writeSectionTitle(doc, 2, "What makes it hard");
+  writeKeyValue(doc, "Why is this hard to accept?", data.whyHard);
+  writeKeyValue(doc, "My willfulness", data.willfulness);
+
+  writeSectionTitle(doc, 3, "Practice");
+  writeKeyValue(doc, "Half-smile practice", data.halfSmile);
+  writeKeyValue(doc, "Willing hands", data.willingHands);
+  writeKeyValue(doc, "Turning the mind", data.turningMind);
+  writeKeyValue(doc, "Body practice", data.bodyPractice);
+
+  writeSectionTitle(doc, 4, "Reflection");
+  writeKeyValue(doc, "What changed?", data.whatChanged);
+  writeKeyValue(doc, "Notes", data.notes);
+}
+
+function generateCrisisSurvivalTracker(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.crisisDate) writeSubtitle(doc, `Date of crisis: ${data.crisisDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The crisis");
+  writeKeyValue(doc, "What happened?", data.crisisDescription);
+  writeKeyValue(doc, "Intensity", String(data.intensity ?? 0) + " / 5");
+
+  writeSectionTitle(doc, 2, "Skills I used");
+  const skills = data.skillsUsed ?? {};
+  const skillLabels: Record<string, string> = {
+    stop: "STOP", tipp: "TIPP", prosCons: "Pros & Cons", distract: "Distract (ACCEPTS)",
+    selfSoothe: "Self-Soothe", improve: "IMPROVE", radicalAcceptance: "Radical Acceptance", turningMind: "Turning the Mind",
+  };
+  const usedSkills = Object.keys(skillLabels).filter((k) => skills[k]).map((k) => skillLabels[k]);
+  writeValue(doc, usedSkills.length > 0 ? usedSkills.join(", ") : "None checked");
+
+  writeSectionTitle(doc, 3, "What worked");
+  writeKeyValue(doc, "What helped?", data.whatHelped);
+  writeKeyValue(doc, "What didn't help?", data.whatDidntHelp);
+  writeKeyValue(doc, "What I did instead", data.whatIDidInstead);
+
+  writeSectionTitle(doc, 4, "Next time");
+  writeKeyValue(doc, "What to try next time", data.whatToTryNextTime);
+  writeKeyValue(doc, "Skills I wish I'd known", data.skillsListMissing);
+}
+
+function generateValuesToActions(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "List your values");
+  writeKeyValue(doc, "My values", data.valuesList);
+
+  writeSectionTitle(doc, 2, "Pick one value");
+  writeKeyValue(doc, "Chosen value", data.chosenValue);
+  writeKeyValue(doc, "Why is this important?", data.whyImportant);
+
+  writeSectionTitle(doc, 3, "Set a goal");
+  writeKeyValue(doc, "My goal", data.goal);
+
+  writeSectionTitle(doc, 4, "Action steps");
+  writeKeyValue(doc, "Action step 1", data.actionStep1);
+  writeKeyValue(doc, "Action step 2", data.actionStep2);
+  writeKeyValue(doc, "Action step 3", data.actionStep3);
+
+  writeSectionTitle(doc, 5, "When");
+  writeKeyValue(doc, "When will I start?", data.when);
+
+  writeSectionTitle(doc, 6, "Track progress");
+  writeKeyValue(doc, "Progress notes", data.progressNotes);
+}
+
+function generatePleasantEventsDiary(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.weekStartDate) writeSubtitle(doc, `Week starting: ${data.weekStartDate}`);
+  y += 8;
+
+  const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const entries: any[] = data.entries ?? [];
+  labels.forEach((label, idx) => {
+    const e = entries[idx];
+    if (!e) return;
+    writeSectionTitle(doc, undefined, label + (e.date ? ` (${e.date})` : ""));
+    writeKeyValue(doc, "Activity", e.activity);
+    writeKeyValue(doc, "Emotion before", String(e.emotionBefore ?? 0) + " / 5");
+    writeKeyValue(doc, "Emotion after", String(e.emotionAfter ?? 0) + " / 5");
+    writeKeyValue(doc, "Present?", e.present ? "Yes" : "No");
+    if (e.notes) writeKeyValue(doc, "Notes", e.notes);
+  });
+}
+
+function generateEmotionDiary(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.weekStartDate) writeSubtitle(doc, `Week starting: ${data.weekStartDate}`);
+  if (data.targetEmotion) writeSubtitle(doc, `Target emotion: ${data.targetEmotion}`);
+  y += 8;
+
+  const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const entries: any[] = data.entries ?? [];
+  labels.forEach((label, idx) => {
+    const e = entries[idx];
+    if (!e) return;
+    writeSectionTitle(doc, undefined, label + (e.date ? ` (${e.date})` : ""));
+    writeKeyValue(doc, "Trigger", e.trigger);
+    writeKeyValue(doc, "Intensity", String(e.intensity ?? 0) + " / 5");
+    writeKeyValue(doc, "Interpretation", e.interpretation);
+    writeKeyValue(doc, "What I did", e.whatIDid);
+    writeKeyValue(doc, "What worked", e.whatWorked);
+    if (e.notes) writeKeyValue(doc, "Notes", e.notes);
+  });
+}
+
+function generateDialecticsPractice(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The relationship");
+  writeKeyValue(doc, "Relationship", data.relationship);
+
+  writeSectionTitle(doc, 2, "Two opposing positions");
+  writeKeyValue(doc, "Position A", data.positionA);
+  writeKeyValue(doc, "What's true about A?", data.trueInA);
+  writeKeyValue(doc, "Position B", data.positionB);
+  writeKeyValue(doc, "What's true about B?", data.trueInB);
+
+  writeSectionTitle(doc, 3, "The synthesis");
+  writeKeyValue(doc, "Synthesis statement", data.synthesis);
+
+  writeSectionTitle(doc, 4, "How I'll act on it");
+  writeKeyValue(doc, "Concrete actions", data.howIWillAct);
+
+  writeSectionTitle(doc, 5, "Practice");
+  writeKeyValue(doc, "When did I slip back?", data.whenSlippedBack);
+}
+
+function generateSelfValidation(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The situation and feeling");
+  writeKeyValue(doc, "Situation", data.situation);
+  writeKeyValue(doc, "The feeling", data.feeling);
+
+  writeSectionTitle(doc, 2, "The 6 levels of self-validation");
+  const levels = [
+    { num: 1, title: "Be present", key: "level1" },
+    { num: 2, title: "Accurate reflection", key: "level2" },
+    { num: 3, title: "Articulate the unsaid", key: "level3" },
+    { num: 4, title: "Validate based on history", key: "level4" },
+    { num: 5, title: "Validate in context", key: "level5" },
+    { num: 6, title: "Treat yourself as equal", key: "level6" },
+  ];
+  levels.forEach((level) => {
+    writeSectionTitle(doc, level.num, level.title);
+    writeValue(doc, data[level.key]);
+  });
+
+  writeSectionTitle(doc, 3, "Reflection");
+  writeKeyValue(doc, "Reflection", data.reflection);
 }
 
 // ============ Comparison PDF ============
