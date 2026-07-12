@@ -3,7 +3,7 @@
 import * as React from "react";
 import type { WorksheetEntry } from "@/lib/worksheet-storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Minus, Calendar, Activity, Target, Award, BookOpen } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Calendar, Activity, Target, Award, BookOpen, LifeBuoy, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -124,6 +124,36 @@ export function ProgressDashboard({ entries }: Props) {
       .slice(0, 5);
   }, [entries]);
 
+  // Detect high urges in recent diary cards for crisis resource banner
+  const [showCrisisBanner, setShowCrisisBanner] = React.useState(false);
+  React.useEffect(() => {
+    if (diaryCards.length === 0) return;
+    // Check the most recent diary card for high urges
+    const recent = diaryCards[diaryCards.length - 1];
+    const days = recent?.data?.days ?? [];
+    const hasHighUrges = days.some(
+      (d: any) => (d?.urgeSelfHarm ?? 0) >= 3 || (d?.urgeSuicide ?? 0) >= 3
+    );
+    if (hasHighUrges) {
+      // Check if user previously dismissed this
+      try {
+        const dismissed = sessionStorage.getItem("dbt-skills:crisis-banner-dismissed");
+        if (!dismissed) setShowCrisisBanner(true);
+      } catch {
+        setShowCrisisBanner(true);
+      }
+    }
+  }, [diaryCards]);
+
+  const dismissCrisisBanner = () => {
+    setShowCrisisBanner(false);
+    try {
+      sessionStorage.setItem("dbt-skills:crisis-banner-dismissed", "1");
+    } catch {
+      // ignore
+    }
+  };
+
   // If no data, show empty state
   if (entries.length === 0) {
     return (
@@ -156,6 +186,38 @@ export function ProgressDashboard({ entries }: Props) {
             Trends across {stats.totalWorksheets} worksheet{stats.totalWorksheets === 1 ? "" : "s"} and {stats.totalDiaryCards} diary card{stats.totalDiaryCards === 1 ? "" : "s"}.
           </p>
         </div>
+
+        {/* Crisis resources banner — shown when high urges detected */}
+        {showCrisisBanner && (
+          <div className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 flex items-start gap-2">
+            <LifeBuoy className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-amber-800 dark:text-amber-200">
+                You've had high urges (3+ out of 5) in your most recent diary card.
+                Crisis resources and grounding exercises are available if you need them.
+              </p>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  // Navigate to crisis resources via the sidebar
+                  const event = new CustomEvent("navigate-crisis");
+                  window.dispatchEvent(event);
+                }}
+                className="text-xs font-medium text-amber-700 dark:text-amber-300 underline mt-1 inline-block"
+              >
+                View crisis resources
+              </a>
+            </div>
+            <button
+              onClick={dismissCrisisBanner}
+              className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-200 shrink-0"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
         {/* Stats cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

@@ -4,11 +4,11 @@ import * as React from "react";
 import { MODULES, SKILLS, type Module, type Skill } from "@/data/skills";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChevronRight, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList } from "lucide-react";
+import { Bookmark, ChevronRight, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy } from "lucide-react";
 
 interface SidebarProps {
-  selectedModule: Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep";
-  onSelectModule: (m: Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep") => void;
+  selectedModule: Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep" | "crisis";
+  onSelectModule: (m: Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep" | "crisis") => void;
   selectedSkillId: string | null;
   onSelectSkill: (skill: Skill) => void;
   bookmarks: Set<string>;
@@ -90,6 +90,12 @@ export function Sidebar({
             onClick={() => onSelectModule("session-prep")}
             icon={<ClipboardList className="h-4 w-4" />}
             label="Session Prep"
+          />
+          <NavButton
+            active={selectedModule === "crisis"}
+            onClick={() => onSelectModule("crisis")}
+            icon={<LifeBuoy className="h-4 w-4" />}
+            label="Crisis Resources"
           />
         </div>
 

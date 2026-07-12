@@ -16,6 +16,7 @@ import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
 import { ProgressDashboard } from "@/components/dbt/progress-dashboard";
 import { SessionPrep } from "@/components/dbt/session-prep";
 import { SkillOfDay } from "@/components/dbt/skill-of-day";
+import { CrisisResources } from "@/components/dbt/crisis-resources";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ import { cn } from "@/lib/utils";
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
 const STORAGE_KEY_RECENT = "dbt-skills:recent";
 
-type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep";
+type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep" | "crisis";
 
 export default function Home() {
   const [selectedModule, setSelectedModule] = React.useState<ViewMode>("all");
@@ -197,6 +198,13 @@ export default function Home() {
     }
   }, []);
 
+  // Listen for crisis navigation event from dashboard banner
+  React.useEffect(() => {
+    const handler = () => handleSelectModule("crisis");
+    window.addEventListener("navigate-crisis", handler);
+    return () => window.removeEventListener("navigate-crisis", handler);
+  }, [handleSelectModule]);
+
   const isWorksheetsMode = selectedModule === "worksheets";
 
   return (
@@ -224,6 +232,8 @@ export default function Home() {
                   "Dashboard"
                 ) : selectedModule === "session-prep" ? (
                   "Session Prep"
+                ) : selectedModule === "crisis" ? (
+                  "Crisis Resources"
                 ) : (
                   "DBT Skills Reference"
                 )}
@@ -335,8 +345,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Middle pane — hidden for dashboard and session-prep (full-width views) */}
-        {(selectedModule !== "dashboard" && selectedModule !== "session-prep") && (
+        {/* Middle pane — hidden for full-width views (dashboard, session-prep, crisis) */}
+        {(selectedModule !== "dashboard" && selectedModule !== "session-prep" && selectedModule !== "crisis") && (
         <section
           className={cn(
             "shrink-0 border-r w-full sm:w-80 lg:w-80 xl:w-96 print:hidden",
@@ -394,6 +404,8 @@ export default function Home() {
             <ProgressDashboard entries={worksheetEntries} />
           ) : selectedModule === "session-prep" ? (
             <SessionPrep entries={worksheetEntries} />
+          ) : selectedModule === "crisis" ? (
+            <CrisisResources />
           ) : (
             <EmptyState
               recent={recent}
