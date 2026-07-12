@@ -13,6 +13,8 @@ import { DiaryComparison } from "@/components/dbt/worksheets/diary-comparison";
 import { SettingsModal } from "@/components/dbt/settings-modal";
 import { HelpDialog } from "@/components/dbt/help-dialog";
 import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
+import { ProgressDashboard } from "@/components/dbt/progress-dashboard";
+import { SessionPrep } from "@/components/dbt/session-prep";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
@@ -22,7 +24,7 @@ import { cn } from "@/lib/utils";
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
 const STORAGE_KEY_RECENT = "dbt-skills:recent";
 
-type ViewMode = Module | "all" | "bookmarks" | "worksheets";
+type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep";
 
 export default function Home() {
   const [selectedModule, setSelectedModule] = React.useState<ViewMode>("all");
@@ -217,6 +219,10 @@ export default function Home() {
                   <span className="text-muted-foreground">DBT Skills</span>
                 ) : isWorksheetsMode ? (
                   "Worksheets"
+                ) : selectedModule === "dashboard" ? (
+                  "Dashboard"
+                ) : selectedModule === "session-prep" ? (
+                  "Session Prep"
                 ) : (
                   "DBT Skills Reference"
                 )}
@@ -328,7 +334,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Middle pane */}
+        {/* Middle pane — hidden for dashboard and session-prep (full-width views) */}
+        {(selectedModule !== "dashboard" && selectedModule !== "session-prep") && (
         <section
           className={cn(
             "shrink-0 border-r w-full sm:w-80 lg:w-80 xl:w-96 print:hidden",
@@ -357,6 +364,7 @@ export default function Home() {
             />
           )}
         </section>
+        )}
 
         {/* Right pane */}
         <main className="flex-1 min-w-0 overflow-y-auto">
@@ -381,6 +389,10 @@ export default function Home() {
             />
           ) : isWorksheetsMode ? (
             <WorksheetsEmptyState onCreate={handleCreateWorksheet} />
+          ) : selectedModule === "dashboard" ? (
+            <ProgressDashboard entries={worksheetEntries} />
+          ) : selectedModule === "session-prep" ? (
+            <SessionPrep entries={worksheetEntries} />
           ) : (
             <EmptyState
               recent={recent}
