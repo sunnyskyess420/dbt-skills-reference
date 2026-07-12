@@ -73,6 +73,26 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        {/* Capture beforeinstallprompt as early as possible — before React loads.
+            Stored on window so the InstallAppButton component can access it whenever it mounts. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__deferredPrompt = null;
+              window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                window.__deferredPrompt = e;
+                // Dispatch a custom event so React components know it's ready
+                window.dispatchEvent(new CustomEvent('pwa-install-available'));
+              });
+              window.addEventListener('appinstalled', function() {
+                window.__deferredPrompt = null;
+                window.__deferredStandalone = true;
+                window.dispatchEvent(new CustomEvent('pwa-installed'));
+              });
+            `,
+          }}
+        />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased bg-background text-foreground`}

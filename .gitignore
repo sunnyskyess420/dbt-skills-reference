@@ -66,3 +66,4 @@ server.log
 .env
 .env.local
 .env.*.local
+scripts/git-ssh-wrapper.py

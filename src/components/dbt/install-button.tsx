@@ -2,142 +2,241 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Check } from "lucide-react";
+import { Download, Check, MonitorSmartphone } from "lucide-react";
 
-// Augment the BeforeInstallPromptEvent type — it's not in the standard TS DOM lib.
 interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[];
-  readonly userChoice: Promise<{
-    outcome: "accepted" | "dismissed";
-    platform: string;
-  }>;
   prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
-interface InstallPromptState {
-  // The deferred prompt event captured from beforeinstallprompt
-  deferredPrompt: BeforeInstallPromptEvent | null;
-  // Whether the app is already running in standalone (installed) mode
+interface InstallState {
+  canInstall: boolean;
   isStandalone: boolean;
-  // Whether the user has dismissed the install button this session
-  dismissed: boolean;
+  isIOS: boolean;
+  browserName: string;
 }
 
-export function useInstallPrompt(): InstallPromptState & {
-  promptInstall: () => Promise<void>;
-  dismiss: () => void;
-} {
-  const [state, setState] = React.useState<InstallPromptState>({
-    deferredPrompt: null,
+function detectBrowser(): string {
+  const ua = navigator.userAgent;
+  if (ua.includes("Edg/")) return "edge";
+  if (ua.includes("Chrome/")) return "chrome";
+  if (ua.includes("Firefox/")) return "firefox";
+  if (ua.includes("Safari/") && !ua.includes("Chrome")) return "safari";
+  return "unknown";
+}
+
+function detectIOS(): boolean {
+  const ua = navigator.userAgent;
+  return /iPad|iPhone|iPod/.test(ua) || (ua.includes("Mac") && "ontouchend" in document);
+}
+
+function detectStandalone(): boolean {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as any).standalone === true
+  );
+}
+
+/**
+ * Hook that checks for the PWA install prompt.
+ * Works with the early-captured event from the inline script in layout.tsx.
+ */
+export function useInstallPrompt() {
+  const [state, setState] = React.useState<InstallState>({
+    canInstall: false,
     isStandalone: false,
-    dismissed: false,
+    isIOS: false,
+    browserName: "unknown",
   });
 
   React.useEffect(() => {
-    // Detect standalone mode (app is already installed and running in its own window)
-    const standalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
-      // iOS Safari
-      (window.navigator as any).standalone === true;
+    const isStandalone = detectStandalone();
+    const isIOS = detectIOS();
+    const browserName = detectBrowser();
 
-    if (standalone) {
-      setState({ deferredPrompt: null, isStandalone: true, dismissed: false });
-      return;
-    }
+    // Check if the event was already captured by the inline script
+    const canInstall = !!(window as any).__deferredPrompt;
 
-    const handler = (e: Event) => {
-      // Prevent the mini-infobar from showing on mobile Chrome
-      e.preventDefault();
-      setState((prev) => ({ ...prev, deferredPrompt: e as BeforeInstallPromptEvent }));
-    };
+    setState({ canInstall, isStandalone, isIOS, browserName });
 
-    const installedHandler = () => {
-      setState({ deferredPrompt: null, isStandalone: true, dismissed: false });
-    };
+    // Listen for the event if it hasn't fired yet
+    const onAvailable = () => setState((s) => ({ ...s, canInstall: true }));
+    const onInstalled = () =>
+      setState((s) => ({ ...s, canInstall: false, isStandalone: true }));
 
-    window.addEventListener("beforeinstallprompt", handler);
-    window.addEventListener("appinstalled", installedHandler);
+    window.addEventListener("pwa-install-available", onAvailable);
+    window.addEventListener("pwa-installed", onInstalled);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-      window.removeEventListener("appinstalled", installedHandler);
+      window.removeEventListener("pwa-install-available", onAvailable);
+      window.removeEventListener("pwa-installed", onInstalled);
     };
   }, []);
 
   const promptInstall = React.useCallback(async () => {
-    if (!state.deferredPrompt) return;
-    await state.deferredPrompt.prompt();
-    const choice = await state.deferredPrompt.userChoice;
-    if (choice.outcome === "dismissed") {
-      setState((prev) => ({ ...prev, dismissed: true }));
-    }
-    // Clear the deferred prompt regardless — it can only be used once
-    setState((prev) => ({ ...prev, deferredPrompt: null }));
-  }, [state.deferredPrompt]);
-
-  const dismiss = React.useCallback(() => {
-    setState((prev) => ({ ...prev, dismissed: true }));
+    const deferred = (window as any).__deferredPrompt as BeforeInstallPromptEvent | null;
+    if (!deferred) return;
+    await deferred.prompt();
+    await deferred.userChoice;
+    (window as any).__deferredPrompt = null;
+    setState((s) => ({ ...s, canInstall: false }));
   }, []);
 
-  return {
-    ...state,
-    promptInstall,
-    dismiss,
-  };
+  return { ...state, promptInstall };
 }
 
 /**
- * Button that triggers the native PWA install prompt when clicked.
- * Only renders when:
- * - The app is NOT already running in standalone mode (i.e., not installed yet)
- * - The browser has fired beforeinstallprompt (i.e., install is supported and available)
- * - The user hasn't dismissed the button this session
- *
- * If the browser doesn't support PWA install (e.g., Firefox, Safari desktop),
- * the button simply doesn't render — no error, no confusing UI.
+ * Install button that ALWAYS renders.
+ * - If already installed: shows "App installed" (if showWhenInstalled)
+ * - If native prompt available: shows "Install" button
+ * - If not available: shows browser-specific instructions toggle
  */
 export function InstallAppButton({
-  variant = "outline",
+  variant = "default",
   size = "sm",
-  className,
-  label = "Install app",
+  className = "w-full",
+  label = "Install as desktop app",
   installedLabel = "App installed",
   showWhenInstalled = false,
 }: {
-  variant?: "default" | "outline" | "ghost" | "secondary" | "link";
+  variant?: "default" | "outline";
   size?: "default" | "sm" | "lg" | "icon";
   className?: string;
   label?: string;
   installedLabel?: string;
   showWhenInstalled?: boolean;
 }) {
-  const { deferredPrompt, isStandalone, dismissed, promptInstall } = useInstallPrompt();
+  const { canInstall, isStandalone, isIOS, browserName, promptInstall } = useInstallPrompt();
 
-  // Already installed and caller doesn't want to show the "installed" state
-  if (isStandalone && !showWhenInstalled) return null;
-
-  // Already installed — show confirmation badge
-  if (isStandalone && showWhenInstalled) {
+  // Already installed
+  if (isStandalone) {
+    if (!showWhenInstalled) return null;
     return (
-      <Button variant={variant} size={size} className={className} disabled>
-        <Check className="h-3.5 w-3.5 mr-1" />
-        {installedLabel}
+      <div className="space-y-2">
+        <Button variant="outline" size={size} className={className} disabled>
+          <Check className="h-3.5 w-3.5 mr-1.5" />
+          {installedLabel}
+        </Button>
+        <p className="text-[10px] text-muted-foreground text-center">
+          Running in app mode — find it in your Start menu
+        </p>
+      </div>
+    );
+  }
+
+  // Native install prompt is available — show the button
+  if (canInstall) {
+    return (
+      <Button variant={variant} size={size} className={className} onClick={promptInstall}>
+        <Download className="h-3.5 w-3.5 mr-1.5" />
+        {label}
       </Button>
     );
   }
 
-  // Install not available in this browser, or user dismissed
-  if (!deferredPrompt || dismissed) return null;
-
+  // No native prompt — show browser-specific instructions
   return (
-    <Button
+    <InstallInstructions
+      isIOS={isIOS}
+      browserName={browserName}
       variant={variant}
       size={size}
       className={className}
-      onClick={promptInstall}
-    >
-      <Download className="h-3.5 w-3.5 mr-1" />
-      {label}
-    </Button>
+    />
+  );
+}
+
+function InstallInstructions({
+  isIOS,
+  browserName,
+  variant,
+  size,
+  className,
+}: {
+  isIOS: boolean;
+  browserName: string;
+  variant: "default" | "outline";
+  size: "default" | "sm" | "lg" | "icon";
+  className: string;
+}) {
+  const [showSteps, setShowSteps] = React.useState(false);
+
+  let browserLabel = "your browser";
+  let steps: React.ReactNode;
+
+  if (isIOS) {
+    browserLabel = "iOS";
+    steps = (
+      <ol className="space-y-1.5 text-[11px] text-muted-foreground list-decimal list-inside">
+        <li>Tap the <strong>Share</strong> button (square with up arrow)</li>
+        <li>Tap <strong>&quot;Add to Home Screen&quot;</strong></li>
+        <li>Tap <strong>&quot;Add&quot;</strong></li>
+      </ol>
+    );
+  } else if (browserName === "edge") {
+    browserLabel = "Edge";
+    steps = (
+      <ol className="space-y-1.5 text-[11px] text-muted-foreground list-decimal list-inside">
+        <li>Click the <strong>three-dot menu</strong> (⋯) in the top-right corner</li>
+        <li>Click <strong>&quot;Apps&quot;</strong> → <strong>&quot;Install this site as an app&quot;</strong></li>
+        <li>Click <strong>&quot;Install&quot;</strong> in the dialog</li>
+      </ol>
+    );
+  } else if (browserName === "chrome") {
+    browserLabel = "Chrome";
+    steps = (
+      <ol className="space-y-1.5 text-[11px] text-muted-foreground list-decimal list-inside">
+        <li>Click the <strong>three-dot menu</strong> (⋮) in the top-right corner</li>
+        <li>Click <strong>&quot;Cast, save, and share&quot;</strong> → <strong>&quot;Install page as app...&quot;</strong></li>
+        <li>Click <strong>&quot;Install&quot;</strong> in the dialog</li>
+      </ol>
+    );
+  } else if (browserName === "firefox") {
+    browserLabel = "Firefox";
+    steps = (
+      <div className="text-[11px] text-muted-foreground space-y-1.5">
+        <p>Firefox doesn&apos;t support installing web apps as desktop apps.</p>
+        <p>For the install feature, open this site in <strong>Chrome</strong> or <strong>Edge</strong>.</p>
+      </div>
+    );
+  } else if (browserName === "safari") {
+    browserLabel = "Safari";
+    steps = (
+      <div className="text-[11px] text-muted-foreground space-y-1.5">
+        <p>Safari doesn&apos;t support installing web apps as desktop apps on Mac.</p>
+        <p>For the install feature, open this site in <strong>Chrome</strong> or <strong>Edge</strong>.</p>
+      </div>
+    );
+  } else {
+    browserLabel = "your browser";
+    steps = (
+      <ol className="space-y-1.5 text-[11px] text-muted-foreground list-decimal list-inside">
+        <li>Open your browser menu (usually three dots, top-right)</li>
+        <li>Look for <strong>&quot;Install this site as an app&quot;</strong></li>
+        <li>For best results, use <strong>Chrome</strong> or <strong>Edge</strong></li>
+      </ol>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <Button
+        variant="outline"
+        size={size}
+        className={className}
+        onClick={() => setShowSteps(!showSteps)}
+      >
+        <MonitorSmartphone className="h-3.5 w-3.5 mr-1.5" />
+        {showSteps ? "Hide steps" : `Install instructions (${browserLabel})`}
+      </Button>
+      {showSteps && (
+        <div className="rounded-md border bg-muted/30 p-3">
+          <p className="text-[11px] font-semibold mb-2">
+            How to install in {browserLabel}:
+          </p>
+          {steps}
+        </div>
+      )}
+    </div>
   );
 }
