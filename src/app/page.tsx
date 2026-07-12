@@ -9,6 +9,7 @@ import { SearchPalette } from "@/components/dbt/search-palette";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { WorksheetList } from "@/components/dbt/worksheets/worksheet-list";
 import { WorksheetDetail } from "@/components/dbt/worksheets/worksheet-detail";
+import { DiaryComparison } from "@/components/dbt/worksheets/diary-comparison";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
@@ -26,12 +27,13 @@ export default function Home() {
   const [selectedWorksheetId, setSelectedWorksheetId] = React.useState<string | null>(null);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [sidebarOpen, setSidebarOpen] = React.useState(false); // mobile sidebar
+  const [compareOpen, setCompareOpen] = React.useState(false); // diary card comparison modal
 
   // Bookmarks persisted to localStorage
   const [bookmarks, setBookmarks] = React.useState<Set<string>>(new Set());
 
   // Worksheets
-  const { entries: worksheetEntries, createEntry, updateEntry, deleteEntry } = useWorksheets();
+  const { entries: worksheetEntries, createEntry, updateEntry, deleteEntry, refresh: refreshWorksheets } = useWorksheets();
 
   const selectedWorksheet = React.useMemo(
     () => worksheetEntries.find((e) => e.id === selectedWorksheetId) ?? null,
@@ -272,6 +274,10 @@ export default function Home() {
               selectedEntryId={selectedWorksheetId}
               onSelectEntry={handleSelectWorksheet}
               onCreate={handleCreateWorksheet}
+              onImportComplete={() => {
+                refreshWorksheets();
+              }}
+              onOpenCompare={() => setCompareOpen(true)}
             />
           ) : (
             <SkillList
@@ -323,6 +329,13 @@ export default function Home() {
         onOpenChange={setSearchOpen}
         onSelect={handleSelectSkill}
         bookmarks={bookmarks}
+      />
+
+      {/* Diary card comparison modal */}
+      <DiaryComparison
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        diaryCards={worksheetEntries.filter((e) => e.type === "diary-card")}
       />
     </div>
   );

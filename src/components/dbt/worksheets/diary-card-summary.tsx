@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import type { WorksheetEntry } from "@/lib/worksheet-storage";
+import { generateDiarySuggestions } from "@/lib/diary-suggestions";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -58,6 +59,12 @@ const SKILL_KEYS = [
 export function DiaryCardSummary({ entry }: Props) {
   const data = entry.data;
   const days: any[] = data.days ?? [];
+
+  // Generate skill suggestions based on this week's data
+  const suggestions = React.useMemo(
+    () => generateDiarySuggestions(entry),
+    [entry]
+  );
 
   // Calculate averages and totals
   const stats = React.useMemo(() => {
@@ -270,6 +277,62 @@ export function DiaryCardSummary({ entry }: Props) {
           </div>
         )}
       </section>
+
+      {/* Skill suggestions based on this week's data */}
+      {suggestions.length > 0 && (
+        <section>
+          <h2 className="text-base font-semibold mb-1">Suggested skills for next week</h2>
+          <p className="text-xs text-muted-foreground mb-3">
+            Based on which emotions, urges, and actions spiked this week.
+            These are suggestions, not prescriptions — your therapist knows best.
+          </p>
+          <div className="space-y-2">
+            {suggestions.map((sug) => {
+              const priorityClass = {
+                high: "border-l-rose-500 bg-rose-500/5",
+                medium: "border-l-amber-500 bg-amber-500/5",
+                low: "border-l-slate-400 bg-slate-400/5",
+              }[sug.priority];
+              const priorityLabel = {
+                high: "High priority",
+                medium: "Medium priority",
+                low: "Worth considering",
+              }[sug.priority];
+              const moduleColor = {
+                general: "text-slate-600 dark:text-slate-300",
+                mindfulness: "text-emerald-600 dark:text-emerald-400",
+                interpersonal: "text-amber-600 dark:text-amber-400",
+                "emotion-regulation": "text-rose-600 dark:text-rose-400",
+                "distress-tolerance": "text-sky-600 dark:text-sky-400",
+              }[sug.module];
+              return (
+                <div
+                  key={sug.skillId}
+                  className={cn(
+                    "rounded-md border border-l-4 p-3 space-y-1",
+                    priorityClass
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm font-semibold">{sug.skillName}</span>
+                      <span className={cn("text-[10px] uppercase tracking-wider font-medium", moduleColor)}>
+                        {sug.module.replace("-", " ")}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground shrink-0">
+                      {priorityLabel}
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground/80 leading-relaxed">
+                    {sug.reason}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Empty state when no data entered */}
       {stats.daysWithNotes === 0 &&

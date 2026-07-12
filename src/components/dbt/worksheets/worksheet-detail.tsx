@@ -15,6 +15,7 @@ import {
   BookOpen,
   BarChart3,
   ListChecks,
+  FileDown,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -34,6 +35,13 @@ import { DiaryCardForm } from "./diary-card-form";
 import { WalkingMiddlePathForm } from "./walking-middle-path-form";
 import { MissingLinksForm } from "./missing-links-form";
 import { DiaryCardSummary } from "./diary-card-summary";
+import { exportToPdf } from "@/lib/worksheet-pdf";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   entry: WorksheetEntry;
@@ -144,6 +152,22 @@ export function WorksheetDetail({
               <Printer className="h-4 w-4" />
               <span className="ml-1 hidden sm:inline">Print</span>
             </Button>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => exportToPdf(entry)}
+                    aria-label="Export as PDF"
+                  >
+                    <FileDown className="h-4 w-4" />
+                    <span className="ml-1 hidden sm:inline">PDF</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Download a formatted PDF</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button

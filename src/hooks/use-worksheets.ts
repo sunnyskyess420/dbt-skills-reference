@@ -58,11 +58,16 @@ export function useWorksheets() {
     setEntries((prev) => prev.filter((e) => e.id !== id));
   }, []);
 
+  const refresh = React.useCallback(() => {
+    setEntries(listEntries());
+  }, []);
+
   return {
     entries,
     loaded,
     createEntry,
     updateEntry,
     deleteEntry,
+    refresh,
   };
 }

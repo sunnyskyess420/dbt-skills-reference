@@ -18,7 +18,17 @@ import {
   Clock,
   GitMerge,
   Unplug,
+  Download,
+  Upload,
+  GitCompare,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { downloadJsonBackup, importFromJson, type ImportResult } from "@/lib/worksheet-export";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Link2,
@@ -33,6 +43,8 @@ interface Props {
   selectedEntryId: string | null;
   onSelectEntry: (entry: WorksheetEntry) => void;
   onCreate: (type: WorksheetType) => void;
+  onImportComplete: () => void;
+  onOpenCompare: () => void;
 }
 
 export function WorksheetList({
@@ -40,14 +52,131 @@ export function WorksheetList({
   selectedEntryId,
   onSelectEntry,
   onCreate,
+  onImportComplete,
+  onOpenCompare,
 }: Props) {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
+
+  const diaryCardCount = entries.filter((e) => e.type === "diary-card").length;
+
+  const handleExport = () => {
+    downloadJsonBackup();
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    const result = importFromJson(text);
+    setImportResult(result);
+    if (result.success && result.imported > 0) {
+      onImportComplete();
+    }
+    // Reset input so same file can be re-selected
+    e.target.value = "";
+  };
+
   return (
     <div className="flex flex-col h-full bg-background">
       <div className="border-b px-3 py-3 shrink-0">
-        <h2 className="text-sm font-semibold mb-2">Worksheets</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-sm font-semibold">Worksheets</h2>
+          <div className="flex items-center gap-0.5">
+            {diaryCardCount >= 2 && (
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={onOpenCompare}
+                      aria-label="Compare two diary cards"
+                    >
+                      <GitCompare className="h-3.5 w-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Compare two diary cards</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={handleExport}
+                    disabled={entries.length === 0}
+                    aria-label="Export all worksheets as JSON"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Export all as JSON (backup)</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={handleImportClick}
+                    aria-label="Import worksheets from JSON"
+                  >
+                    <Upload className="h-3.5 w-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Import from JSON (restore)</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
         <p className="text-[11px] text-muted-foreground mb-3">
           Fill out, save, and print interactive versions of the core DBT worksheets. Saved to your browser only.
         </p>
+
+        {importResult && (
+          <div
+            className={cn(
+              "mb-2 rounded-md border p-2 text-[11px]",
+              importResult.success
+                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                : "border-rose-500/50 bg-rose-500/10 text-rose-700 dark:text-rose-300"
+            )}
+          >
+            {importResult.success ? (
+              <>
+                Imported {importResult.imported} worksheet(s)
+                {importResult.skipped > 0 && `, skipped ${importResult.skipped} duplicate(s)`}.
+              </>
+            ) : (
+              <>Import failed: {importResult.error}</>
+            )}
+            <button
+              className="ml-2 underline"
+              onClick={() => setImportResult(null)}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-1.5">
           {WORKSHEET_TYPES.map((type) => {
             const Icon = ICONS[type.icon] ?? FileText;
@@ -87,7 +216,7 @@ export function WorksheetList({
           <div className="px-6 py-12 text-center">
             <FileText className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
             <p className="text-sm text-muted-foreground">
-              No worksheets yet. Use the buttons above to start a new Chain Analysis, Pros & Cons, or Diary Card.
+              No worksheets yet. Use the buttons above to start a new worksheet.
             </p>
           </div>
         ) : (
