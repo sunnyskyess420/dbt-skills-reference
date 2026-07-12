@@ -27,7 +27,7 @@ const SHORTCUT_GROUPS: { title: string; shortcuts: Shortcut[] }[] = [
     shortcuts: [
       {
         keys: ["Ctrl", "K"],
-        description: "Open the skill search palette",
+        description: "Open the skill search palette (⌘K on Mac)",
         icon: Search,
       },
       {
@@ -97,8 +97,11 @@ export function HelpDialog({ open, onOpenChange }: Props) {
           </DialogTitle>
           <DialogDescription>
             Quick reference for all keyboard shortcuts and key interactions.
-            On Mac, use <kbd className="font-mono">Cmd</kbd> instead of{" "}
-            <kbd className="font-mono">Ctrl</kbd>.
+            The search shortcut uses{" "}
+            <kbd className="font-mono bg-muted px-1 rounded text-[11px]">Ctrl+K</kbd>{" "}
+            on Windows/Linux and{" "}
+            <kbd className="font-mono bg-muted px-1 rounded text-[11px]">⌘K</kbd>{" "}
+            on Mac.
           </DialogDescription>
         </DialogHeader>
 

@@ -12,6 +12,7 @@ import { WorksheetDetail } from "@/components/dbt/worksheets/worksheet-detail";
 import { DiaryComparison } from "@/components/dbt/worksheets/diary-comparison";
 import { SettingsModal } from "@/components/dbt/settings-modal";
 import { HelpDialog } from "@/components/dbt/help-dialog";
+import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
@@ -244,9 +245,7 @@ export default function Home() {
             >
               <Search className="h-4 w-4 mr-1.5" />
               <span>Search</span>
-              <kbd className="ml-2 text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded border">
-                ⌘K
-              </kbd>
+              <KbdShortcut combo="K" className="ml-2" />
             </Button>
             <Button
               variant="ghost"
@@ -458,9 +457,7 @@ function EmptyState({
         >
           <Search className="h-4 w-4 mr-2" />
           Search skills
-          <kbd className="ml-2 text-[10px] font-mono bg-primary-foreground/20 px-1.5 py-0.5 rounded">
-            ⌘K
-          </kbd>
+          <KbdShortcut combo="K" className="ml-2 border-0 bg-primary-foreground/20" />
         </Button>
 
         {recentSkills.length > 0 && (

@@ -5,6 +5,7 @@ import { MODULES, SKILLS, type Skill } from "@/data/skills";
 import { cn } from "@/lib/utils";
 import { Bookmark, Search as SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
 
 interface SkillListProps {
   selectedModule: string; // "all" | "bookmarks" | module id
@@ -64,9 +65,7 @@ export function SkillList({
         >
           <SearchIcon className="h-4 w-4 mr-2" />
           <span className="flex-1 text-left">Search skills…</span>
-          <kbd className="ml-2 text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded border">
-            ⌘K
-          </kbd>
+          <KbdShortcut combo="K" className="ml-2" />
         </Button>
       </div>
 
