@@ -32,7 +32,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useTheme } from "next-themes";
-import { Settings, Download, Trash2, Sun, Moon, Monitor } from "lucide-react";
+import { Settings, Download, Trash2, Sun, Moon, Monitor, MonitorSmartphone } from "lucide-react";
 import {
   type AppSettings,
   loadSettings,
@@ -40,6 +40,7 @@ import {
   DEFAULT_SETTINGS,
 } from "@/lib/settings";
 import { downloadJsonBackup } from "@/lib/worksheet-export";
+import { InstallAppButton } from "@/components/dbt/install-button";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -127,6 +128,31 @@ export function SettingsModal({ open, onOpenChange, onDataCleared }: Props) {
 
         {loaded && (
           <div className="space-y-6 py-2">
+            {/* Section: App */}
+            <section className="space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold flex items-center gap-1.5">
+                  <MonitorSmartphone className="h-3.5 w-3.5" />
+                  App
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Install DBT Skills Reference as a desktop app. Opens in its own
+                  window, appears in your Start menu, and can be pinned to your
+                  taskbar.
+                </p>
+              </div>
+              <InstallAppButton
+                variant="default"
+                size="sm"
+                className="w-full"
+                label="Install as desktop app"
+                installedLabel="App installed"
+                showWhenInstalled
+              />
+            </section>
+
+            <div className="border-t" />
+
             {/* Section: Backup */}
             <section className="space-y-3">
               <div>

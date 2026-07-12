@@ -9,6 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Keyboard, Search, FileText, Settings, Moon, Bookmark } from "lucide-react";
+import { InstallAppButton } from "@/components/dbt/install-button";
 
 interface Props {
   open: boolean;
@@ -145,16 +146,28 @@ export function HelpDialog({ open, onOpenChange }: Props) {
           ))}
         </div>
 
-        <div className="border-t pt-3 mt-2 text-[11px] text-muted-foreground space-y-1">
+        <div className="border-t pt-3 mt-2 text-[11px] text-muted-foreground space-y-2">
           <p>
             <strong>Tip:</strong> Press <kbd className="font-mono bg-muted px-1 rounded">?</kbd> from
             anywhere in the app to reopen this dialog.
           </p>
-          <p>
-            <strong>Install as an app:</strong> In your browser&apos;s menu, look for
-            &quot;Install DBT Skills Reference&quot; or &quot;Install this site as an app&quot;
-            to open it in its own window like a native app.
-          </p>
+          <div className="flex items-start gap-2">
+            <div className="flex-1">
+              <p>
+                <strong>Install as an app:</strong> Install DBT Skills Reference to open it in its
+                own window — like a native app. It appears in your Start menu and can be pinned to
+                your taskbar.
+              </p>
+            </div>
+          </div>
+          <InstallAppButton
+            variant="default"
+            size="sm"
+            className="w-full"
+            label="Install DBT Skills Reference"
+            installedLabel="App installed"
+            showWhenInstalled
+          />
         </div>
       </DialogContent>
     </Dialog>
