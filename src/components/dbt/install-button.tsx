@@ -18,6 +18,10 @@ interface InstallState {
 
 function detectBrowser(): string {
   const ua = navigator.userAgent;
+  // Brave detection: check for navigator.brave ( Brave exposes this property)
+  if ((navigator as any).brave) return "brave";
+  // Fallback: some Brave versions include "Brave" in the UA
+  if (ua.includes("Brave")) return "brave";
   if (ua.includes("Edg/")) return "edge";
   if (ua.includes("Chrome/")) return "chrome";
   if (ua.includes("Firefox/")) return "firefox";
@@ -172,6 +176,30 @@ function InstallInstructions({
         <li>Tap <strong>&quot;Add to Home Screen&quot;</strong></li>
         <li>Tap <strong>&quot;Add&quot;</strong></li>
       </ol>
+    );
+  } else if (browserName === "brave") {
+    browserLabel = "Brave";
+    steps = (
+      <div className="space-y-2">
+        <div className="rounded-md border border-amber-500/50 bg-amber-500/10 p-2 text-[11px]">
+          <strong>Brave Shields can block PWA install.</strong> If the &quot;Install as desktop app&quot; button
+          above doesn&apos;t appear, try one of these:
+        </div>
+        <ol className="space-y-1.5 text-[11px] text-muted-foreground list-decimal list-inside">
+          <li>
+            <strong>Lower Shields for this site:</strong> Click the Brave lion icon in the address bar →
+            toggle <strong>&quot;Shields down for this site&quot;</strong> → refresh the page → reopen Settings
+          </li>
+          <li>
+            <strong>Install via menu:</strong> Click the <strong>three-dot menu</strong> (⋮) top-right →
+            look for <strong>&quot;Install DBT Skills Reference...&quot;</strong> (or &quot;Install page as app&quot;)
+          </li>
+          <li>
+            <strong>Use Chrome or Edge instead:</strong> Open this site in Chrome or Edge for the most
+            reliable PWA install experience
+          </li>
+        </ol>
+      </div>
     );
   } else if (browserName === "edge") {
     browserLabel = "Edge";
