@@ -32,7 +32,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useTheme } from "next-themes";
-import { Settings, Download, Trash2, Sun, Moon, Monitor, MonitorSmartphone } from "lucide-react";
+import { Settings, Download, Trash2, Sun, Moon, Monitor, MonitorSmartphone, Palette } from "lucide-react";
 import {
   type AppSettings,
   loadSettings,
@@ -41,6 +41,14 @@ import {
 } from "@/lib/settings";
 import { downloadJsonBackup } from "@/lib/worksheet-export";
 import { InstallAppButton } from "@/components/dbt/install-button";
+import {
+  THEME_PRESETS,
+  getSavedPresetId,
+  savePresetId,
+  applyThemePreset,
+  clearThemePreset,
+  type ThemePreset,
+} from "@/lib/theme-presets";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -61,12 +69,14 @@ export function SettingsModal({ open, onOpenChange, onDataCleared }: Props) {
   const { theme: nextTheme, setTheme } = useTheme();
   const [settings, setSettings] = React.useState<AppSettings>(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = React.useState(false);
+  const [selectedPreset, setSelectedPreset] = React.useState<string>("default");
 
   // Load settings when modal opens
   React.useEffect(() => {
     if (open) {
       const loaded = loadSettings();
       setSettings(loaded);
+      setSelectedPreset(getSavedPresetId());
       // If next-themes has a different value (e.g., user toggled via top bar),
       // prefer next-themes' value as the source of truth for display.
       if (nextTheme && nextTheme !== loaded.theme) {
@@ -87,6 +97,16 @@ export function SettingsModal({ open, onOpenChange, onDataCleared }: Props) {
     setSettings(next);
     saveSettings(next);
     setTheme(value);
+  };
+
+  const handlePresetChange = (presetId: string) => {
+    setSelectedPreset(presetId);
+    savePresetId(presetId);
+    if (presetId === "default") {
+      clearThemePreset();
+    } else {
+      applyThemePreset(presetId);
+    }
   };
 
   const handleExportNow = () => {
@@ -234,6 +254,30 @@ export function SettingsModal({ open, onOpenChange, onDataCleared }: Props) {
                   selected={settings.theme === "dark"}
                 />
               </RadioGroup>
+            </section>
+
+            {/* Section: Color & Font Theme */}
+            <section className="space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold flex items-center gap-1.5">
+                  <Palette className="h-3.5 w-3.5" />
+                  Color &amp; font theme
+                </h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Pick a coordinated color palette and font pairing. Changes apply
+                  instantly and are saved to your browser.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {THEME_PRESETS.map((preset) => (
+                  <PresetCard
+                    key={preset.id}
+                    preset={preset}
+                    selected={selectedPreset === preset.id}
+                    onSelect={() => handlePresetChange(preset.id)}
+                  />
+                ))}
+              </div>
             </section>
 
             <div className="border-t" />
@@ -403,5 +447,49 @@ function ThemeOption({
       <div className="text-xs font-medium">{label}</div>
       <div className="text-[10px] text-muted-foreground">{description}</div>
     </label>
+  );
+}
+
+function PresetCard({
+  preset,
+  selected,
+  onSelect,
+}: {
+  preset: ThemePreset;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      onClick={onSelect}
+      className={cn(
+        "flex flex-col items-start gap-1.5 rounded-md border p-2.5 cursor-pointer transition-all text-left",
+        selected
+          ? "border-primary ring-1 ring-primary"
+          : "border-border hover:bg-muted/40"
+      )}
+    >
+      {/* Color swatches */}
+      <div className="flex gap-1 w-full">
+        {preset.swatches.map((color, i) => (
+          <div
+            key={i}
+            className="h-6 flex-1 rounded-sm border border-black/10"
+            style={{ backgroundColor: color }}
+          />
+        ))}
+      </div>
+      <div className="text-xs font-medium leading-tight">{preset.name}</div>
+      <div className="text-[10px] text-muted-foreground leading-tight line-clamp-2">
+        {preset.description}
+      </div>
+      {/* Font preview */}
+      <div
+        className="text-[10px] text-muted-foreground mt-0.5 truncate w-full"
+        style={{ fontFamily: preset.fontSans }}
+      >
+        Aa Bb Cc 123
+      </div>
+    </button>
   );
 }
