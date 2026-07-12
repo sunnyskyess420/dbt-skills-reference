@@ -15,8 +15,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowRight, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { ArrowRight, TrendingUp, TrendingDown, Minus, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { exportComparisonToPdf } from "@/lib/worksheet-pdf";
 
 interface Props {
   open: boolean;
@@ -118,11 +119,27 @@ export function DiaryComparison({ open, onOpenChange, diaryCards }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Compare two diary cards</DialogTitle>
-          <DialogDescription>
-            See two weeks side-by-side to spot trends. The right column is
-            typically the more recent week.
-          </DialogDescription>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <DialogTitle>Compare two diary cards</DialogTitle>
+              <DialogDescription>
+                See two weeks side-by-side to spot trends. The right column is
+                typically the more recent week.
+              </DialogDescription>
+            </div>
+            {left && right && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => exportComparisonToPdf(left, right)}
+                className="shrink-0"
+              >
+                <FileDown className="h-3.5 w-3.5 mr-1" />
+                <span className="hidden sm:inline">Download PDF</span>
+                <span className="sm:hidden">PDF</span>
+              </Button>
+            )}
+          </div>
         </DialogHeader>
 
         {diaryCards.length < 2 ? (

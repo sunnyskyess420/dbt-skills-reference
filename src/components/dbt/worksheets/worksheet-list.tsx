@@ -29,6 +29,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { downloadJsonBackup, importFromJson, type ImportResult } from "@/lib/worksheet-export";
+import {
+  shouldShowReminder,
+  markExported,
+  dismissReminder,
+  REMINDER_INTERVAL,
+} from "@/lib/backup-reminder";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Link2,
@@ -57,11 +63,30 @@ export function WorksheetList({
 }: Props) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
+  const [showBackupReminder, setShowBackupReminder] = React.useState(false);
 
   const diaryCardCount = entries.filter((e) => e.type === "diary-card").length;
+  const entryCount = entries.length;
+
+  // Check whether to show the backup reminder whenever entry count changes
+  React.useEffect(() => {
+    if (shouldShowReminder(entryCount)) {
+      setShowBackupReminder(true);
+    } else {
+      setShowBackupReminder(false);
+    }
+  }, [entryCount]);
 
   const handleExport = () => {
     downloadJsonBackup();
+    // Mark exported so the reminder resets (next reminder fires after REMINDER_INTERVAL more entries)
+    markExported(entryCount);
+    setShowBackupReminder(false);
+  };
+
+  const handleDismissReminder = () => {
+    dismissReminder(entryCount);
+    setShowBackupReminder(false);
   };
 
   const handleImportClick = () => {
@@ -174,6 +199,43 @@ export function WorksheetList({
             >
               Dismiss
             </button>
+          </div>
+        )}
+
+        {/* Auto-backup reminder */}
+        {showBackupReminder && (
+          <div className="mb-3 rounded-md border border-amber-500/50 bg-amber-500/10 p-2.5 text-[11px] text-amber-800 dark:text-amber-200">
+            <div className="flex items-start gap-1.5">
+              <span className="text-base leading-none mt-0.5" aria-hidden>⚠</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold">Time to back up your worksheets</p>
+                <p className="mt-0.5">
+                  You now have {entryCount} saved worksheet{entryCount === 1 ? "" : "s"}. If your
+                  browser data is cleared, you&apos;ll lose them. Export a JSON backup now to keep
+                  them safe.
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-[11px] px-2 border-amber-500/50 hover:bg-amber-500/20"
+                    onClick={handleExport}
+                  >
+                    <Download className="h-3 w-3 mr-1" />
+                    Export now
+                  </Button>
+                  <button
+                    className="underline text-[11px]"
+                    onClick={handleDismissReminder}
+                  >
+                    Remind me later
+                  </button>
+                </div>
+                <p className="text-[10px] mt-1.5 opacity-70">
+                  Next reminder after {REMINDER_INTERVAL} more new entries.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 

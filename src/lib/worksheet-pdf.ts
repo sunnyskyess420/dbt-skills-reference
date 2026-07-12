@@ -125,7 +125,7 @@ function generateChainAnalysis(doc: jsPDF, entry: WorksheetEntry) {
   writeTitle(doc, entry.title);
   writeSubtitle(
     doc,
-    `${getWorksheetTypeMeta(entry.type).name} — ${getWorksheetTypeMeta(entry.type).reference}`
+    `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`
   );
   if (data.behaviorDate) {
     writeSubtitle(doc, `Date of behavior: ${data.behaviorDate}`);
@@ -189,7 +189,7 @@ function generateProsCons(doc: jsPDF, entry: WorksheetEntry) {
   writeTitle(doc, entry.title);
   writeSubtitle(
     doc,
-    `${getWorksheetTypeMeta(entry.type).name} — ${getWorksheetTypeMeta(entry.type).reference}`
+    `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`
   );
   if (data.entryDate) {
     writeSubtitle(doc, `Date: ${data.entryDate}`);
@@ -199,19 +199,19 @@ function generateProsCons(doc: jsPDF, entry: WorksheetEntry) {
   writeSectionTitle(doc, 1, "The urge");
   writeKeyValue(doc, "The urge I'm considering acting on", data.urgeDescription);
 
-  writeSectionTitle(doc, 2, "ACTING on the urge — Pros");
+  writeSectionTitle(doc, 2, "ACTING on the urge - Pros");
   writeKeyValue(doc, "Short-term", data.actingProsShort);
   writeKeyValue(doc, "Long-term", data.actingProsLong);
 
-  writeSectionTitle(doc, 3, "ACTING on the urge — Cons");
+  writeSectionTitle(doc, 3, "ACTING on the urge - Cons");
   writeKeyValue(doc, "Short-term", data.actingConsShort);
   writeKeyValue(doc, "Long-term", data.actingConsLong);
 
-  writeSectionTitle(doc, 4, "RESISTING the urge — Pros");
+  writeSectionTitle(doc, 4, "RESISTING the urge - Pros");
   writeKeyValue(doc, "Short-term", data.notActingProsShort);
   writeKeyValue(doc, "Long-term", data.notActingProsLong);
 
-  writeSectionTitle(doc, 5, "RESISTING the urge — Cons");
+  writeSectionTitle(doc, 5, "RESISTING the urge - Cons");
   writeKeyValue(doc, "Short-term", data.notActingConsShort);
   writeKeyValue(doc, "Long-term", data.notActingConsLong);
 
@@ -226,7 +226,7 @@ function generateDiaryCard(doc: jsPDF, entry: WorksheetEntry) {
   writeTitle(doc, entry.title);
   writeSubtitle(
     doc,
-    `${getWorksheetTypeMeta(entry.type).name} — ${getWorksheetTypeMeta(entry.type).reference}`
+    `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`
   );
   if (data.weekStartDate) {
     writeSubtitle(doc, `Week starting: ${data.weekStartDate}`);
@@ -262,26 +262,26 @@ function generateDiaryCard(doc: jsPDF, entry: WorksheetEntry) {
     doc.setTextColor(30);
     doc.text(label, PAGE_MARGIN, y);
     values.forEach((v, idx) => {
-      const text = v === 0 || v === "" ? "–" : String(v);
+      const text = v === 0 || v === "" ? "-" : String(v);
       doc.text(text, PAGE_MARGIN + colWidth * (idx + 1), y);
     });
     y += 14;
   };
 
-  writeSectionTitle(doc, undefined, "Urges (0–5)");
+  writeSectionTitle(doc, undefined, "Urges (0-5)");
   writeTableHeader();
   writeRow("Self-harm urge", days.map((d) => d?.urgeSelfHarm ?? 0));
   writeRow("Suicide urge", days.map((d) => d?.urgeSuicide ?? 0));
   writeRow("Substance urge", days.map((d) => d?.urgeSubstances ?? 0));
   writeRow("Quit therapy urge", days.map((d) => d?.urgeQuitTherapy ?? 0));
 
-  writeSectionTitle(doc, undefined, "Actions (0–5)");
+  writeSectionTitle(doc, undefined, "Actions (0-5)");
   writeTableHeader();
   writeRow("Self-harm", days.map((d) => d?.actSelfHarm ?? 0));
   writeRow("Substance use", days.map((d) => d?.actSubstances ?? 0));
   writeRow(data.customTarget || "Other target", days.map((d) => d?.actOther ?? 0));
 
-  writeSectionTitle(doc, undefined, "Emotions (0–5)");
+  writeSectionTitle(doc, undefined, "Emotions (0-5)");
   writeTableHeader();
   writeRow("Anger", days.map((d) => d?.emoAnger ?? 0));
   writeRow("Sadness", days.map((d) => d?.emoSadness ?? 0));
@@ -289,12 +289,12 @@ function generateDiaryCard(doc: jsPDF, entry: WorksheetEntry) {
   writeRow("Shame", days.map((d) => d?.emoShame ?? 0));
   writeRow("Joy", days.map((d) => d?.emoJoy ?? 0));
 
-  writeSectionTitle(doc, undefined, "Skills used (✓)");
+  writeSectionTitle(doc, undefined, "Skills used (Y)");
   writeTableHeader();
-  writeRow("Mindfulness", days.map((d) => (d?.skillMindfulness ? "✓" : "")));
-  writeRow("Distress Tolerance", days.map((d) => (d?.skillDistressTolerance ? "✓" : "")));
-  writeRow("Emotion Regulation", days.map((d) => (d?.skillEmotionRegulation ? "✓" : "")));
-  writeRow("Interpersonal", days.map((d) => (d?.skillInterpersonal ? "✓" : "")));
+  writeRow("Mindfulness", days.map((d) => (d?.skillMindfulness ? "Y" : "")));
+  writeRow("Distress Tolerance", days.map((d) => (d?.skillDistressTolerance ? "Y" : "")));
+  writeRow("Emotion Regulation", days.map((d) => (d?.skillEmotionRegulation ? "Y" : "")));
+  writeRow("Interpersonal", days.map((d) => (d?.skillInterpersonal ? "Y" : "")));
 
   writeSectionTitle(doc, undefined, "Daily notes");
   days.forEach((d, idx) => {
@@ -309,7 +309,7 @@ function generateWalkingMiddlePath(doc: jsPDF, entry: WorksheetEntry) {
   writeTitle(doc, entry.title);
   writeSubtitle(
     doc,
-    `${getWorksheetTypeMeta(entry.type).name} — ${getWorksheetTypeMeta(entry.type).reference}`
+    `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`
   );
   if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
   y += 8;
@@ -344,7 +344,7 @@ function generateMissingLinks(doc: jsPDF, entry: WorksheetEntry) {
   writeTitle(doc, entry.title);
   writeSubtitle(
     doc,
-    `${getWorksheetTypeMeta(entry.type).name} — ${getWorksheetTypeMeta(entry.type).reference}`
+    `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`
   );
   if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
   y += 8;
@@ -410,4 +410,295 @@ export function exportToPdf(entry: WorksheetEntry) {
 
   writeFooter(doc, entry);
   save(doc, entry);
+}
+
+// ============ Comparison PDF ============
+
+const COMPARE_METRIC_GROUPS: {
+  title: string;
+  metrics: { key: string; label: string }[];
+}[] = [
+  {
+    title: "Urges (0-5)",
+    metrics: [
+      { key: "urgeSelfHarm", label: "Self-harm urge" },
+      { key: "urgeSuicide", label: "Suicide urge" },
+      { key: "urgeSubstances", label: "Substance urge" },
+      { key: "urgeQuitTherapy", label: "Quit therapy urge" },
+    ],
+  },
+  {
+    title: "Actions (0-5)",
+    metrics: [
+      { key: "actSelfHarm", label: "Self-harm" },
+      { key: "actSubstances", label: "Substance use" },
+      { key: "actOther", label: "Other target" },
+    ],
+  },
+  {
+    title: "Emotions (0-5)",
+    metrics: [
+      { key: "emoAnger", label: "Anger" },
+      { key: "emoSadness", label: "Sadness" },
+      { key: "emoFear", label: "Fear" },
+      { key: "emoShame", label: "Shame" },
+      { key: "emoJoy", label: "Joy" },
+    ],
+  },
+];
+
+const COMPARE_SKILL_KEYS = [
+  { key: "skillMindfulness", label: "Mindfulness" },
+  { key: "skillDistressTolerance", label: "Distress Tolerance" },
+  { key: "skillEmotionRegulation", label: "Emotion Regulation" },
+  { key: "skillInterpersonal", label: "Interpersonal" },
+];
+
+interface WeekStats {
+  sum: (key: string) => number;
+  avg: (key: string) => number;
+  max: (key: string) => number;
+  skillsDays: number;
+  actionDays: number;
+  days: any[];
+}
+
+function computeStats(entry: WorksheetEntry): WeekStats {
+  const days: any[] = entry.data.days ?? [];
+  const sum = (key: string) =>
+    days.reduce((acc, d) => acc + (Number(d?.[key] ?? 0) || 0), 0);
+  const avg = (key: string) => sum(key) / (days.length || 1);
+  const max = (key: string) =>
+    days.reduce((m, d) => Math.max(m, Number(d?.[key] ?? 0) || 0), 0);
+  const skillsDays = days.filter(
+    (d) =>
+      d?.skillMindfulness ||
+      d?.skillDistressTolerance ||
+      d?.skillEmotionRegulation ||
+      d?.skillInterpersonal
+  ).length;
+  const actionDays = days.filter(
+    (d) => (d?.actSelfHarm ?? 0) > 0 || (d?.actSubstances ?? 0) > 0
+  ).length;
+  return { sum, avg, max, skillsDays, actionDays, days };
+}
+
+function trendSymbol(left: number, right: number, higherIsBetter: boolean): string {
+  const delta = right - left;
+  if (Math.abs(delta) < 0.01) return "--";
+  const isUp = delta > 0;
+  const isGood = higherIsBetter ? isUp : !isUp;
+  // For urges/actions/emotions (higherIsBetter=false): decrease is good -> "DN" (green)
+  // For joy/skills (higherIsBetter=true): increase is good -> "UP" (green)
+  if (isGood) return "DN"; // favorable direction
+  return "UP"; // unfavorable direction
+}
+
+function trendColor(left: number, right: number, higherIsBetter: boolean): [number, number, number] {
+  const delta = right - left;
+  if (Math.abs(delta) < 0.01) return [120, 120, 120]; // gray
+  const isUp = delta > 0;
+  const isGood = higherIsBetter ? isUp : !isUp;
+  return isGood ? [22, 163, 74] : [220, 38, 38]; // green or red
+}
+
+export function exportComparisonToPdf(
+  leftEntry: WorksheetEntry,
+  rightEntry: WorksheetEntry
+) {
+  const doc = newDoc();
+  y = PAGE_MARGIN;
+
+  const left = computeStats(leftEntry);
+  const right = computeStats(rightEntry);
+
+  // Title
+  writeTitle(doc, "Diary Card Comparison");
+
+  // Subtitle: week dates
+  const leftLabel = leftEntry.data.weekStartDate
+    ? new Date(leftEntry.data.weekStartDate + "T00:00:00").toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : leftEntry.title;
+  const rightLabel = rightEntry.data.weekStartDate
+    ? new Date(rightEntry.data.weekStartDate + "T00:00:00").toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : rightEntry.title;
+  writeSubtitle(doc, `Week 1: ${leftLabel}  ->  Week 2: ${rightLabel}`);
+  writeSubtitle(
+    doc,
+    `Generated ${new Date().toLocaleDateString()} · DBT Skills Reference`
+  );
+  y += 10;
+
+  // High-level stats row
+  writeSectionTitle(doc, undefined, "Week at a glance");
+  const colWidth = CONTENT_WIDTH / 3;
+  const statRow = (label: string, leftVal: number, rightVal: number, higherIsBetter: boolean) => {
+    ensureSpace(doc, 20);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(80);
+    doc.text(label, PAGE_MARGIN, y);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(30);
+    doc.text(String(leftVal), PAGE_MARGIN + colWidth, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(120);
+    doc.text("->", PAGE_MARGIN + colWidth * 1.5, y);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.setTextColor(30);
+    doc.text(String(rightVal), PAGE_MARGIN + colWidth * 1.7, y);
+    const [r, g, b] = trendColor(leftVal, rightVal, higherIsBetter);
+    doc.setTextColor(r, g, b);
+    doc.setFontSize(10);
+    doc.text(trendSymbol(leftVal, rightVal, higherIsBetter), PAGE_MARGIN + colWidth * 1.95, y);
+    y += 16;
+  };
+  statRow("Skills-practice days", left.skillsDays, right.skillsDays, true);
+  statRow("Action days", left.actionDays, right.actionDays, false);
+
+  // Metric groups
+  for (const group of COMPARE_METRIC_GROUPS) {
+    writeSectionTitle(doc, undefined, group.title);
+    // Table header
+    ensureSpace(doc, 20);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(80);
+    doc.text("Metric", PAGE_MARGIN, y);
+    doc.text("Week 1 (max / avg)", PAGE_MARGIN + colWidth, y);
+    doc.text("Trend", PAGE_MARGIN + colWidth * 1.7, y);
+    doc.text("Week 2 (max / avg)", PAGE_MARGIN + colWidth * 1.95, y);
+    y += 4;
+    doc.setDrawColor(200);
+    doc.line(PAGE_MARGIN, y, PAGE_MARGIN + CONTENT_WIDTH, y);
+    y += 12;
+
+    for (const metric of group.metrics) {
+      ensureSpace(doc, 16);
+      const leftAvg = left.avg(metric.key);
+      const rightAvg = right.avg(metric.key);
+      const leftMax = left.max(metric.key);
+      const rightMax = right.max(metric.key);
+      const higherIsBetter = metric.key === "emoJoy";
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(30);
+      doc.text(metric.label, PAGE_MARGIN, y);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${leftMax} / ${leftAvg.toFixed(1)}`, PAGE_MARGIN + colWidth, y);
+      const [r, g, b] = trendColor(leftAvg, rightAvg, higherIsBetter);
+      doc.setTextColor(r, g, b);
+      doc.setFontSize(11);
+      doc.text(trendSymbol(leftAvg, rightAvg, higherIsBetter), PAGE_MARGIN + colWidth * 1.75, y);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(30);
+      doc.text(`${rightMax} / ${rightAvg.toFixed(1)}`, PAGE_MARGIN + colWidth * 1.95, y);
+      y += 14;
+    }
+    y += 6;
+  }
+
+  // Skills usage
+  writeSectionTitle(doc, undefined, "Skills used (days/week)");
+  ensureSpace(doc, 20);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(80);
+  doc.text("Skill module", PAGE_MARGIN, y);
+  doc.text("Week 1", PAGE_MARGIN + colWidth, y);
+  doc.text("Trend", PAGE_MARGIN + colWidth * 1.7, y);
+  doc.text("Week 2", PAGE_MARGIN + colWidth * 1.95, y);
+  y += 4;
+  doc.setDrawColor(200);
+  doc.line(PAGE_MARGIN, y, PAGE_MARGIN + CONTENT_WIDTH, y);
+  y += 12;
+
+  for (const sk of COMPARE_SKILL_KEYS) {
+    ensureSpace(doc, 16);
+    const leftCount = left.days.filter((d) => d?.[sk.key]).length;
+    const rightCount = right.days.filter((d) => d?.[sk.key]).length;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(30);
+    doc.text(sk.label, PAGE_MARGIN, y);
+    doc.setFont("helvetica", "bold");
+    doc.text(`${leftCount}/7`, PAGE_MARGIN + colWidth, y);
+    const [r, g, b] = trendColor(leftCount, rightCount, true);
+    doc.setTextColor(r, g, b);
+    doc.setFontSize(11);
+    doc.text(trendSymbol(leftCount, rightCount, true), PAGE_MARGIN + colWidth * 1.75, y);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(30);
+    doc.text(`${rightCount}/7`, PAGE_MARGIN + colWidth * 1.95, y);
+    y += 14;
+  }
+  y += 6;
+
+  // Legend
+  ensureSpace(doc, 30);
+  y += 8;
+  doc.setDrawColor(200);
+  doc.line(PAGE_MARGIN, y, PAGE_MARGIN + CONTENT_WIDTH, y);
+  y += 14;
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(8);
+  doc.setTextColor(100);
+  doc.text(
+    "Legend:  DN = decreased (green = favorable for urges/actions/emotions; red = unfavorable for joy/skills)",
+    PAGE_MARGIN,
+    y
+  );
+  y += 10;
+  doc.text(
+    "         UP = increased (green = favorable for joy/skills; red = unfavorable for urges/actions/emotions)",
+    PAGE_MARGIN,
+    y
+  );
+  y += 10;
+  doc.text("         -- = no change", PAGE_MARGIN, y);
+
+  // Footer
+  const pageCount = doc.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(140);
+    doc.text(
+      `DBT Skills Reference · Diary Card Comparison · Generated ${new Date().toLocaleDateString()}`,
+      PAGE_MARGIN,
+      820
+    );
+    doc.text(`Page ${i} of ${pageCount}`, 595.28 - PAGE_MARGIN, 820, {
+      align: "right",
+    });
+  }
+
+  // Save with descriptive filename
+  const safeLeft = (leftEntry.title || "week-1")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .toLowerCase()
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 30);
+  const safeRight = (rightEntry.title || "week-2")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .toLowerCase()
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 30);
+  const dateStr = new Date().toISOString().slice(0, 10);
+  doc.save(`comparison-${safeLeft}-vs-${safeRight}-${dateStr}.pdf`);
 }
