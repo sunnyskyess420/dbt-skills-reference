@@ -13,6 +13,8 @@ import {
   Printer,
   Check,
   BookOpen,
+  BarChart3,
+  ListChecks,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -29,6 +31,9 @@ import { cn } from "@/lib/utils";
 import { ChainAnalysisForm } from "./chain-analysis-form";
 import { ProsConsForm } from "./pros-cons-form";
 import { DiaryCardForm } from "./diary-card-form";
+import { WalkingMiddlePathForm } from "./walking-middle-path-form";
+import { MissingLinksForm } from "./missing-links-form";
+import { DiaryCardSummary } from "./diary-card-summary";
 
 interface Props {
   entry: WorksheetEntry;
@@ -48,6 +53,12 @@ export function WorksheetDetail({
   const meta = getWorksheetTypeMeta(entry.type);
   const [titleDraft, setTitleDraft] = React.useState(entry.title);
   const [savedFlash, setSavedFlash] = React.useState(false);
+  const [view, setView] = React.useState<"form" | "summary">("form");
+
+  // Reset to form view when entry changes
+  React.useEffect(() => {
+    setView("form");
+  }, [entry.id]);
 
   // Sync title draft if entry changes (e.g., new entry selected)
   React.useEffect(() => {
@@ -101,6 +112,29 @@ export function WorksheetDetail({
             )}
           </div>
           <div className="flex items-center gap-1">
+            {/* Summary/Form toggle for diary cards only */}
+            {entry.type === "diary-card" && (
+              <div className="flex items-center rounded-md border bg-background p-0.5 mr-1">
+                <Button
+                  variant={view === "form" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setView("form")}
+                  className="h-7 px-2 text-xs"
+                >
+                  <ListChecks className="h-3.5 w-3.5 mr-1" />
+                  <span className="hidden sm:inline">Form</span>
+                </Button>
+                <Button
+                  variant={view === "summary" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setView("summary")}
+                  className="h-7 px-2 text-xs"
+                >
+                  <BarChart3 className="h-3.5 w-3.5 mr-1" />
+                  <span className="hidden sm:inline">Summary</span>
+                </Button>
+              </div>
+            )}
             <Button
               variant="ghost"
               size="sm"
@@ -185,8 +219,17 @@ export function WorksheetDetail({
           {entry.type === "pros-cons" && (
             <ProsConsForm entry={entry} onChange={onChangeData} />
           )}
-          {entry.type === "diary-card" && (
-            <DiaryCardForm entry={entry} onChange={onChangeData} />
+          {entry.type === "diary-card" &&
+            (view === "form" ? (
+              <DiaryCardForm entry={entry} onChange={onChangeData} />
+            ) : (
+              <DiaryCardSummary entry={entry} />
+            ))}
+          {entry.type === "walking-middle-path" && (
+            <WalkingMiddlePathForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "missing-links" && (
+            <MissingLinksForm entry={entry} onChange={onChangeData} />
           )}
 
           <div className="mt-12 pt-6 border-t text-xs text-muted-foreground print:mt-6">

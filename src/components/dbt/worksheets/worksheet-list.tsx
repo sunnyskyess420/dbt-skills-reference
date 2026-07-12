@@ -16,12 +16,16 @@ import {
   Plus,
   FileText,
   Clock,
+  GitMerge,
+  Unplug,
 } from "lucide-react";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Link2,
   Scale,
   CalendarRange,
+  GitMerge,
+  Unplug,
 };
 
 interface Props {

@@ -12,7 +12,7 @@ import { WorksheetDetail } from "@/components/dbt/worksheets/worksheet-detail";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -422,7 +422,7 @@ function WorksheetsEmptyState({
           the left.
         </p>
 
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 text-left">
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
           <button
             onClick={() => onCreate("chain-analysis")}
             className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
@@ -450,7 +450,27 @@ function WorksheetsEmptyState({
             <CalendarRange className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mb-2" />
             <div className="text-sm font-medium">Diary Card</div>
             <div className="text-[11px] text-muted-foreground mt-1">
-              Track urges, emotions, and skills across 7 days.
+              Track urges, emotions, and skills across 7 days. Includes weekly summary view.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("walking-middle-path")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <GitMerge className="h-5 w-5 text-violet-600 dark:text-violet-400 mb-2" />
+            <div className="text-sm font-medium">Walking the Middle Path</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Find the synthesis between two opposing positions.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("missing-links")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors sm:col-span-2"
+          >
+            <Unplug className="h-5 w-5 text-orange-600 dark:text-orange-400 mb-2" />
+            <div className="text-sm font-medium">Missing-Links Analysis (Behavior Analysis)</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Why didn&apos;t you use a skill you already knew? Find the specific gap and plan to close it.
             </div>
           </button>
         </div>

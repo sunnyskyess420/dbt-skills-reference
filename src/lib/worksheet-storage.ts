@@ -1,7 +1,12 @@
 // Worksheet definitions, schemas, and localStorage CRUD.
 // References the printed Linehan (2014) worksheets by number.
 
-export type WorksheetType = "chain-analysis" | "pros-cons" | "diary-card";
+export type WorksheetType =
+  | "chain-analysis"
+  | "pros-cons"
+  | "diary-card"
+  | "walking-middle-path"
+  | "missing-links";
 
 export interface WorksheetEntry {
   id: string;
@@ -52,6 +57,26 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     icon: "CalendarRange",
     reference: "Standard DBT Diary Card format",
     color: "text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    id: "walking-middle-path",
+    name: "Walking the Middle Path (Dialectics)",
+    shortName: "Middle Path",
+    description:
+      "Identify two opposing positions, find what's true in each, and articulate a synthesis that integrates both. The core dialectical thinking skill.",
+    icon: "GitMerge",
+    reference: "Mindfulness Worksheets 10, 10a, 10b / IE Worksheets 11–11b (Handouts 10, 15, 16)",
+    color: "text-violet-600 dark:text-violet-400",
+  },
+  {
+    id: "missing-links",
+    name: "Missing-Links Analysis (Behavior Analysis)",
+    shortName: "Missing-Links",
+    description:
+      "When you knew a skill that would have helped but didn't use it: find the precise gap between knowing and doing, and plan a strategy to close it.",
+    icon: "Unplug",
+    reference: "General Handout 8 / General Worksheet 3",
+    color: "text-orange-600 dark:text-orange-400",
   },
 ];
 
@@ -147,6 +172,43 @@ export function blankDiaryCardData(): Record<string, any> {
   };
 }
 
+export function blankWalkingMiddlePathData(): Record<string, any> {
+  return {
+    entryDate: "",
+    situation: "",
+    positionA: "",
+    trueInA: "",
+    positionB: "",
+    trueInB: "",
+    oldSynthesisAttempt: "",
+    synthesis: "",
+    howIWillAct: "",
+    // Tracking practice: when did you notice you collapsed back into one side?
+    practiceNotes: "",
+    // Examples of opposites that can both be true (awareness practice)
+    oppositesBothTrue: "",
+  };
+}
+
+export function blankMissingLinksData(): Record<string, any> {
+  return {
+    entryDate: "",
+    skillIntended: "",
+    situation: "",
+    whatHappened: "",
+    // Where did the skill drop out? (the missing link)
+    missingLinkType: [] as string[], // multi-select
+    missingLinkNotes: "",
+    // What got in the way
+    barriers: "",
+    // Plan to close the gap
+    planStrategy: "",
+    nextTimePlan: "",
+    // Implementation intentions
+    cueReminder: "",
+  };
+}
+
 export function blankData(type: WorksheetType): Record<string, any> {
   switch (type) {
     case "chain-analysis":
@@ -155,6 +217,10 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankProsConsData();
     case "diary-card":
       return blankDiaryCardData();
+    case "walking-middle-path":
+      return blankWalkingMiddlePathData();
+    case "missing-links":
+      return blankMissingLinksData();
   }
 }
 
