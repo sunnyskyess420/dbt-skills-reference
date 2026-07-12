@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -25,14 +25,41 @@ export const metadata: Metadata = {
     "therapy reference",
   ],
   authors: [{ name: "DBT Skills Reference" }],
+  applicationName: "DBT Skills Reference",
+  manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "DBT Skills",
   },
   openGraph: {
     title: "DBT Skills Reference",
     description: "Fast, search-first DBT skills reference for virtual group therapy.",
     type: "website",
   },
+  twitter: {
+    card: "summary",
+    title: "DBT Skills Reference",
+    description: "Fast, search-first DBT skills reference for virtual group therapy.",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -44,6 +71,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body
         className={`${inter.variable} font-sans antialiased bg-background text-foreground`}

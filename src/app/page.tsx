@@ -11,10 +11,11 @@ import { WorksheetList } from "@/components/dbt/worksheets/worksheet-list";
 import { WorksheetDetail } from "@/components/dbt/worksheets/worksheet-detail";
 import { DiaryComparison } from "@/components/dbt/worksheets/diary-comparison";
 import { SettingsModal } from "@/components/dbt/settings-modal";
+import { HelpDialog } from "@/components/dbt/help-dialog";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -30,6 +31,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = React.useState(false); // mobile sidebar
   const [compareOpen, setCompareOpen] = React.useState(false); // diary card comparison modal
   const [settingsOpen, setSettingsOpen] = React.useState(false); // settings modal
+  const [helpOpen, setHelpOpen] = React.useState(false); // keyboard shortcut help modal
 
   // Bookmarks persisted to localStorage
   const [bookmarks, setBookmarks] = React.useState<Set<string>>(new Set());
@@ -154,7 +156,7 @@ export default function Home() {
     setSelectedSkill(null);
   }, [refreshWorksheets, reloadBookmarks, reloadRecent]);
 
-  // Cmd+K / Ctrl+K to open search
+  // Cmd+K / Ctrl+K to open search, '/' to focus search, '?' to open help
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -169,10 +171,27 @@ export default function Home() {
           setSearchOpen(true);
         }
       }
+      if (e.key === "?" && !searchOpen) {
+        const target = e.target as HTMLElement;
+        const tag = target?.tagName?.toLowerCase();
+        if (tag !== "input" && tag !== "textarea" && !target?.isContentEditable) {
+          e.preventDefault();
+          setHelpOpen(true);
+        }
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [searchOpen]);
+
+  // Register service worker for PWA installability
+  React.useEffect(() => {
+    if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {
+        // ignore registration errors — app still works without SW
+      });
+    }
+  }, []);
 
   const isWorksheetsMode = selectedModule === "worksheets";
 
@@ -237,6 +256,15 @@ export default function Home() {
               aria-label="Search"
             >
               <Search className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setHelpOpen(true)}
+              aria-label="Keyboard shortcuts help"
+            >
+              <Keyboard className="h-4 w-4" />
             </Button>
             <ThemeToggle />
             <Button
@@ -385,6 +413,9 @@ export default function Home() {
         onOpenChange={setSettingsOpen}
         onDataCleared={handleDataCleared}
       />
+
+      {/* Keyboard shortcuts help dialog */}
+      <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </div>
   );
 }

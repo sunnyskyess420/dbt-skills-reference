@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Maskable icon: full-bleed background, content within safe zone (80% = ~410px centered) -->
+  <rect width="512" height="512" fill="#0f172a"/>
+  <text x="256" y="340" font-family="ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="240" font-weight="700" fill="#10b981" text-anchor="middle">D</text>
+</svg>
