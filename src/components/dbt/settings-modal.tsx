@@ -40,6 +40,7 @@ import {
   DEFAULT_SETTINGS,
 } from "@/lib/settings";
 import { downloadJsonBackup } from "@/lib/worksheet-export";
+import { downloadCSV } from "@/lib/worksheet-csv";
 import { InstallAppButton } from "@/components/dbt/install-button";
 import {
   THEME_PRESETS,
@@ -55,6 +56,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDataCleared: () => void;
+  worksheetEntries?: any[];
 }
 
 const STORAGE_KEYS = [
@@ -65,7 +67,7 @@ const STORAGE_KEYS = [
   { key: "dbt-skills:settings", label: "App settings" },
 ];
 
-export function SettingsModal({ open, onOpenChange, onDataCleared }: Props) {
+export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntries }: Props) {
   const { theme: nextTheme, setTheme } = useTheme();
   const [settings, setSettings] = React.useState<AppSettings>(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = React.useState(false);
@@ -111,6 +113,12 @@ export function SettingsModal({ open, onOpenChange, onDataCleared }: Props) {
 
   const handleExportNow = () => {
     downloadJsonBackup();
+  };
+
+  const handleExportCSV = () => {
+    if (worksheetEntries && worksheetEntries.length > 0) {
+      downloadCSV(worksheetEntries);
+    }
   };
 
   const handleClearData = (keysToClear: string[]) => {
@@ -212,7 +220,16 @@ export function SettingsModal({ open, onOpenChange, onDataCleared }: Props) {
                   onClick={handleExportNow}
                 >
                   <Download className="h-3.5 w-3.5 mr-1" />
-                  Export backup now
+                  Export backup now (JSON)
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportCSV}
+                  disabled={!worksheetEntries || worksheetEntries.length === 0}
+                >
+                  <Download className="h-3.5 w-3.5 mr-1" />
+                  Export as CSV (spreadsheet)
                 </Button>
               </div>
             </section>

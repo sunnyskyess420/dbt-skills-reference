@@ -15,6 +15,7 @@ import { HelpDialog } from "@/components/dbt/help-dialog";
 import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
 import { ProgressDashboard } from "@/components/dbt/progress-dashboard";
 import { SessionPrep } from "@/components/dbt/session-prep";
+import { SkillOfDay } from "@/components/dbt/skill-of-day";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
@@ -423,6 +424,7 @@ export default function Home() {
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
         onDataCleared={handleDataCleared}
+        worksheetEntries={worksheetEntries}
       />
 
       {/* Keyboard shortcuts help dialog */}
@@ -451,7 +453,7 @@ function EmptyState({
 
   return (
     <div className="h-full flex items-center justify-center p-6">
-      <div className="max-w-md w-full text-center">
+      <div className="max-w-lg w-full text-center">
         <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl font-bold mx-auto mb-4">
           D
         </div>
@@ -471,6 +473,10 @@ function EmptyState({
           Search skills
           <KbdShortcut combo="K" className="ml-2 border-0 bg-primary-foreground/20" />
         </Button>
+
+        <div className="mt-6 text-left">
+          <SkillOfDay onSelectSkill={onSelectSkill} />
+        </div>
 
         {recentSkills.length > 0 && (
           <div className="mt-8 text-left">
