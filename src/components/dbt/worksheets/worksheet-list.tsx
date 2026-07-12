@@ -31,6 +31,8 @@ import {
   Activity,
   HeartPulse,
   Coins,
+  Pin,
+  PinOff,
 } from "lucide-react";
 import {
   Tooltip,
@@ -53,6 +55,7 @@ import {
   dismissReminder,
   getReminderInterval,
 } from "@/lib/backup-reminder";
+import { getPinnedIds, togglePin } from "@/lib/pinned-worksheets";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Link2,
@@ -116,6 +119,29 @@ export function WorksheetList({
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
   const [showBackupReminder, setShowBackupReminder] = React.useState(false);
+  const [pinnedIds, setPinnedIds] = React.useState<Set<string>>(new Set());
+
+  // Load pinned IDs on mount and when entries change
+  React.useEffect(() => {
+    setPinnedIds(getPinnedIds());
+  }, [entries]);
+
+  const handleTogglePin = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    const isNowPinned = togglePin(id);
+    setPinnedIds(getPinnedIds());
+  };
+
+  // Sort: pinned first, then by updatedAt desc
+  const sortedEntries = React.useMemo(() => {
+    return [...entries].sort((a, b) => {
+      const aPinned = pinnedIds.has(a.id);
+      const bPinned = pinnedIds.has(b.id);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    });
+  }, [entries, pinnedIds]);
 
   const diaryCardCount = entries.filter((e) => e.type === "diary-card").length;
   const entryCount = entries.length;
@@ -350,12 +376,13 @@ export function WorksheetList({
           </div>
         ) : (
           <ul className="pb-2">
-            {entries.map((entry) => {
+            {sortedEntries.map((entry) => {
               const meta = getWorksheetTypeMeta(entry.type);
               const Icon = ICONS[meta.icon] ?? FileText;
               const isSelected = entry.id === selectedEntryId;
+              const isPinned = pinnedIds.has(entry.id);
               return (
-                <li key={entry.id}>
+                <li key={entry.id} className="relative group">
                   <button
                     onClick={() => onSelectEntry(entry)}
                     className={cn(
@@ -367,8 +394,9 @@ export function WorksheetList({
                   >
                     <div className="flex items-start gap-2">
                       <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", meta.color)} />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">
+                      <div className="flex-1 min-w-0 pr-6">
+                        <div className="text-sm font-medium truncate flex items-center gap-1">
+                          {isPinned && <Pin className="h-3 w-3 fill-primary text-primary shrink-0" />}
                           {entry.title || meta.shortName}
                         </div>
                         <div className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
@@ -379,6 +407,23 @@ export function WorksheetList({
                         </div>
                       </div>
                     </div>
+                  </button>
+                  {/* Pin button — appears on hover or when pinned */}
+                  <button
+                    onClick={(e) => handleTogglePin(e, entry.id)}
+                    className={cn(
+                      "absolute right-2 top-2.5 h-6 w-6 flex items-center justify-center rounded transition-all",
+                      isPinned
+                        ? "opacity-100 text-primary"
+                        : "opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground"
+                    )}
+                    aria-label={isPinned ? "Unpin" : "Pin to top"}
+                  >
+                    {isPinned ? (
+                      <Pin className="h-3.5 w-3.5 fill-primary" />
+                    ) : (
+                      <PinOff className="h-3.5 w-3.5" />
+                    )}
                   </button>
                 </li>
               );
