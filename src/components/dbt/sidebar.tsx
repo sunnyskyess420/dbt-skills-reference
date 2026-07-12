@@ -4,14 +4,15 @@ import * as React from "react";
 import { MODULES, SKILLS, type Module, type Skill } from "@/data/skills";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChevronRight, Brain, Heart, Users, Flame, BookOpen } from "lucide-react";
+import { Bookmark, ChevronRight, Brain, Heart, Users, Flame, BookOpen, FileText } from "lucide-react";
 
 interface SidebarProps {
-  selectedModule: Module | "all" | "bookmarks";
-  onSelectModule: (m: Module | "all" | "bookmarks") => void;
+  selectedModule: Module | "all" | "bookmarks" | "worksheets";
+  onSelectModule: (m: Module | "all" | "bookmarks" | "worksheets") => void;
   selectedSkillId: string | null;
   onSelectSkill: (skill: Skill) => void;
   bookmarks: Set<string>;
+  worksheetCount: number;
 }
 
 const MODULE_ICONS: Record<Module, React.ComponentType<{ className?: string }>> = {
@@ -28,6 +29,7 @@ export function Sidebar({
   selectedSkillId,
   onSelectSkill,
   bookmarks,
+  worksheetCount,
 }: SidebarProps) {
   const bookmarkedSkills = React.useMemo(
     () => SKILLS.filter((s) => bookmarks.has(s.id)),
@@ -53,7 +55,7 @@ export function Sidebar({
 
       {/* Scrollable nav */}
       <div className="flex-1 overflow-y-auto px-2 py-3">
-        {/* All + Bookmarks */}
+        {/* All + Bookmarks + Worksheets */}
         <div className="space-y-0.5 mb-3">
           <NavButton
             active={selectedModule === "all"}
@@ -69,6 +71,13 @@ export function Sidebar({
             label="Bookmarks"
             count={bookmarkedSkills.length}
             highlight={bookmarkedSkills.length > 0}
+          />
+          <NavButton
+            active={selectedModule === "worksheets"}
+            onClick={() => onSelectModule("worksheets")}
+            icon={<FileText className="h-4 w-4" />}
+            label="Worksheets"
+            count={worksheetCount}
           />
         </div>
 

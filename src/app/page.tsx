@@ -7,22 +7,36 @@ import { SkillList } from "@/components/dbt/skill-list";
 import { SkillDetail } from "@/components/dbt/skill-detail";
 import { SearchPalette } from "@/components/dbt/search-palette";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { WorksheetList } from "@/components/dbt/worksheets/worksheet-list";
+import { WorksheetDetail } from "@/components/dbt/worksheets/worksheet-detail";
+import { useWorksheets } from "@/hooks/use-worksheets";
+import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
 const STORAGE_KEY_RECENT = "dbt-skills:recent";
 
+type ViewMode = Module | "all" | "bookmarks" | "worksheets";
+
 export default function Home() {
-  const [selectedModule, setSelectedModule] = React.useState<Module | "all" | "bookmarks">("all");
+  const [selectedModule, setSelectedModule] = React.useState<ViewMode>("all");
   const [selectedSkill, setSelectedSkill] = React.useState<Skill | null>(null);
+  const [selectedWorksheetId, setSelectedWorksheetId] = React.useState<string | null>(null);
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [sidebarOpen, setSidebarOpen] = React.useState(false); // mobile sidebar
-  const [listOpenMobile, setListOpenMobile] = React.useState(false); // mobile list view
 
   // Bookmarks persisted to localStorage
   const [bookmarks, setBookmarks] = React.useState<Set<string>>(new Set());
+
+  // Worksheets
+  const { entries: worksheetEntries, createEntry, updateEntry, deleteEntry } = useWorksheets();
+
+  const selectedWorksheet = React.useMemo(
+    () => worksheetEntries.find((e) => e.id === selectedWorksheetId) ?? null,
+    [worksheetEntries, selectedWorksheetId]
+  );
 
   // Load bookmarks from localStorage on mount
   React.useEffect(() => {
@@ -54,7 +68,7 @@ export default function Home() {
     });
   }, []);
 
-  // Track recently viewed skills (separate from bookmarks)
+  // Track recently viewed skills
   const [recent, setRecent] = React.useState<string[]>([]);
   React.useEffect(() => {
     try {
@@ -67,23 +81,44 @@ export default function Home() {
     }
   }, []);
 
-  const handleSelectSkill = React.useCallback(
-    (skill: Skill) => {
-      setSelectedSkill(skill);
-      setListOpenMobile(true); // show detail on mobile
-      // Update recent (cap at 10, dedupe)
-      setRecent((prev) => {
-        const next = [skill.id, ...prev.filter((id) => id !== skill.id)].slice(0, 10);
-        try {
-          localStorage.setItem(STORAGE_KEY_RECENT, JSON.stringify(next));
-        } catch (e) {
-          // ignore
-        }
-        return next;
-      });
+  const handleSelectSkill = React.useCallback((skill: Skill) => {
+    setSelectedSkill(skill);
+    setSelectedWorksheetId(null); // skills and worksheets are mutually exclusive
+    setRecent((prev) => {
+      const next = [skill.id, ...prev.filter((id) => id !== skill.id)].slice(0, 10);
+      try {
+        localStorage.setItem(STORAGE_KEY_RECENT, JSON.stringify(next));
+      } catch (e) {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  const handleSelectWorksheet = React.useCallback((entry: WorksheetEntry) => {
+    setSelectedWorksheetId(entry.id);
+    setSelectedSkill(null);
+  }, []);
+
+  const handleCreateWorksheet = React.useCallback(
+    (type: WorksheetType) => {
+      const entry = createEntry(type);
+      setSelectedWorksheetId(entry.id);
+      setSelectedSkill(null);
     },
-    []
+    [createEntry]
   );
+
+  // When selecting a non-worksheets mode, clear worksheet selection
+  const handleSelectModule = React.useCallback((m: ViewMode) => {
+    setSelectedModule(m);
+    if (m === "worksheets") {
+      setSelectedSkill(null);
+    } else {
+      setSelectedWorksheetId(null);
+      setSelectedSkill(null);
+    }
+  }, []);
 
   // Cmd+K / Ctrl+K to open search
   React.useEffect(() => {
@@ -92,7 +127,6 @@ export default function Home() {
         e.preventDefault();
         setSearchOpen(true);
       }
-      // '/' to focus search (when not typing)
       if (e.key === "/" && !searchOpen) {
         const target = e.target as HTMLElement;
         const tag = target?.tagName?.toLowerCase();
@@ -106,13 +140,14 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handler);
   }, [searchOpen]);
 
+  const isWorksheetsMode = selectedModule === "worksheets";
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
-      {/* Top bar */}
-      <header className="shrink-0 border-b bg-background/95 backdrop-blur z-30">
+      {/* Top bar — hidden on print */}
+      <header className="shrink-0 border-b bg-background/95 backdrop-blur z-30 print:hidden">
         <div className="flex items-center justify-between gap-2 px-3 sm:px-4 h-12">
           <div className="flex items-center gap-2 min-w-0">
-            {/* Mobile sidebar toggle */}
             <Button
               variant="ghost"
               size="icon"
@@ -124,8 +159,10 @@ export default function Home() {
             </Button>
             <div className="flex items-center gap-1.5 min-w-0">
               <span className="font-semibold text-sm truncate">
-                {selectedSkill ? (
+                {selectedSkill || selectedWorksheet ? (
                   <span className="text-muted-foreground">DBT Skills</span>
+                ) : isWorksheetsMode ? (
+                  "Worksheets"
                 ) : (
                   "DBT Skills Reference"
                 )}
@@ -134,6 +171,12 @@ export default function Home() {
                 <>
                   <span className="text-muted-foreground text-xs">/</span>
                   <span className="text-sm truncate">{selectedSkill.name}</span>
+                </>
+              )}
+              {selectedWorksheet && (
+                <>
+                  <span className="text-muted-foreground text-xs">/</span>
+                  <span className="text-sm truncate">{selectedWorksheet.title}</span>
                 </>
               )}
             </div>
@@ -168,23 +211,21 @@ export default function Home() {
 
       {/* Main 3-pane layout */}
       <div className="flex flex-1 min-h-0 relative">
-        {/* Desktop sidebar (lg+) */}
-        <aside className="hidden lg:block w-64 shrink-0 border-r">
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:block w-64 shrink-0 border-r print:hidden">
           <Sidebar
             selectedModule={selectedModule}
-            onSelectModule={(m) => {
-              setSelectedModule(m);
-              setSelectedSkill(null);
-            }}
+            onSelectModule={handleSelectModule}
             selectedSkillId={selectedSkill?.id ?? null}
             onSelectSkill={handleSelectSkill}
             bookmarks={bookmarks}
+            worksheetCount={worksheetEntries.length}
           />
         </aside>
 
         {/* Mobile sidebar drawer */}
         {sidebarOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div className="lg:hidden fixed inset-0 z-50 flex print:hidden">
             <div
               className="absolute inset-0 bg-black/50"
               onClick={() => setSidebarOpen(false)}
@@ -202,8 +243,7 @@ export default function Home() {
               <Sidebar
                 selectedModule={selectedModule}
                 onSelectModule={(m) => {
-                  setSelectedModule(m);
-                  setSelectedSkill(null);
+                  handleSelectModule(m);
                   setSidebarOpen(false);
                 }}
                 selectedSkillId={selectedSkill?.id ?? null}
@@ -212,31 +252,52 @@ export default function Home() {
                   setSidebarOpen(false);
                 }}
                 bookmarks={bookmarks}
+                worksheetCount={worksheetEntries.length}
               />
             </div>
           </div>
         )}
 
-        {/* Middle: skill list (always visible on desktop; conditional on mobile) */}
+        {/* Middle pane */}
         <section
           className={cn(
-            "shrink-0 border-r w-full sm:w-80 lg:w-80 xl:w-96",
-            // On mobile, hide the list when a skill is selected (detail takes over)
-            selectedSkill ? "hidden sm:block" : "block"
+            "shrink-0 border-r w-full sm:w-80 lg:w-80 xl:w-96 print:hidden",
+            // On mobile, hide the list when a skill/worksheet is selected
+            (selectedSkill || selectedWorksheet) ? "hidden sm:block" : "block"
           )}
         >
-          <SkillList
-            selectedModule={selectedModule}
-            selectedSkillId={selectedSkill?.id ?? null}
-            onSelectSkill={handleSelectSkill}
-            onOpenSearch={() => setSearchOpen(true)}
-            bookmarks={bookmarks}
-          />
+          {isWorksheetsMode ? (
+            <WorksheetList
+              entries={worksheetEntries}
+              selectedEntryId={selectedWorksheetId}
+              onSelectEntry={handleSelectWorksheet}
+              onCreate={handleCreateWorksheet}
+            />
+          ) : (
+            <SkillList
+              selectedModule={selectedModule}
+              selectedSkillId={selectedSkill?.id ?? null}
+              onSelectSkill={handleSelectSkill}
+              onOpenSearch={() => setSearchOpen(true)}
+              bookmarks={bookmarks}
+            />
+          )}
         </section>
 
-        {/* Right: skill detail (or empty state) */}
+        {/* Right pane */}
         <main className="flex-1 min-w-0">
-          {selectedSkill ? (
+          {selectedWorksheet ? (
+            <WorksheetDetail
+              entry={selectedWorksheet}
+              onBack={() => setSelectedWorksheetId(null)}
+              onChangeTitle={(title) => updateEntry(selectedWorksheet.id, { title })}
+              onChangeData={(data) => updateEntry(selectedWorksheet.id, { data })}
+              onDelete={() => {
+                deleteEntry(selectedWorksheet.id);
+                setSelectedWorksheetId(null);
+              }}
+            />
+          ) : selectedSkill ? (
             <SkillDetail
               skill={selectedSkill}
               onBack={() => setSelectedSkill(null)}
@@ -244,6 +305,8 @@ export default function Home() {
               onToggleBookmark={toggleBookmark}
               onSelectSkill={handleSelectSkill}
             />
+          ) : isWorksheetsMode ? (
+            <WorksheetsEmptyState onCreate={handleCreateWorksheet} />
           ) : (
             <EmptyState
               recent={recent}
@@ -335,6 +398,61 @@ function EmptyState({
             <strong>{SKILLS.length} skills</strong> across 5 modules:
           </p>
           <p>General · Mindfulness · Interpersonal Effectiveness · Emotion Regulation · Distress Tolerance</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WorksheetsEmptyState({
+  onCreate,
+}: {
+  onCreate: (type: WorksheetType) => void;
+}) {
+  return (
+    <div className="h-full flex items-center justify-center p-6">
+      <div className="max-w-lg w-full text-center">
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+          <FileText className="h-7 w-7" />
+        </div>
+        <h1 className="text-2xl font-bold tracking-tight">Interactive Worksheets</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Fill out digital versions of the core DBT worksheets. Autosave to your
+          browser, print when you need to. Saved entries appear in the list on
+          the left.
+        </p>
+
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 text-left">
+          <button
+            onClick={() => onCreate("chain-analysis")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Link2 className="h-5 w-5 text-slate-600 dark:text-slate-300 mb-2" />
+            <div className="text-sm font-medium">Chain Analysis</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Map a problem behavior link-by-link.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("pros-cons")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Scale className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
+            <div className="text-sm font-medium">Pros & Cons</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Weigh acting on vs. resisting a crisis urge.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("diary-card")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <CalendarRange className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mb-2" />
+            <div className="text-sm font-medium">Diary Card</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Track urges, emotions, and skills across 7 days.
+            </div>
+          </button>
         </div>
       </div>
     </div>

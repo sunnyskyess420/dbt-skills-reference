@@ -120,3 +120,53 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Print styles: hide nav, expand worksheet to fill page */
+@media print {
+  html, body {
+    background: white !important;
+    color: black !important;
+  }
+  /* Hide everything marked print:hidden */
+  .print\:hidden {
+    display: none !important;
+  }
+  /* Make main content fill the page */
+  main {
+    display: block !important;
+    flex: 1 1 auto !important;
+  }
+  /* Force the worksheet detail to render at full width */
+  main > div {
+    height: auto !important;
+    max-height: none !important;
+  }
+  /* Remove scroll containers — let content flow */
+  .overflow-y-auto {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+  /* Better print typography */
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+  /* Avoid breaking inside form sections */
+  section {
+    page-break-inside: avoid;
+  }
+  /* Show inputs and textareas at their value — not as form widgets */
+  textarea, input {
+    border: 1px solid #999 !important;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* Keep card backgrounds subtle in print */
+  .bg-card, .bg-muted\/30, .bg-muted\/50, .bg-muted\/60 {
+    background: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
