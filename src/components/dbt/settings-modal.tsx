@@ -142,7 +142,7 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -213,11 +213,12 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
                   <span>50 (rarely)</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 pt-1">
+              <div className="flex flex-col gap-2 pt-1">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleExportNow}
+                  className="w-full justify-center"
                 >
                   <Download className="h-3.5 w-3.5 mr-1" />
                   Export backup now (JSON)
@@ -227,6 +228,7 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
                   size="sm"
                   onClick={handleExportCSV}
                   disabled={!worksheetEntries || worksheetEntries.length === 0}
+                  className="w-full justify-center"
                 >
                   <Download className="h-3.5 w-3.5 mr-1" />
                   Export as CSV (spreadsheet)
