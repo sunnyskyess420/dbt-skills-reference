@@ -38,13 +38,11 @@ export function KbdShortcut({
   return (
     <kbd
       className={cn(
-        "inline-flex items-center gap-0.5 text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded border",
+        "inline-flex items-center text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded border whitespace-nowrap",
         className
       )}
     >
-      {modifier}
-      {showPlus && "+"}
-      {combo}
+      {modifier}{showPlus && "+"}{modifier === "Ctrl" ? "+" : ""}{combo}
     </kbd>
   );
 }

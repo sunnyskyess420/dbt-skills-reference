@@ -96,13 +96,9 @@ export function HelpDialog({ open, onOpenChange }: Props) {
             <Keyboard className="h-4 w-4" />
             Keyboard shortcuts
           </DialogTitle>
-          <DialogDescription>
-            Quick reference for all keyboard shortcuts and key interactions.
-            The search shortcut uses{" "}
-            <kbd className="font-mono bg-muted px-1 rounded text-[11px]">Ctrl+K</kbd>{" "}
-            on Windows/Linux and{" "}
-            <kbd className="font-mono bg-muted px-1 rounded text-[11px]">⌘K</kbd>{" "}
-            on Mac.
+          <DialogDescription className="break-words">
+            Quick reference for all keyboard shortcuts. The search shortcut
+            uses Ctrl+K on Windows/Linux and Cmd+K on Mac.
           </DialogDescription>
         </DialogHeader>
 
@@ -118,21 +114,21 @@ export function HelpDialog({ open, onOpenChange }: Props) {
                   return (
                     <li
                       key={idx}
-                      className="flex items-center justify-between gap-3 py-1"
+                      className="flex items-start justify-between gap-3 py-1"
                     >
-                      <div className="flex items-center gap-2 min-w-0">
+                      <div className="flex items-start gap-2 min-w-0 flex-1">
                         {Icon && (
-                          <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                          <Icon className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
                         )}
-                        <span className="text-sm text-foreground/90 truncate">
+                        <span className="text-sm text-foreground/90">
                           {shortcut.description}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0 mt-0.5">
                         {shortcut.keys.map((key, kIdx) => (
                           <kbd
                             key={kIdx}
-                            className="inline-flex items-center justify-center min-w-[1.75rem] h-6 px-1.5 rounded border bg-muted font-mono text-[11px] font-semibold"
+                            className="inline-flex items-center justify-center min-w-[1.75rem] h-6 px-1.5 rounded border bg-muted font-mono text-[11px] font-semibold whitespace-nowrap"
                           >
                             {key}
                           </kbd>
