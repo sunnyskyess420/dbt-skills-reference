@@ -48,6 +48,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { downloadJsonBackup, importFromJson, type ImportResult } from "@/lib/worksheet-export";
 import {
   shouldShowReminder,
@@ -120,28 +127,65 @@ export function WorksheetList({
   const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
   const [showBackupReminder, setShowBackupReminder] = React.useState(false);
   const [pinnedIds, setPinnedIds] = React.useState<Set<string>>(new Set());
+  const [sortBy, setSortBy] = React.useState<"recent" | "created" | "type" | "name">("recent");
 
   // Load pinned IDs on mount and when entries change
   React.useEffect(() => {
     setPinnedIds(getPinnedIds());
+    // Load saved sort preference
+    try {
+      const saved = localStorage.getItem("dbt-skills:worksheet-sort");
+      if (saved && ["recent", "created", "type", "name"].includes(saved)) {
+        setSortBy(saved as typeof sortBy);
+      }
+    } catch {
+      // ignore
+    }
   }, [entries]);
 
   const handleTogglePin = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    const isNowPinned = togglePin(id);
+    togglePin(id);
     setPinnedIds(getPinnedIds());
   };
 
-  // Sort: pinned first, then by updatedAt desc
+  const handleSortChange = (value: string) => {
+    setSortBy(value as typeof sortBy);
+    try {
+      localStorage.setItem("dbt-skills:worksheet-sort", value);
+    } catch {
+      // ignore
+    }
+  };
+
+  // Sort: pinned first, then by selected sort method
   const sortedEntries = React.useMemo(() => {
-    return [...entries].sort((a, b) => {
+    const sorted = [...entries].sort((a, b) => {
+      switch (sortBy) {
+        case "created":
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case "type": {
+          const aType = getWorksheetTypeMeta(a.type).shortName;
+          const bType = getWorksheetTypeMeta(b.type).shortName;
+          if (aType !== bType) return aType.localeCompare(bType);
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        }
+        case "name":
+          return (a.title || "").localeCompare(b.title || "");
+        case "recent":
+        default:
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      }
+    });
+    // Always move pinned to top
+    return sorted.sort((a, b) => {
       const aPinned = pinnedIds.has(a.id);
       const bPinned = pinnedIds.has(b.id);
       if (aPinned && !bPinned) return -1;
       if (!aPinned && bPinned) return 1;
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      return 0;
     });
-  }, [entries, pinnedIds]);
+  }, [entries, pinnedIds, sortBy]);
 
   const diaryCardCount = entries.filter((e) => e.type === "diary-card").length;
   const entryCount = entries.length;
@@ -358,13 +402,28 @@ export function WorksheetList({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="px-3 py-2 sticky top-0 bg-background/95 backdrop-blur">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Saved worksheets
-          </span>
-          <span className="ml-1.5 text-[10px] text-muted-foreground">
-            ({entries.length})
-          </span>
+        <div className="px-3 py-2 sticky top-0 bg-background/95 backdrop-blur z-10 flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Saved worksheets
+            </span>
+            <span className="ml-1.5 text-[10px] text-muted-foreground">
+              ({entries.length})
+            </span>
+          </div>
+          {entries.length > 1 && (
+            <Select value={sortBy} onValueChange={handleSortChange}>
+              <SelectTrigger className="h-7 w-[110px] text-[10px] shrink-0 border-none bg-muted/50 px-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent" className="text-xs">Recent</SelectItem>
+                <SelectItem value="created" className="text-xs">Created</SelectItem>
+                <SelectItem value="type" className="text-xs">Type</SelectItem>
+                <SelectItem value="name" className="text-xs">Name (A-Z)</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
         </div>
 
         {entries.length === 0 ? (
