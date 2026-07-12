@@ -44,6 +44,7 @@ import { PleasantEventsDiaryForm } from "./pleasant-events-diary-form";
 import { EmotionDiaryForm } from "./emotion-diary-form";
 import { DialecticsPracticeForm } from "./dialectics-practice-form";
 import { SelfValidationForm } from "./self-validation-form";
+import { DimeGameForm } from "./dime-game-form";
 import { DiaryCardSummary } from "./diary-card-summary";
 import { exportToPdf } from "@/lib/worksheet-pdf";
 import {
@@ -294,6 +295,9 @@ export function WorksheetDetail({
           )}
           {entry.type === "self-validation" && (
             <SelfValidationForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "dime-game" && (
+            <DimeGameForm entry={entry} onChange={onChangeData} />
           )}
 
           <div className="mt-12 pt-6 border-t text-xs text-muted-foreground print:mt-6">

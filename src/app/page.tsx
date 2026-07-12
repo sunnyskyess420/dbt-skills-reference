@@ -16,7 +16,7 @@ import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -660,6 +660,16 @@ function WorksheetsEmptyState({
             <div className="text-sm font-medium">Self-Validation Practice</div>
             <div className="text-[11px] text-muted-foreground mt-1">
               Practice the 6 levels of validation on yourself.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("dime-game")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Coins className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
+            <div className="text-sm font-medium">The Dime Game</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              How intensely should you ask or say no? Answer 10 questions for a live score.
             </div>
           </button>
         </div>

@@ -30,6 +30,7 @@ import {
   Smile,
   Activity,
   HeartPulse,
+  Coins,
 } from "lucide-react";
 import {
   Tooltip,
@@ -68,6 +69,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Smile,
   Activity,
   HeartPulse,
+  Coins,
 };
 
 // Group worksheet types by module for the dropdown menu
@@ -86,7 +88,7 @@ const WORKSHEET_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
   },
   {
     label: "Interpersonal",
-    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game"].includes(t.id)),
   },
   {
     label: "Mindfulness",

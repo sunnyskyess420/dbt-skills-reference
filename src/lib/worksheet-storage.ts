@@ -16,7 +16,8 @@ export type WorksheetType =
   | "pleasant-events-diary"
   | "emotion-diary"
   | "dialectics-practice"
-  | "self-validation";
+  | "self-validation"
+  | "dime-game";
 
 export interface WorksheetEntry {
   id: string;
@@ -186,6 +187,16 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
       "Practice the 6 levels of validation on yourself, for when you're being harsh with yourself about a feeling you're having.",
     icon: "HeartPulse",
     reference: "IE Handouts 17-19 / IE Worksheet 13",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "dime-game",
+    name: "The Dime Game (Intensity of Asking or Saying No)",
+    shortName: "Dime Game",
+    description:
+      "Interactive decision tool: answer 10 questions about your situation to figure out how intensely to ask for what you want or how firmly to say no. Live score calculation.",
+    icon: "Coins",
+    reference: "IE Handout 8 / IE Worksheet 6",
     color: "text-amber-600 dark:text-amber-400",
   },
 ];
@@ -515,6 +526,29 @@ export function blankSelfValidationData(): Record<string, any> {
   };
 }
 
+export function blankDimeGameData(): Record<string, any> {
+  return {
+    entryDate: "",
+    situation: "",
+    // "ask" or "sayno"
+    mode: "ask",
+    // 10 factors, each: "yes" | "no" | "maybe"
+    factors: {
+      capability: "",
+      right: "",
+      timing: "",
+      priority: "",
+      giveToGet: "",
+      relationship: "",
+      clarity: "",
+      selfRespect: "",
+      reciprocity: "",
+      authority: "",
+    },
+    notes: "",
+  };
+}
+
 export function blankData(type: WorksheetType): Record<string, any> {
   switch (type) {
     case "chain-analysis":
@@ -547,6 +581,8 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankDialecticsPracticeData();
     case "self-validation":
       return blankSelfValidationData();
+    case "dime-game":
+      return blankDimeGameData();
   }
 }
 

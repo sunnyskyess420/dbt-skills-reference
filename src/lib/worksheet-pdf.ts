@@ -436,6 +436,9 @@ export function exportToPdf(entry: WorksheetEntry) {
     case "self-validation":
       generateSelfValidation(doc, entry);
       break;
+    case "dime-game":
+      generateDimeGame(doc, entry);
+      break;
   }
 
   writeFooter(doc, entry);
@@ -713,6 +716,62 @@ function generateSelfValidation(doc: jsPDF, entry: WorksheetEntry) {
 
   writeSectionTitle(doc, 3, "Reflection");
   writeKeyValue(doc, "Reflection", data.reflection);
+}
+
+function generateDimeGame(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  const mode = data.mode === "sayno" ? "Saying no" : "Asking";
+  writeSubtitle(doc, `Mode: ${mode}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The situation");
+  writeKeyValue(doc, "What I want to ask for (or say no to)", data.situation);
+
+  writeSectionTitle(doc, 2, "The 10 questions");
+
+  const factorQuestions: Record<string, string> = {
+    capability: "Is the person capable?",
+    right: "Is it my right?",
+    timing: "Is now a good time?",
+    priority: "Is it important to me?",
+    giveToGet: "Am I willing to give to get?",
+    relationship: "Is it appropriate to the relationship?",
+    clarity: "Am I clear and specific?",
+    selfRespect: "Is it important for my self-respect?",
+    reciprocity: "Have they given to me before?",
+    authority: "Do they have authority over me?",
+  };
+
+  const factors = data.factors ?? {};
+  let score = 0;
+  Object.keys(factorQuestions).forEach((key, idx) => {
+    const answer = factors[key] || "(not answered)";
+    writeKeyValue(doc, `${idx + 1}. ${factorQuestions[key]}`, answer);
+
+    // Calculate score
+    if (answer === "yes") {
+      score += key === "authority" ? -1 : 1;
+    } else if (answer === "no") {
+      score += key === "authority" ? 1 : -1;
+    }
+  });
+
+  writeSectionTitle(doc, 3, "Score and recommendation");
+  writeKeyValue(doc, "Score", String(score > 0 ? "+" : "") + score);
+
+  const action = mode === "Asking" ? "Ask" : "Say no";
+  let recommendation = "";
+  if (score <= -7) recommendation = "Don't ask / Let it go";
+  else if (score <= -3) recommendation = `${action} lightly`;
+  else if (score <= 2) recommendation = `${action} with some hesitation`;
+  else if (score <= 6) recommendation = `${action} firmly`;
+  else recommendation = `${action} as firmly as you can`;
+  writeKeyValue(doc, "Recommendation", recommendation);
+
+  writeKeyValue(doc, "Notes", data.notes);
 }
 
 // ============ Comparison PDF ============
