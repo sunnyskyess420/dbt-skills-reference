@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { SKILLS, MODULES, type Skill } from "@/data/skills";
 import { Search, Bookmark } from "lucide-react";
 
@@ -33,6 +33,11 @@ export function SearchPalette({ open, onOpenChange, onSelect, bookmarks }: Searc
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 overflow-hidden max-w-2xl gap-0">
+        {/* Accessible title and description for screen readers (visually hidden) */}
+        <DialogTitle className="sr-only">Search DBT skills</DialogTitle>
+        <DialogDescription className="sr-only">
+          Search for skills by name, acronym, or keyword. Use arrow keys to navigate results and Enter to select.
+        </DialogDescription>
         <Command
           className="rounded-lg"
           filter={(value, search) => {
