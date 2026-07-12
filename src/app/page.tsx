@@ -10,10 +10,11 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { WorksheetList } from "@/components/dbt/worksheets/worksheet-list";
 import { WorksheetDetail } from "@/components/dbt/worksheets/worksheet-detail";
 import { DiaryComparison } from "@/components/dbt/worksheets/diary-comparison";
+import { SettingsModal } from "@/components/dbt/settings-modal";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -28,6 +29,7 @@ export default function Home() {
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [sidebarOpen, setSidebarOpen] = React.useState(false); // mobile sidebar
   const [compareOpen, setCompareOpen] = React.useState(false); // diary card comparison modal
+  const [settingsOpen, setSettingsOpen] = React.useState(false); // settings modal
 
   // Bookmarks persisted to localStorage
   const [bookmarks, setBookmarks] = React.useState<Set<string>>(new Set());
@@ -49,6 +51,16 @@ export default function Home() {
       }
     } catch (e) {
       // ignore
+    }
+  }, []);
+
+  // Reload bookmarks from localStorage (used after settings "clear data")
+  const reloadBookmarks = React.useCallback(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_BOOKMARKS);
+      setBookmarks(stored ? new Set(JSON.parse(stored)) : new Set());
+    } catch {
+      setBookmarks(new Set());
     }
   }, []);
 
@@ -80,6 +92,16 @@ export default function Home() {
       }
     } catch (e) {
       // ignore
+    }
+  }, []);
+
+  // Reload recent list from localStorage (used after settings "clear data")
+  const reloadRecent = React.useCallback(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_RECENT);
+      setRecent(stored ? JSON.parse(stored) : []);
+    } catch {
+      setRecent([]);
     }
   }, []);
 
@@ -121,6 +143,16 @@ export default function Home() {
       setSelectedSkill(null);
     }
   }, []);
+
+  // Called when user clears data from the Settings modal.
+  // Reloads all state from (now-empty) localStorage so the UI updates immediately.
+  const handleDataCleared = React.useCallback(() => {
+    refreshWorksheets();
+    reloadBookmarks();
+    reloadRecent();
+    setSelectedWorksheetId(null);
+    setSelectedSkill(null);
+  }, [refreshWorksheets, reloadBookmarks, reloadRecent]);
 
   // Cmd+K / Ctrl+K to open search
   React.useEffect(() => {
@@ -207,6 +239,15 @@ export default function Home() {
               <Search className="h-4 w-4" />
             </Button>
             <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setSettingsOpen(true)}
+              aria-label="Settings"
+            >
+              <SettingsIcon className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </header>
@@ -336,6 +377,13 @@ export default function Home() {
         open={compareOpen}
         onOpenChange={setCompareOpen}
         diaryCards={worksheetEntries.filter((e) => e.type === "diary-card")}
+      />
+
+      {/* Settings modal */}
+      <SettingsModal
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        onDataCleared={handleDataCleared}
       />
     </div>
   );

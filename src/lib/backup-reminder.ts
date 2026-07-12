@@ -1,11 +1,22 @@
 // Auto-backup reminder logic.
 // Reminds the user to export a backup after every N new worksheet entries.
 // State is persisted in localStorage so it survives across sessions.
+//
+// The interval N is configurable via app settings (see src/lib/settings.ts).
+// We read it dynamically on each check so settings changes take effect immediately.
 
 const STORAGE_KEY_REMINDER = "dbt-skills:backup-reminder";
 
-// Remind every 5 new entries since the last reminder (or last export).
-export const REMINDER_INTERVAL = 5;
+// Default interval used when settings aren't loaded yet (e.g., during SSR or first paint).
+// The actual value comes from loadSettings().backupReminderInterval.
+export const DEFAULT_REMINDER_INTERVAL = 5;
+
+import { loadSettings } from "./settings";
+
+/** Get the current reminder interval from settings (1-50, default 5). */
+export function getReminderInterval(): number {
+  return loadSettings().backupReminderInterval;
+}
 
 export interface BackupReminderState {
   lastReminderEntryCount: number; // total entries when last reminded (or last dismissed)
@@ -46,21 +57,20 @@ function saveReminderState(state: BackupReminderState) {
 
 /**
  * Returns true if a backup reminder should be shown for the given current entry count.
- * A reminder is shown when (currentCount - lastReminderCount) >= REMINDER_INTERVAL.
- * First reminder fires after the user has created their first entry (so they know
- * about the feature) — actually, we wait until they have at least REMINDER_INTERVAL
- * entries, so they're not nagged when they have just one or two.
+ * A reminder is shown when (currentCount - lastReminderCount) >= interval AND
+ * currentCount >= interval (so the user isn't nagged when they have just 1-2 entries).
  */
 export function shouldShowReminder(currentEntryCount: number): boolean {
-  if (currentEntryCount < REMINDER_INTERVAL) return false;
+  const interval = getReminderInterval();
+  if (currentEntryCount < interval) return false;
   const state = loadReminderState();
   const newSinceLast = currentEntryCount - state.lastReminderEntryCount;
-  return newSinceLast >= REMINDER_INTERVAL;
+  return newSinceLast >= interval;
 }
 
 /**
  * Mark that the user has been reminded at the current entry count (so we don't
- * show the reminder again until another REMINDER_INTERVAL new entries are created).
+ * show the reminder again until another interval's worth of new entries are created).
  */
 export function markReminderShown(currentEntryCount: number) {
   const state = loadReminderState();
@@ -73,7 +83,7 @@ export function markReminderShown(currentEntryCount: number) {
 
 /**
  * Mark that the user has successfully exported a backup. Resets the reminder
- * counter so the next reminder won't fire for another REMINDER_INTERVAL new entries.
+ * counter so the next reminder won't fire for another interval's worth of new entries.
  */
 export function markExported(currentEntryCount: number) {
   const state = loadReminderState();
@@ -87,7 +97,7 @@ export function markExported(currentEntryCount: number) {
 
 /**
  * Permanently dismiss the reminder for the current cycle. The reminder will fire
- * again after another REMINDER_INTERVAL new entries are created.
+ * again after another interval's worth of new entries are created.
  * (Same as markReminderShown, but semantically distinct for clarity.)
  */
 export function dismissReminder(currentEntryCount: number) {

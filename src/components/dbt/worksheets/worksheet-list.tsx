@@ -33,7 +33,7 @@ import {
   shouldShowReminder,
   markExported,
   dismissReminder,
-  REMINDER_INTERVAL,
+  getReminderInterval,
 } from "@/lib/backup-reminder";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -232,7 +232,7 @@ export function WorksheetList({
                   </button>
                 </div>
                 <p className="text-[10px] mt-1.5 opacity-70">
-                  Next reminder after {REMINDER_INTERVAL} more new entries.
+                  Next reminder after {getReminderInterval()} more new entries.
                 </p>
               </div>
             </div>
