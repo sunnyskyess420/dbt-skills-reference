@@ -47,32 +47,39 @@ function defaultPlan(): SafetyPlan {
 
 const HOTLINES = [
   {
-    name: "988 Suicide & Crisis Lifeline",
-    number: "988",
-    detail: "Call or text 988, or chat at 988lifeline.org",
+    name: "9-8-8 Suicide Crisis Helpline",
+    number: "Call or text 988",
+    detail: "Available 24/7 across Canada. Call or text 988, or chat at 988.ca",
     icon: Phone,
     href: "tel:988",
   },
   {
-    name: "Crisis Text Line",
-    number: "Text HOME to 741741",
-    detail: "Free 24/7 crisis support via text",
+    name: "Kids Help Phone",
+    number: "1-800-668-6868",
+    detail: "For youth and young adults. Call or text CONNECT to 686868",
     icon: MessageSquare,
-    href: "sms:741741?body=HOME",
+    href: "tel:18006686868",
   },
   {
-    name: "National Domestic Violence Hotline",
-    number: "1-800-799-7233",
-    detail: "Call or text START to 88788",
+    name: "Talk Suicide Canada",
+    number: "1-833-456-4566",
+    detail: "Suicide prevention support. Available 24/7 in English and French",
     icon: Phone,
-    href: "tel:18007997233",
+    href: "tel:18334564566",
   },
   {
-    name: "Veterans Crisis Line",
-    number: "988, then press 1",
-    detail: "Or text 838255",
+    name: "Assaulted Women's Helpline (Ontario)",
+    number: "1-866-863-0511",
+    detail: "24/7 crisis support for women experiencing violence. TTY 1-866-863-7868",
     icon: Phone,
-    href: "tel:988",
+    href: "tel:18668630511",
+  },
+  {
+    name: "Crisis Services Canada",
+    number: "Text 45645",
+    detail: "Text CONNECT to 45645 for crisis support via text (charges may apply)",
+    icon: MessageSquare,
+    href: "sms:45645?body=CONNECT",
   },
 ];
 
@@ -227,8 +234,8 @@ export function CrisisResources() {
             Crisis Resources
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            If you're in crisis right now, call <strong>988</strong> or text <strong>HOME to 741741</strong>.
-            Below are hotlines, grounding exercises, and your personal safety plan.
+            If you're in crisis right now, call or text <strong>988</strong>. Below are Canadian
+            crisis hotlines, grounding exercises, and your personal safety plan.
           </p>
         </div>
 
@@ -237,7 +244,7 @@ export function CrisisResources() {
           <CardHeader>
             <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <Phone className="h-4 w-4" />
-              Crisis hotlines (available 24/7)
+              Canadian crisis hotlines (available 24/7)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -395,7 +402,7 @@ export function CrisisResources() {
           <p>
             <strong>This app is not a substitute for professional help.</strong> If you are in immediate
             danger, call 911. If you are having thoughts of suicide, call or text 988. The resources on
-            this page are for support, not replacement of treatment.
+            this page are for support, not replacement of treatment. All numbers listed are Canadian.
           </p>
         </div>
       </div>
