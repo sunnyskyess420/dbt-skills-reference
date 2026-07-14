@@ -1,7 +1,8 @@
 // Pinned worksheet utilities — lets users pin frequently-used worksheets
-// to the top of the worksheet list.
+// to the top of the worksheet list. Also tracks view counts for "Most Used" sorting.
 
 const STORAGE_KEY = "dbt-skills:pinned-worksheets";
+const VIEWS_KEY = "dbt-skills:worksheet-views";
 
 export function getPinnedIds(): Set<string> {
   try {
@@ -30,4 +31,34 @@ export function togglePin(id: string): boolean {
     // ignore
   }
   return pinned.has(id);
+}
+
+// =================== View count tracking ===================
+
+function getViewCounts(): Record<string, number> {
+  try {
+    const stored = localStorage.getItem(VIEWS_KEY);
+    if (!stored) return {};
+    return JSON.parse(stored);
+  } catch {
+    return {};
+  }
+}
+
+export function getViewCount(id: string): number {
+  return getViewCounts()[id] ?? 0;
+}
+
+export function incrementViewCount(id: string): void {
+  const counts = getViewCounts();
+  counts[id] = (counts[id] ?? 0) + 1;
+  try {
+    localStorage.setItem(VIEWS_KEY, JSON.stringify(counts));
+  } catch {
+    // ignore
+  }
+}
+
+export function getViewCountsMap(): Record<string, number> {
+  return getViewCounts();
 }

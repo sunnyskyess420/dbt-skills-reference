@@ -72,7 +72,7 @@ import {
   dismissReminder,
   getReminderInterval,
 } from "@/lib/backup-reminder";
-import { getPinnedIds, togglePin } from "@/lib/pinned-worksheets";
+import { getPinnedIds, togglePin, getViewCountsMap } from "@/lib/pinned-worksheets";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Link2,
@@ -147,15 +147,18 @@ export function WorksheetList({
   const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
   const [showBackupReminder, setShowBackupReminder] = React.useState(false);
   const [pinnedIds, setPinnedIds] = React.useState<Set<string>>(new Set());
-  const [sortBy, setSortBy] = React.useState<"recent" | "created" | "type" | "name">("recent");
+  const [sortBy, setSortBy] = React.useState<"recent" | "created" | "type" | "name" | "most-used">("recent");
+  const [showPinnedOnly, setShowPinnedOnly] = React.useState(false);
+  const [viewCounts, setViewCounts] = React.useState<Record<string, number>>({});
 
-  // Load pinned IDs on mount and when entries change
+  // Load pinned IDs and view counts on mount and when entries change
   React.useEffect(() => {
     setPinnedIds(getPinnedIds());
+    setViewCounts(getViewCountsMap());
     // Load saved sort preference
     try {
       const saved = localStorage.getItem("dbt-skills:worksheet-sort");
-      if (saved && ["recent", "created", "type", "name"].includes(saved)) {
+      if (saved && ["recent", "created", "type", "name", "most-used"].includes(saved)) {
         setSortBy(saved as typeof sortBy);
       }
     } catch {
@@ -178,9 +181,12 @@ export function WorksheetList({
     }
   };
 
-  // Sort: pinned first, then by selected sort method
+  // Sort: pinned first, then by selected sort method. Filter by pinned if toggle is on.
   const sortedEntries = React.useMemo(() => {
-    const sorted = [...entries].sort((a, b) => {
+    // Filter to pinned only if toggle is on
+    const filtered = showPinnedOnly ? entries.filter((e) => pinnedIds.has(e.id)) : entries;
+
+    const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
         case "created":
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
@@ -192,20 +198,25 @@ export function WorksheetList({
         }
         case "name":
           return (a.title || "").localeCompare(b.title || "");
+        case "most-used":
+          return (viewCounts[b.id] ?? 0) - (viewCounts[a.id] ?? 0);
         case "recent":
         default:
           return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
       }
     });
-    // Always move pinned to top
-    return sorted.sort((a, b) => {
-      const aPinned = pinnedIds.has(a.id);
-      const bPinned = pinnedIds.has(b.id);
-      if (aPinned && !bPinned) return -1;
-      if (!aPinned && bPinned) return 1;
-      return 0;
-    });
-  }, [entries, pinnedIds, sortBy]);
+    // Always move pinned to top (unless sorting by most-used or already filtered to pinned)
+    if (sortBy !== "most-used" && !showPinnedOnly) {
+      return sorted.sort((a, b) => {
+        const aPinned = pinnedIds.has(a.id);
+        const bPinned = pinnedIds.has(b.id);
+        if (aPinned && !bPinned) return -1;
+        if (!aPinned && bPinned) return 1;
+        return 0;
+      });
+    }
+    return sorted;
+  }, [entries, pinnedIds, sortBy, viewCounts, showPinnedOnly]);
 
   const diaryCardCount = entries.filter((e) => e.type === "diary-card").length;
   const entryCount = entries.length;
@@ -425,25 +436,39 @@ export function WorksheetList({
         <div className="px-3 py-2 sticky top-0 bg-background/95 backdrop-blur z-10 flex items-center justify-between gap-2">
           <div className="min-w-0">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Saved worksheets
+              {showPinnedOnly ? "Pinned worksheets" : "Saved worksheets"}
             </span>
             <span className="ml-1.5 text-[10px] text-muted-foreground">
-              ({entries.length})
+              ({sortedEntries.length})
             </span>
           </div>
-          {entries.length > 1 && (
-            <Select value={sortBy} onValueChange={handleSortChange}>
-              <SelectTrigger className="h-7 w-[110px] text-[10px] shrink-0 border-none bg-muted/50 px-2">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recent" className="text-xs">Recent</SelectItem>
-                <SelectItem value="created" className="text-xs">Created</SelectItem>
-                <SelectItem value="type" className="text-xs">Type</SelectItem>
-                <SelectItem value="name" className="text-xs">Name (A-Z)</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
+          <div className="flex items-center gap-1 shrink-0">
+            {pinnedIds.size > 0 && (
+              <Button
+                variant={showPinnedOnly ? "default" : "ghost"}
+                size="sm"
+                className="h-7 px-2 text-[10px]"
+                onClick={() => setShowPinnedOnly(!showPinnedOnly)}
+              >
+                <Pin className={cn("h-3 w-3 mr-0.5", showPinnedOnly && "fill-current")} />
+                <span className="hidden sm:inline">Pinned</span>
+              </Button>
+            )}
+            {entries.length > 1 && (
+              <Select value={sortBy} onValueChange={handleSortChange}>
+                <SelectTrigger className="h-7 w-[110px] text-[10px] shrink-0 border-none bg-muted/50 px-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent" className="text-xs">Recent</SelectItem>
+                  <SelectItem value="most-used" className="text-xs">Most Used</SelectItem>
+                  <SelectItem value="created" className="text-xs">Created</SelectItem>
+                  <SelectItem value="type" className="text-xs">Type</SelectItem>
+                  <SelectItem value="name" className="text-xs">Name (A-Z)</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+          </div>
         </div>
 
         {entries.length === 0 ? (

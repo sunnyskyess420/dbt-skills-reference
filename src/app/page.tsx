@@ -17,6 +17,7 @@ import { ProgressDashboard } from "@/components/dbt/progress-dashboard";
 import { SessionPrep } from "@/components/dbt/session-prep";
 import { SkillOfDay } from "@/components/dbt/skill-of-day";
 import { CrisisResources } from "@/components/dbt/crisis-resources";
+import { incrementViewCount } from "@/lib/pinned-worksheets";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
@@ -131,6 +132,8 @@ export default function Home() {
   const handleSelectWorksheet = React.useCallback((entry: WorksheetEntry) => {
     setSelectedWorksheetId(entry.id);
     setSelectedSkill(null);
+    // Increment view count for "Most Used" sorting
+    incrementViewCount(entry.id);
     // Push history state for back button support
     history.pushState({ type: "worksheet", id: entry.id }, "");
   }, []);
