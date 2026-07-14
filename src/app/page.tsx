@@ -401,9 +401,21 @@ export default function Home() {
           ) : isWorksheetsMode ? (
             <WorksheetsEmptyState onCreate={handleCreateWorksheet} />
           ) : selectedModule === "dashboard" ? (
-            <ProgressDashboard entries={worksheetEntries} />
+            <ProgressDashboard
+              entries={worksheetEntries}
+              onSelectWorksheet={(entry) => {
+                setSelectedModule("worksheets");
+                handleSelectWorksheet(entry);
+              }}
+            />
           ) : selectedModule === "session-prep" ? (
-            <SessionPrep entries={worksheetEntries} />
+            <SessionPrep
+              entries={worksheetEntries}
+              onSelectWorksheet={(entry) => {
+                setSelectedModule("worksheets");
+                handleSelectWorksheet(entry);
+              }}
+            />
           ) : selectedModule === "crisis" ? (
             <CrisisResources />
           ) : (

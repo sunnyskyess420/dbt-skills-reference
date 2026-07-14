@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   entries: WorksheetEntry[];
+  onSelectWorksheet?: (entry: WorksheetEntry) => void;
 }
 
 interface SessionPrepState {
@@ -60,7 +61,7 @@ const CHECKLIST_ITEMS: { key: keyof SessionPrepState; label: string; description
   { key: "preparedQuestions", label: "Prepare questions for therapist", description: "What do you want to ask or get help with?" },
 ];
 
-export function SessionPrep({ entries }: Props) {
+export function SessionPrep({ entries, onSelectWorksheet }: Props) {
   const [state, setState] = React.useState<SessionPrepState>(defaultState);
 
   // Load from localStorage on mount
@@ -186,11 +187,16 @@ export function SessionPrep({ entries }: Props) {
               {recentDiaryCards.length > 0 && (
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Diary Cards</div>
-                  <ul className="space-y-1">
+                  <ul className="space-y-0.5">
                     {recentDiaryCards.map((ws) => (
-                      <li key={ws.id} className="text-xs flex items-center justify-between">
-                        <span className="font-medium">{ws.title}</span>
-                        <span className="text-muted-foreground">{new Date(ws.updatedAt).toLocaleDateString()}</span>
+                      <li key={ws.id}>
+                        <button
+                          onClick={() => onSelectWorksheet?.(ws)}
+                          className="w-full text-xs flex items-center justify-between px-2 -mx-2 py-1 rounded hover:bg-muted/50 transition-colors text-left"
+                        >
+                          <span className="font-medium truncate">{ws.title}</span>
+                          <span className="text-muted-foreground shrink-0">{new Date(ws.updatedAt).toLocaleDateString()}</span>
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -199,11 +205,16 @@ export function SessionPrep({ entries }: Props) {
               {recentChainAnalyses.length > 0 && (
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">Chain Analyses</div>
-                  <ul className="space-y-1">
+                  <ul className="space-y-0.5">
                     {recentChainAnalyses.map((ws) => (
-                      <li key={ws.id} className="text-xs flex items-center justify-between">
-                        <span className="font-medium">{ws.title}</span>
-                        <span className="text-muted-foreground">{new Date(ws.updatedAt).toLocaleDateString()}</span>
+                      <li key={ws.id}>
+                        <button
+                          onClick={() => onSelectWorksheet?.(ws)}
+                          className="w-full text-xs flex items-center justify-between px-2 -mx-2 py-1 rounded hover:bg-muted/50 transition-colors text-left"
+                        >
+                          <span className="font-medium truncate">{ws.title}</span>
+                          <span className="text-muted-foreground shrink-0">{new Date(ws.updatedAt).toLocaleDateString()}</span>
+                        </button>
                       </li>
                     ))}
                   </ul>

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   entries: WorksheetEntry[];
+  onSelectWorksheet?: (entry: WorksheetEntry) => void;
 }
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -31,7 +32,7 @@ const SKILL_KEYS = [
   { key: "skillInterpersonal", label: "Interpersonal" },
 ];
 
-export function ProgressDashboard({ entries }: Props) {
+export function ProgressDashboard({ entries, onSelectWorksheet }: Props) {
   // Get all diary cards, sorted by date
   const diaryCards = React.useMemo(() => {
     return entries
@@ -332,13 +333,18 @@ export function ProgressDashboard({ entries }: Props) {
               <CardTitle className="text-sm font-semibold">Recent worksheets</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-1.5">
+              <ul className="space-y-1">
                 {recentWorksheets.map((ws) => (
-                  <li key={ws.id} className="flex items-center justify-between gap-2 text-xs py-1 border-b last:border-0">
-                    <span className="font-medium truncate">{ws.title}</span>
-                    <span className="text-muted-foreground shrink-0">
-                      {new Date(ws.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                    </span>
+                  <li key={ws.id}>
+                    <button
+                      onClick={() => onSelectWorksheet?.(ws)}
+                      className="w-full flex items-center justify-between gap-2 text-xs py-1.5 px-2 -mx-2 rounded hover:bg-muted/50 transition-colors text-left"
+                    >
+                      <span className="font-medium truncate">{ws.title}</span>
+                      <span className="text-muted-foreground shrink-0">
+                        {new Date(ws.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                      </span>
+                    </button>
                   </li>
                 ))}
               </ul>
