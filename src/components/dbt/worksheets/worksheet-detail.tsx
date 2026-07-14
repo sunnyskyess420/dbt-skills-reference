@@ -53,7 +53,7 @@ import { MindfulnessEmotionsForm } from "./mindfulness-emotions-form";
 import { MindfulnessThoughtsForm } from "./mindfulness-thoughts-form";
 import { TurningMindWillingnessForm } from "./turning-mind-willingness-form";
 import { ClarifyingPrioritiesForm } from "./clarifying-priorities-form";
-import { TroubleshootingIEForm } from "./troubleshooting-ie-form";
+import { TroubleshootingIeForm } from "./troubleshooting-ie-form";
 import { ValidatingOthersForm } from "./validating-others-form";
 import { MythsEmotionsForm } from "./myths-emotions-form";
 import { DiaryCardSummary } from "./diary-card-summary";
@@ -335,7 +335,7 @@ export function WorksheetDetail({
             <ClarifyingPrioritiesForm entry={entry} onChange={onChangeData} />
           )}
           {entry.type === "troubleshooting-ie" && (
-            <TroubleshootingIEForm entry={entry} onChange={onChangeData} />
+            <TroubleshootingIeForm entry={entry} onChange={onChangeData} />
           )}
           {entry.type === "validating-others" && (
             <ValidatingOthersForm entry={entry} onChange={onChangeData} />
