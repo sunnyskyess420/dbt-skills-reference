@@ -124,11 +124,15 @@ export default function Home() {
       }
       return next;
     });
+    // Push history state for back button support
+    history.pushState({ type: "skill", id: skill.id }, "");
   }, []);
 
   const handleSelectWorksheet = React.useCallback((entry: WorksheetEntry) => {
     setSelectedWorksheetId(entry.id);
     setSelectedSkill(null);
+    // Push history state for back button support
+    history.pushState({ type: "worksheet", id: entry.id }, "");
   }, []);
 
   const handleCreateWorksheet = React.useCallback(
@@ -136,6 +140,7 @@ export default function Home() {
       const entry = createEntry(type);
       setSelectedWorksheetId(entry.id);
       setSelectedSkill(null);
+      history.pushState({ type: "worksheet", id: entry.id }, "");
     },
     [createEntry]
   );
@@ -148,6 +153,10 @@ export default function Home() {
     } else {
       setSelectedWorksheetId(null);
       setSelectedSkill(null);
+    }
+    // Push history state for back button support (only for view changes, not "all")
+    if (m !== "all") {
+      history.pushState({ type: "module", module: m }, "");
     }
   }, []);
 
@@ -204,6 +213,28 @@ export default function Home() {
     window.addEventListener("navigate-crisis", handler);
     return () => window.removeEventListener("navigate-crisis", handler);
   }, [handleSelectModule]);
+
+  // Handle browser back button (mouse back button, Alt+Left, browser back)
+  React.useEffect(() => {
+    const handler = (e: PopStateEvent) => {
+      // When back is pressed, clear the current selection (go "back" to the list)
+      setSelectedSkill(null);
+      setSelectedWorksheetId(null);
+      // If we were in a special view (dashboard, session-prep, crisis),
+      // go back to "all" skills view
+      const state = e.state;
+      if (!state) {
+        // No state = initial page load = go to "all"
+        setSelectedModule("all");
+      } else if (state.type === "module") {
+        setSelectedModule(state.module);
+      }
+      // For skill/worksheet states, we've already cleared the selection above,
+      // which shows the list view for the current module
+    };
+    window.addEventListener("popstate", handler);
+    return () => window.removeEventListener("popstate", handler);
+  }, []);
 
   const isWorksheetsMode = selectedModule === "worksheets";
 
