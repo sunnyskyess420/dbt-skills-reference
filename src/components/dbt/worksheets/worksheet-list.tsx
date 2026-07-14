@@ -34,6 +34,15 @@ import {
   Pin,
   PinOff,
   BrainCog,
+  TrendingUp,
+  Moon,
+  Waves,
+  Cloud,
+  RefreshCw,
+  ListChecks,
+  Wrench,
+  Users,
+  Lightbulb,
 } from "lucide-react";
 import {
   Tooltip,
@@ -82,6 +91,15 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   HeartPulse,
   Coins,
   BrainCog,
+  TrendingUp,
+  Moon,
+  Waves,
+  Cloud,
+  RefreshCw,
+  ListChecks,
+  Wrench,
+  Users,
+  Lightbulb,
 };
 
 // Group worksheet types by module for the dropdown menu
@@ -92,15 +110,15 @@ const WORKSHEET_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
   },
   {
     label: "Distress Tolerance",
-    types: WORKSHEET_TYPES.filter((t) => ["pros-cons", "radical-acceptance", "crisis-survival-tracker"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["pros-cons", "radical-acceptance", "crisis-survival-tracker", "mindfulness-thoughts", "turning-mind-willingness"].includes(t.id)),
   },
   {
     label: "Emotion Regulation",
-    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions"].includes(t.id)),
   },
   {
     label: "Interpersonal",
-    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others"].includes(t.id)),
   },
   {
     label: "Mindfulness",

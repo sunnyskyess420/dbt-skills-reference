@@ -46,6 +46,16 @@ import { DialecticsPracticeForm } from "./dialectics-practice-form";
 import { SelfValidationForm } from "./self-validation-form";
 import { DimeGameForm } from "./dime-game-form";
 import { CopeAheadForm } from "./cope-ahead-form";
+import { BuildMasteryForm } from "./build-mastery-form";
+import { PleaseTrackerForm } from "./please-tracker-form";
+import { NightmareProtocolForm } from "./nightmare-protocol-form";
+import { MindfulnessEmotionsForm } from "./mindfulness-emotions-form";
+import { MindfulnessThoughtsForm } from "./mindfulness-thoughts-form";
+import { TurningMindWillingnessForm } from "./turning-mind-willingness-form";
+import { ClarifyingPrioritiesForm } from "./clarifying-priorities-form";
+import { TroubleshootingIEForm } from "./troubleshooting-ie-form";
+import { ValidatingOthersForm } from "./validating-others-form";
+import { MythsEmotionsForm } from "./myths-emotions-form";
 import { DiaryCardSummary } from "./diary-card-summary";
 import { exportToPdf } from "@/lib/worksheet-pdf";
 import {
@@ -302,6 +312,36 @@ export function WorksheetDetail({
           )}
           {entry.type === "cope-ahead" && (
             <CopeAheadForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "build-mastery" && (
+            <BuildMasteryForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "please-tracker" && (
+            <PleaseTrackerForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "nightmare-protocol" && (
+            <NightmareProtocolForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "mindfulness-emotions" && (
+            <MindfulnessEmotionsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "mindfulness-thoughts" && (
+            <MindfulnessThoughtsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "turning-mind-willingness" && (
+            <TurningMindWillingnessForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "clarifying-priorities" && (
+            <ClarifyingPrioritiesForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "troubleshooting-ie" && (
+            <TroubleshootingIEForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "validating-others" && (
+            <ValidatingOthersForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "myths-emotions" && (
+            <MythsEmotionsForm entry={entry} onChange={onChangeData} />
           )}
 
           <div className="mt-12 pt-6 border-t text-xs text-muted-foreground print:mt-6">

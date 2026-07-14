@@ -18,7 +18,17 @@ export type WorksheetType =
   | "dialectics-practice"
   | "self-validation"
   | "dime-game"
-  | "cope-ahead";
+  | "cope-ahead"
+  | "build-mastery"
+  | "please-tracker"
+  | "nightmare-protocol"
+  | "mindfulness-emotions"
+  | "mindfulness-thoughts"
+  | "turning-mind-willingness"
+  | "clarifying-priorities"
+  | "troubleshooting-ie"
+  | "validating-others"
+  | "myths-emotions";
 
 export interface WorksheetEntry {
   id: string;
@@ -208,6 +218,106 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
       "Rehearse a difficult situation in detail — imagine it vividly, feel the emotions, and practice the skill you'll use. So it's ready when the situation arrives.",
     icon: "BrainCog",
     reference: "ER Handout 19 / ER Worksheets 12, 13",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "build-mastery",
+    name: "Build Mastery",
+    shortName: "Build Mastery",
+    description:
+      "Daily competence tracker — do one thing each day that gives you a sense of accomplishment. Builds self-respect and resilience against despair.",
+    icon: "TrendingUp",
+    reference: "ER Handout 19 / ER Worksheets 12, 13",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "please-tracker",
+    name: "PLEASE Skills Tracker",
+    shortName: "PLEASE Tracker",
+    description:
+      "Weekly physical self-care checklist: treat Physical iLLness, balanced Eating, avoid mood-Altering drugs, balanced Sleep, get Exercise.",
+    icon: "HeartPulse",
+    reference: "ER Handout 20 / ER Worksheet 14",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "nightmare-protocol",
+    name: "Nightmare Protocol",
+    shortName: "Nightmare Protocol",
+    description:
+      "Rewrite a recurring nightmare with a different, mastery-ending. Rehearse the new version before sleep to reduce nightmare frequency.",
+    icon: "Moon",
+    reference: "ER Handout 20a / ER Worksheet 14a",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "mindfulness-emotions",
+    name: "Mindfulness of Current Emotions",
+    shortName: "Mindfulness of Emotions",
+    description:
+      "Observe an emotion as a wave — notice where you feel it in your body, name it, let it crest and pass without acting on it or suppressing it.",
+    icon: "Waves",
+    reference: "ER Handout 22 / ER Worksheet 15",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "mindfulness-thoughts",
+    name: "Mindfulness of Current Thoughts",
+    shortName: "Mindfulness of Thoughts",
+    description:
+      "Observe thoughts as passing mental events — like leaves on a stream or clouds in the sky. Not as truth, not as you. Let them come and go.",
+    icon: "Cloud",
+    reference: "DT Handouts 15, 15a / DT Worksheets 12, 12a",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "turning-mind-willingness",
+    name: "Turning the Mind & Willingness",
+    shortName: "Turning & Willingness",
+    description:
+      "Practice turning back to acceptance each time you slip, and choosing willingness (doing what's needed) over willfulness (refusing reality).",
+    icon: "RefreshCw",
+    reference: "DT Handouts 12, 13 / DT Worksheets 8, 8a, 10",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "clarifying-priorities",
+    name: "Clarifying Priorities",
+    shortName: "Clarifying Priorities",
+    description:
+      "Figure out whether your priority is objectives (get what you want), relationship (keep the connection), or self-respect in a specific situation.",
+    icon: "ListChecks",
+    reference: "IE Handout 4 / IE Worksheet 3",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "troubleshooting-ie",
+    name: "Troubleshooting Interpersonal Effectiveness",
+    shortName: "Troubleshooting IE",
+    description:
+      "When DEAR MAN, GIVE, or FAST didn't work — diagnose what got in the way and what to try differently next time.",
+    icon: "Wrench",
+    reference: "IE Handout 9 / IE Worksheet 7",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "validating-others",
+    name: "Validating Others",
+    shortName: "Validating Others",
+    description:
+      "Practice the 6 levels of validation on another person. Communicate that their experience makes sense — without necessarily agreeing with it.",
+    icon: "Users",
+    reference: "IE Handouts 17-18 / IE Worksheet 12",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "myths-emotions",
+    name: "Myths About Emotions",
+    shortName: "Myths About Emotions",
+    description:
+      "Identify and challenge false beliefs about emotions — 'there's a right way to feel', 'negative emotions are bad', 'if I feel it I must act on it'.",
+    icon: "Lightbulb",
+    reference: "ER Handout 4a / ER Worksheet 3",
     color: "text-rose-600 dark:text-rose-400",
   },
 ];
@@ -574,6 +684,135 @@ export function blankCopeAheadData(): Record<string, any> {
   };
 }
 
+// =================== Batch 10 new blank templates ===================
+
+export function blankBuildMasteryData(): Record<string, any> {
+  return {
+    weekStartDate: "",
+    entries: Array.from({ length: 7 }, () => ({
+      date: "", activity: "", difficulty: 0, accomplished: false, notes: "",
+    })),
+  };
+}
+
+export function blankPleaseTrackerData(): Record<string, any> {
+  return {
+    weekStartDate: "",
+    entries: Array.from({ length: 7 }, () => ({
+      date: "",
+      physicalIllness: false,
+      eating: "",
+      moodAltering: false,
+      sleepHours: 0,
+      exercise: false,
+      notes: "",
+    })),
+  };
+}
+
+export function blankNightmareProtocolData(): Record<string, any> {
+  return {
+    entryDate: "",
+    nightmareDescription: "",
+    originalEnding: "",
+    newEnding: "",
+    rehearsalPlan: "",
+    sleepHygienePlan: "",
+    progress: "",
+  };
+}
+
+export function blankMindfulnessEmotionsData(): Record<string, any> {
+  return {
+    entryDate: "",
+    emotion: "",
+    whereInBody: "",
+    intensity: 0,
+    waveDescription: "",
+    whatIDid: "",
+    whatChanged: "",
+    notes: "",
+  };
+}
+
+export function blankMindfulnessThoughtsData(): Record<string, any> {
+  return {
+    entryDate: "",
+    recurringThought: "",
+    howItFeels: "",
+    observation: "",
+    metaphor: "",
+    whatHappened: "",
+    notes: "",
+  };
+}
+
+export function blankTurningMindWillingnessData(): Record<string, any> {
+  return {
+    entryDate: "",
+    whatIAmAccepting: "",
+    whenSlippedBack: "",
+    turningBack: "",
+    willfulness: "",
+    willingness: "",
+    whatIDid: "",
+    notes: "",
+  };
+}
+
+export function blankClarifyingPrioritiesData(): Record<string, any> {
+  return {
+    entryDate: "",
+    situation: "",
+    objective: "",
+    relationship: "",
+    selfRespect: "",
+    priority: "",
+    howPriorityAffectsPlan: "",
+    notes: "",
+  };
+}
+
+export function blankTroubleshootingIEData(): Record<string, any> {
+  return {
+    entryDate: "",
+    situation: "",
+    skillUsed: "",
+    whatHappened: "",
+    whatWentWrong: "",
+    factorsInterfering: "",
+    whatToDoDifferently: "",
+    notes: "",
+  };
+}
+
+export function blankValidatingOthersData(): Record<string, any> {
+  return {
+    entryDate: "",
+    person: "",
+    situation: "",
+    level1: "",
+    level2: "",
+    level3: "",
+    level4: "",
+    level5: "",
+    level6: "",
+    whatHappened: "",
+    notes: "",
+  };
+}
+
+export function blankMythsEmotionsData(): Record<string, any> {
+  return {
+    entryDate: "",
+    myth: "",
+    whyItsAMyth: "",
+    challenge: "",
+    replacementBelief: "",
+    notes: "",
+  };
+}
+
 export function blankData(type: WorksheetType): Record<string, any> {
   switch (type) {
     case "chain-analysis":
@@ -610,6 +849,26 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankDimeGameData();
     case "cope-ahead":
       return blankCopeAheadData();
+    case "build-mastery":
+      return blankBuildMasteryData();
+    case "please-tracker":
+      return blankPleaseTrackerData();
+    case "nightmare-protocol":
+      return blankNightmareProtocolData();
+    case "mindfulness-emotions":
+      return blankMindfulnessEmotionsData();
+    case "mindfulness-thoughts":
+      return blankMindfulnessThoughtsData();
+    case "turning-mind-willingness":
+      return blankTurningMindWillingnessData();
+    case "clarifying-priorities":
+      return blankClarifyingPrioritiesData();
+    case "troubleshooting-ie":
+      return blankTroubleshootingIEData();
+    case "validating-others":
+      return blankValidatingOthersData();
+    case "myths-emotions":
+      return blankMythsEmotionsData();
   }
 }
 

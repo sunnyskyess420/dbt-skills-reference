@@ -103,6 +103,16 @@ export function importFromJson(jsonString: string): ImportResult {
         "self-validation",
         "dime-game",
         "cope-ahead",
+        "build-mastery",
+        "please-tracker",
+        "nightmare-protocol",
+        "mindfulness-emotions",
+        "mindfulness-thoughts",
+        "turning-mind-willingness",
+        "clarifying-priorities",
+        "troubleshooting-ie",
+        "validating-others",
+        "myths-emotions",
       ];
       if (!validTypes.includes(entry.type)) {
         skipped++;

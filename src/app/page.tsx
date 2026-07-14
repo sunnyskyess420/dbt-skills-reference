@@ -20,7 +20,7 @@ import { CrisisResources } from "@/components/dbt/crisis-resources";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -710,6 +710,106 @@ function WorksheetsEmptyState({
             <div className="text-sm font-medium">Cope Ahead</div>
             <div className="text-[11px] text-muted-foreground mt-1">
               Rehearse a difficult situation in your mind — vividly imagine it and practice the skill.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("build-mastery")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <TrendingUp className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Build Mastery</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Daily competence tracker — do one thing each day that gives accomplishment.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("please-tracker")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <HeartPulse className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">PLEASE Tracker</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Weekly physical self-care: sleep, eating, exercise, illness, substances.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("nightmare-protocol")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Moon className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Nightmare Protocol</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Rewrite recurring nightmares with a mastery ending. Rehearse before sleep.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("mindfulness-emotions")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Waves className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Mindfulness of Emotions</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Observe an emotion as a wave — let it crest and pass without acting on it.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("mindfulness-thoughts")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Cloud className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
+            <div className="text-sm font-medium">Mindfulness of Thoughts</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Observe thoughts as passing events — not as truth, not as you.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("turning-mind-willingness")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <RefreshCw className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
+            <div className="text-sm font-medium">Turning the Mind & Willingness</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Turn back to acceptance when you slip. Choose willingness over willfulness.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("clarifying-priorities")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <ListChecks className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
+            <div className="text-sm font-medium">Clarifying Priorities</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Is your priority objectives, relationship, or self-respect? Decide before acting.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("troubleshooting-ie")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Wrench className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
+            <div className="text-sm font-medium">Troubleshooting IE</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              When DEAR MAN, GIVE, or FAST didn&apos;t work — diagnose what went wrong.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("validating-others")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Users className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
+            <div className="text-sm font-medium">Validating Others</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Practice the 6 levels of validation on another person.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("myths-emotions")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <Lightbulb className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Myths About Emotions</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Identify and challenge false beliefs about emotions.
             </div>
           </button>
         </div>
