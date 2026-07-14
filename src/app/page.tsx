@@ -20,7 +20,7 @@ import { CrisisResources } from "@/components/dbt/crisis-resources";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -700,6 +700,16 @@ function WorksheetsEmptyState({
             <div className="text-sm font-medium">The Dime Game</div>
             <div className="text-[11px] text-muted-foreground mt-1">
               How intensely should you ask or say no? Answer 10 questions for a live score.
+            </div>
+          </button>
+          <button
+            onClick={() => onCreate("cope-ahead")}
+            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
+          >
+            <BrainCog className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
+            <div className="text-sm font-medium">Cope Ahead</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Rehearse a difficult situation in your mind — vividly imagine it and practice the skill.
             </div>
           </button>
         </div>

@@ -33,6 +33,7 @@ import {
   Coins,
   Pin,
   PinOff,
+  BrainCog,
 } from "lucide-react";
 import {
   Tooltip,
@@ -80,6 +81,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Activity,
   HeartPulse,
   Coins,
+  BrainCog,
 };
 
 // Group worksheet types by module for the dropdown menu
@@ -94,7 +96,7 @@ const WORKSHEET_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
   },
   {
     label: "Emotion Regulation",
-    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead"].includes(t.id)),
   },
   {
     label: "Interpersonal",

@@ -439,6 +439,9 @@ export function exportToPdf(entry: WorksheetEntry) {
     case "dime-game":
       generateDimeGame(doc, entry);
       break;
+    case "cope-ahead":
+      generateCopeAhead(doc, entry);
+      break;
   }
 
   writeFooter(doc, entry);
@@ -771,6 +774,40 @@ function generateDimeGame(doc: jsPDF, entry: WorksheetEntry) {
   else recommendation = `${action} as firmly as you can`;
   writeKeyValue(doc, "Recommendation", recommendation);
 
+  writeKeyValue(doc, "Notes", data.notes);
+}
+
+function generateCopeAhead(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The situation");
+  writeKeyValue(doc, "Describe the situation", data.situation);
+
+  writeSectionTitle(doc, 2, "Expected emotions");
+  writeKeyValue(doc, "Emotions I expect", data.expectedEmotions);
+  writeKeyValue(doc, "Expected intensity", String(data.intensity ?? 0) + " / 5");
+
+  writeSectionTitle(doc, 3, "The skill I'll use");
+  writeKeyValue(doc, "Skill(s) I will use", data.skillToUse);
+
+  writeSectionTitle(doc, 4, "Vivid imagination");
+  writeKeyValue(doc, "Vivid imagery of the situation", data.vividImagery);
+
+  writeSectionTitle(doc, 5, "Rehearse the skill");
+  writeKeyValue(doc, "Rehearsal - me using the skill", data.rehearsal);
+
+  writeSectionTitle(doc, 6, "Relax while imagining");
+  writeKeyValue(doc, "Relaxation plan", data.relaxationPlan);
+
+  writeSectionTitle(doc, 7, "Coping plan");
+  writeKeyValue(doc, "My coping plan", data.copingPlan);
+
+  writeSectionTitle(doc, 8, "Obstacles");
+  writeKeyValue(doc, "Potential obstacles", data.obstacles);
   writeKeyValue(doc, "Notes", data.notes);
 }
 

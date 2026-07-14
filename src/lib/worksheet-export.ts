@@ -102,6 +102,7 @@ export function importFromJson(jsonString: string): ImportResult {
         "dialectics-practice",
         "self-validation",
         "dime-game",
+        "cope-ahead",
       ];
       if (!validTypes.includes(entry.type)) {
         skipped++;

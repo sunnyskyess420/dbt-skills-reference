@@ -17,7 +17,8 @@ export type WorksheetType =
   | "emotion-diary"
   | "dialectics-practice"
   | "self-validation"
-  | "dime-game";
+  | "dime-game"
+  | "cope-ahead";
 
 export interface WorksheetEntry {
   id: string;
@@ -198,6 +199,16 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     icon: "Coins",
     reference: "IE Handout 8 / IE Worksheet 6",
     color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "cope-ahead",
+    name: "Cope Ahead",
+    shortName: "Cope Ahead",
+    description:
+      "Rehearse a difficult situation in detail — imagine it vividly, feel the emotions, and practice the skill you'll use. So it's ready when the situation arrives.",
+    icon: "BrainCog",
+    reference: "ER Handout 19 / ER Worksheets 12, 13",
+    color: "text-rose-600 dark:text-rose-400",
   },
 ];
 
@@ -530,9 +541,7 @@ export function blankDimeGameData(): Record<string, any> {
   return {
     entryDate: "",
     situation: "",
-    // "ask" or "sayno"
     mode: "ask",
-    // 10 factors, each: "yes" | "no" | "maybe"
     factors: {
       capability: "",
       right: "",
@@ -545,6 +554,22 @@ export function blankDimeGameData(): Record<string, any> {
       reciprocity: "",
       authority: "",
     },
+    notes: "",
+  };
+}
+
+export function blankCopeAheadData(): Record<string, any> {
+  return {
+    entryDate: "",
+    situation: "",
+    expectedEmotions: "",
+    intensity: 0,
+    skillToUse: "",
+    vividImagery: "",
+    rehearsal: "",
+    relaxationPlan: "",
+    copingPlan: "",
+    obstacles: "",
     notes: "",
   };
 }
@@ -583,6 +608,8 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankSelfValidationData();
     case "dime-game":
       return blankDimeGameData();
+    case "cope-ahead":
+      return blankCopeAheadData();
   }
 }
 
