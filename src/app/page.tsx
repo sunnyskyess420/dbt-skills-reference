@@ -19,7 +19,7 @@ import { SkillOfDay } from "@/components/dbt/skill-of-day";
 import { CrisisResources } from "@/components/dbt/crisis-resources";
 import { incrementViewCount } from "@/lib/pinned-worksheets";
 import { useWorksheets } from "@/hooks/use-worksheets";
-import { type WorksheetType, type WorksheetEntry } from "@/lib/worksheet-storage";
+import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
 import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -569,296 +569,82 @@ function EmptyState({
   );
 }
 
+// Worksheet groups matching the dropdown order
+const EMPTY_STATE_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
+  {
+    label: "General",
+    types: WORKSHEET_TYPES.filter((t) => ["chain-analysis", "missing-links"].includes(t.id)),
+  },
+  {
+    label: "Distress Tolerance",
+    types: WORKSHEET_TYPES.filter((t) => ["pros-cons", "radical-acceptance", "crisis-survival-tracker", "mindfulness-thoughts", "turning-mind-willingness"].includes(t.id)),
+  },
+  {
+    label: "Emotion Regulation",
+    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions"].includes(t.id)),
+  },
+  {
+    label: "Interpersonal",
+    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others"].includes(t.id)),
+  },
+  {
+    label: "Mindfulness",
+    types: WORKSHEET_TYPES.filter((t) => ["walking-middle-path"].includes(t.id)),
+  },
+];
+
+// Icon map for the empty state — must match worksheet-list.tsx ICONS
+const EMPTY_STATE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  Link2, Scale, CalendarRange, GitMerge, Unplug, MessageSquareText, SearchCheck,
+  FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse,
+  Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench,
+  Users, Lightbulb,
+};
+
 function WorksheetsEmptyState({
   onCreate,
 }: {
   onCreate: (type: WorksheetType) => void;
 }) {
   return (
-    <div className="min-h-full flex items-center justify-center p-6">
-      <div className="max-w-2xl w-full text-center">
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
-          <FileText className="h-7 w-7" />
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+            <FileText className="h-7 w-7" />
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight">Interactive Worksheets</h1>
+          <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+            Fill out digital versions of the DBT worksheets. Autosave to your browser,
+            print when you need to. Saved entries appear in the list on the left.
+          </p>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">Interactive Worksheets</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Fill out digital versions of the core DBT worksheets. Autosave to your
-          browser, print when you need to. Saved entries appear in the list on
-          the left.
-        </p>
 
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2 text-left">
-          <button
-            onClick={() => onCreate("chain-analysis")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Link2 className="h-5 w-5 text-slate-600 dark:text-slate-300 mb-2" />
-            <div className="text-sm font-medium">Chain Analysis</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Map a problem behavior link-by-link.
+        {EMPTY_STATE_GROUPS.map((group) => (
+          <div key={group.label} className="mb-6">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 px-1">
+              {group.label}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {group.types.map((type) => {
+                const Icon = EMPTY_STATE_ICONS[type.icon] ?? FileText;
+                return (
+                  <button
+                    key={type.id}
+                    onClick={() => onCreate(type.id)}
+                    className="p-3 rounded-md border hover:bg-muted/50 transition-colors text-left"
+                  >
+                    <Icon className={cn("h-4 w-4 mb-1.5", type.color)} />
+                    <div className="text-sm font-medium">{type.shortName}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
+                      {type.description}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-          </button>
-          <button
-            onClick={() => onCreate("pros-cons")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Scale className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
-            <div className="text-sm font-medium">Pros & Cons</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Weigh acting on vs. resisting a crisis urge.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("diary-card")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <CalendarRange className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mb-2" />
-            <div className="text-sm font-medium">Diary Card</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Track urges, emotions, and skills across 7 days. Includes weekly summary view.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("walking-middle-path")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <GitMerge className="h-5 w-5 text-violet-600 dark:text-violet-400 mb-2" />
-            <div className="text-sm font-medium">Walking the Middle Path</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Find the synthesis between two opposing positions.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("missing-links")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Unplug className="h-5 w-5 text-orange-600 dark:text-orange-400 mb-2" />
-            <div className="text-sm font-medium">Missing-Links Analysis (Behavior Analysis)</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Why didn&apos;t you use a skill you already knew? Find the specific gap and plan to close it.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("dear-man-script")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <MessageSquareText className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
-            <div className="text-sm font-medium">DEAR MAN Script</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Write out a full interpersonal effectiveness script before a difficult conversation.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("check-the-facts")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <SearchCheck className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Check the Facts</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Does your emotion and its intensity fit the situation? Walk through the facts.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("opposite-action")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <FlipHorizontal className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Opposite Action</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Do the opposite of what your emotion urges — all the way, repeated.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("radical-acceptance")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <HeartHandshake className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
-            <div className="text-sm font-medium">Radical Acceptance Practice</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Guided steps for accepting a reality you cannot change.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("crisis-survival-tracker")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <ShieldCheck className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
-            <div className="text-sm font-medium">Crisis Survival Skills Tracker</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              After a crisis, check off which skills you used and what worked.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("values-to-actions")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Target className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Values to Action Steps</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Turn a value into a concrete weekly action. Build a life worth living.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("pleasant-events-diary")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Smile className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Pleasant Events Diary</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Track one pleasant activity per day. Rate emotion before and after.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("emotion-diary")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Activity className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Emotion Diary (Single Emotion)</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Track one emotion across a week: triggers, intensity, what worked.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("dialectics-practice")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <GitMerge className="h-5 w-5 text-violet-600 dark:text-violet-400 mb-2" />
-            <div className="text-sm font-medium">Dialectics Practice</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Find the synthesis in a specific relationship conflict.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("self-validation")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <HeartPulse className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
-            <div className="text-sm font-medium">Self-Validation Practice</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Practice the 6 levels of validation on yourself.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("dime-game")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Coins className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
-            <div className="text-sm font-medium">The Dime Game</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              How intensely should you ask or say no? Answer 10 questions for a live score.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("cope-ahead")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <BrainCog className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Cope Ahead</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Rehearse a difficult situation in your mind — vividly imagine it and practice the skill.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("build-mastery")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <TrendingUp className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Build Mastery</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Daily competence tracker — do one thing each day that gives accomplishment.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("please-tracker")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <HeartPulse className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">PLEASE Tracker</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Weekly physical self-care: sleep, eating, exercise, illness, substances.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("nightmare-protocol")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Moon className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Nightmare Protocol</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Rewrite recurring nightmares with a mastery ending. Rehearse before sleep.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("mindfulness-emotions")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Waves className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Mindfulness of Emotions</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Observe an emotion as a wave — let it crest and pass without acting on it.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("mindfulness-thoughts")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Cloud className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
-            <div className="text-sm font-medium">Mindfulness of Thoughts</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Observe thoughts as passing events — not as truth, not as you.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("turning-mind-willingness")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <RefreshCw className="h-5 w-5 text-sky-600 dark:text-sky-400 mb-2" />
-            <div className="text-sm font-medium">Turning the Mind & Willingness</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Turn back to acceptance when you slip. Choose willingness over willfulness.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("clarifying-priorities")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <ListChecks className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
-            <div className="text-sm font-medium">Clarifying Priorities</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Is your priority objectives, relationship, or self-respect? Decide before acting.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("troubleshooting-ie")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Wrench className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
-            <div className="text-sm font-medium">Troubleshooting IE</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              When DEAR MAN, GIVE, or FAST didn&apos;t work — diagnose what went wrong.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("validating-others")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Users className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-2" />
-            <div className="text-sm font-medium">Validating Others</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Practice the 6 levels of validation on another person.
-            </div>
-          </button>
-          <button
-            onClick={() => onCreate("myths-emotions")}
-            className="p-4 rounded-md border hover:bg-muted/50 transition-colors"
-          >
-            <Lightbulb className="h-5 w-5 text-rose-600 dark:text-rose-400 mb-2" />
-            <div className="text-sm font-medium">Myths About Emotions</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              Identify and challenge false beliefs about emotions.
-            </div>
-          </button>
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
