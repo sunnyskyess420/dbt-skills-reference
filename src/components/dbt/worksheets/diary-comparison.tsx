@@ -163,7 +163,6 @@ export function DiaryComparison({ open, onOpenChange, diaryCards }: Props) {
                     {diaryCards.map((d) => (
                       <SelectItem key={d.id} value={d.id}>
                         {d.title}
-                        {d.data.weekStartDate ? ` (week of ${d.data.weekStartDate})` : ""}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -181,7 +180,6 @@ export function DiaryComparison({ open, onOpenChange, diaryCards }: Props) {
                     {diaryCards.map((d) => (
                       <SelectItem key={d.id} value={d.id}>
                         {d.title}
-                        {d.data.weekStartDate ? ` (week of ${d.data.weekStartDate})` : ""}
                       </SelectItem>
                     ))}
                   </SelectContent>
