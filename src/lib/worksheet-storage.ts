@@ -28,7 +28,8 @@ export type WorksheetType =
   | "clarifying-priorities"
   | "troubleshooting-ie"
   | "validating-others"
-  | "myths-emotions";
+  | "myths-emotions"
+  | "being-effective";
 
 export interface WorksheetEntry {
   id: string;
@@ -319,6 +320,16 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     icon: "Lightbulb",
     reference: "ER Handout 4a / ER Worksheet 3",
     color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "being-effective",
+    name: "Being Effective (FAST Skill)",
+    shortName: "Being Effective",
+    description:
+      "Plan and practice the FAST skill for self-respect effectiveness: Be Fair, no Apologies, Stick to values, Be Truthful. Write your script, rehearse it, and reflect.",
+    icon: "ShieldCheck",
+    reference: "IE Handout 7 / IE Worksheet 5",
+    color: "text-amber-600 dark:text-amber-400",
   },
 ];
 
@@ -813,6 +824,20 @@ export function blankMythsEmotionsData(): Record<string, any> {
   };
 }
 
+export function blankBeingEffectiveData(): Record<string, any> {
+  return {
+    entryDate: "",
+    situation: "",
+    objective: "",
+    fair: "",
+    apologies: "",
+    values: "",
+    truthful: "",
+    script: "",
+    reflection: "",
+  };
+}
+
 export function blankData(type: WorksheetType): Record<string, any> {
   switch (type) {
     case "chain-analysis":
@@ -869,6 +894,8 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankValidatingOthersData();
     case "myths-emotions":
       return blankMythsEmotionsData();
+    case "being-effective":
+      return blankBeingEffectiveData();
   }
 }
 

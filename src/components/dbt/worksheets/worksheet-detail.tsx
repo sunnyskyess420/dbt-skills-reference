@@ -56,6 +56,7 @@ import { ClarifyingPrioritiesForm } from "./clarifying-priorities-form";
 import { TroubleshootingIeForm } from "./troubleshooting-ie-form";
 import { ValidatingOthersForm } from "./validating-others-form";
 import { MythsEmotionsForm } from "./myths-emotions-form";
+import { BeingEffectiveForm } from "./being-effective-form";
 import { DiaryCardSummary } from "./diary-card-summary";
 import { exportToPdf } from "@/lib/worksheet-pdf";
 import {
@@ -342,6 +343,9 @@ export function WorksheetDetail({
           )}
           {entry.type === "myths-emotions" && (
             <MythsEmotionsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "being-effective" && (
+            <BeingEffectiveForm entry={entry} onChange={onChangeData} />
           )}
 
           <div className="mt-12 pt-6 border-t text-xs text-muted-foreground print:mt-6">

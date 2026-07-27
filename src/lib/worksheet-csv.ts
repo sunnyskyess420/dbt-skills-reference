@@ -145,6 +145,8 @@ function getKeyFields(ws: WorksheetEntry): string[] {
       return [d.skillIntended || "", d.situation || "", Array.isArray(d.missingLinkType) ? d.missingLinkType.join("; ") : "", d.planStrategy || "", d.nextTimePlan || ""];
     case "dear-man-script":
       return [d.relationship || "", d.objective || "", d.describe || "", d.assert || "", d.negotiate || ""];
+    case "being-effective":
+      return [d.situation || "", d.objective || "", d.fair || "", d.values || "", d.script || ""];
     case "check-the-facts":
       return [d.emotion || "", String(d.intensity ?? 0), d.promptingEvent || "", d.interpretation || "", d.skillToUse || ""];
     case "opposite-action":

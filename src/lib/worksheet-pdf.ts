@@ -472,6 +472,9 @@ export function exportToPdf(entry: WorksheetEntry) {
     case "myths-emotions":
       generateMythsEmotions(doc, entry);
       break;
+    case "being-effective":
+      generateBeingEffective(doc, entry);
+      break;
   }
 
   writeFooter(doc, entry);
@@ -1031,6 +1034,30 @@ function generateMythsEmotions(doc: jsPDF, entry: WorksheetEntry) {
   writeSectionTitle(doc, 3, "My replacement belief");
   writeKeyValue(doc, "Replacement belief", data.replacementBelief);
   writeKeyValue(doc, "Notes", data.notes);
+}
+
+function generateBeingEffective(doc: jsPDF, entry: WorksheetEntry) {
+  const data = entry.data;
+  writeTitle(doc, entry.title);
+  writeSubtitle(doc, `${getWorksheetTypeMeta(entry.type).name} - ${getWorksheetTypeMeta(entry.type).reference}`);
+  if (data.entryDate) writeSubtitle(doc, `Date: ${data.entryDate}`);
+  y += 8;
+
+  writeSectionTitle(doc, 1, "The situation");
+  writeKeyValue(doc, "Situation", data.situation);
+  writeKeyValue(doc, "Objective", data.objective);
+
+  writeSectionTitle(doc, 2, "Plan your FAST approach");
+  writeKeyValue(doc, "F - Be Fair", data.fair);
+  writeKeyValue(doc, "A - No Apologies", data.apologies);
+  writeKeyValue(doc, "S - Stick to Values", data.values);
+  writeKeyValue(doc, "T - Be Truthful", data.truthful);
+
+  writeSectionTitle(doc, 3, "Your script");
+  writeKeyValue(doc, "Script", data.script);
+
+  writeSectionTitle(doc, 4, "Reflect on the outcome");
+  writeKeyValue(doc, "Reflection", data.reflection);
 }
 
 // ============ Comparison PDF ============
