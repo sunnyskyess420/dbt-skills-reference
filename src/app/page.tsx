@@ -585,7 +585,7 @@ const EMPTY_STATE_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
   },
   {
     label: "Interpersonal",
-    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others", "being-effective"].includes(t.id)),
   },
   {
     label: "Mindfulness",
