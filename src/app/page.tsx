@@ -21,7 +21,7 @@ import { incrementViewCount } from "@/lib/pinned-worksheets";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -573,23 +573,23 @@ function EmptyState({
 const EMPTY_STATE_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
   {
     label: "General",
-    types: WORKSHEET_TYPES.filter((t) => ["chain-analysis", "missing-links"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["chain-analysis", "missing-links", "options-problems"].includes(t.id)),
   },
   {
     label: "Distress Tolerance",
-    types: WORKSHEET_TYPES.filter((t) => ["pros-cons", "radical-acceptance", "crisis-survival-tracker", "mindfulness-thoughts", "turning-mind-willingness"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["pros-cons", "radical-acceptance", "crisis-survival-tracker", "mindfulness-thoughts", "turning-mind-willingness", "stop-skill", "tipp", "accepts", "self-soothing", "improve", "half-smiling", "clear-mind", "dialectical-abstinence"].includes(t.id)),
   },
   {
     label: "Emotion Regulation",
-    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions", "emotion-model", "problem-solving", "positives-short", "positives-long", "sleep-hygiene", "extreme-emotions"].includes(t.id)),
   },
   {
     label: "Interpersonal",
-    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others", "being-effective"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others", "being-effective", "finding-people", "mindfulness-others", "ending-relationships", "behavior-change"].includes(t.id)),
   },
   {
     label: "Mindfulness",
-    types: WORKSHEET_TYPES.filter((t) => ["walking-middle-path"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["walking-middle-path", "wise-mind", "what-skills", "how-skills", "loving-kindness", "balancing-doing-being"].includes(t.id)),
   },
 ];
 
@@ -598,7 +598,8 @@ const EMPTY_STATE_ICONS: Record<string, React.ComponentType<{ className?: string
   Link2, Scale, CalendarRange, GitMerge, Unplug, MessageSquareText, SearchCheck,
   FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse,
   Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench,
-  Users, Lightbulb,
+  Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus,
+  Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat,
 };
 
 function WorksheetsEmptyState({

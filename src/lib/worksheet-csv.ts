@@ -196,6 +196,10 @@ function getDimeScore(data: any): number {
  * Diary cards get their own detailed format; other worksheets get a summary.
  * If both exist, they're separated by a blank line.
  */
+function genericCsvRow(d: Record<string, any>): string[] {
+  return Object.values(d).map(v => String(v ?? ""));
+}
+
 export function exportAllToCSV(entries: WorksheetEntry[]): string {
   const parts: string[] = [];
 
@@ -213,9 +217,6 @@ export function exportAllToCSV(entries: WorksheetEntry[]): string {
   return parts.join("\n");
 }
 
-/**
- * Trigger a CSV file download in the browser.
- */
 export function downloadCSV(entries: WorksheetEntry[]) {
   const csv = exportAllToCSV(entries);
   if (!csv) return;

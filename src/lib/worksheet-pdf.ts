@@ -386,6 +386,31 @@ function generateMissingLinks(doc: jsPDF, entry: WorksheetEntry) {
 
 // ============ Public API ============
 
+function generateGenericWorksheet(doc: any, entry: WorksheetEntry) {
+  const meta = getWorksheetTypeMeta(entry.type);
+  const d = entry.data;
+  let y = 20;
+  const lm = 20;
+  const pw = doc.internal.pageSize.getWidth() - lm * 2;
+  
+  writeTitle(doc, entry.title, lm, y, pw); y += 12;
+  writeSubtitle(doc, meta.name + " — " + meta.reference, lm, y, pw); y += 10;
+  
+  const keys = Object.keys(d).filter(k => d[k] !== "" && d[k] !== 0 && d[k] !== false && d[k] !== undefined);
+  for (const key of keys) {
+    if (y > 270) { doc.addPage(); y = 20; }
+    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+    writeSectionTitle(doc, label, lm, y, pw); y += 8;
+    const val = String(d[key]);
+    const lines = doc.splitTextToSize(val, pw - 10);
+    for (const line of lines) {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.text(line, lm + 5, y); y += 6;
+    }
+    y += 4;
+  }
+}
+
 export function exportToPdf(entry: WorksheetEntry) {
   const doc = newDoc();
   y = PAGE_MARGIN;

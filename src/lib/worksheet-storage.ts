@@ -29,7 +29,31 @@ export type WorksheetType =
   | "troubleshooting-ie"
   | "validating-others"
   | "myths-emotions"
-  | "being-effective";
+  | "being-effective"
+  | "wise-mind"
+  | "what-skills"
+  | "how-skills"
+  | "loving-kindness"
+  | "balancing-doing-being"
+  | "stop-skill"
+  | "tipp"
+  | "accepts"
+  | "self-soothing"
+  | "improve"
+  | "half-smiling"
+  | "emotion-model"
+  | "problem-solving"
+  | "positives-short"
+  | "positives-long"
+  | "sleep-hygiene"
+  | "extreme-emotions"
+  | "clear-mind"
+  | "finding-people"
+  | "mindfulness-others"
+  | "ending-relationships"
+  | "options-problems"
+  | "dialectical-abstinence"
+  | "behavior-change";
 
 export interface WorksheetEntry {
   id: string;
@@ -329,6 +353,246 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
       "Plan and practice the FAST skill for self-respect effectiveness: Be Fair, no Apologies, Stick to values, Be Truthful. Write your script, rehearse it, and reflect.",
     icon: "ShieldCheck",
     reference: "IE Handout 7 / IE Worksheet 5",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "wise-mind",
+    name: "Wise Mind Practice",
+    shortName: "Wise Mind",
+    description:
+      "Distinguish reasonable mind vs. emotion mind, and find Wise Mind — the quiet synthesis that includes both feeling and reason.",
+    icon: "Sparkles",
+    reference: "Mindfulness Handouts 3, 3a / Mindfulness Worksheet 3",
+    color: "text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    id: "what-skills",
+    name: "What Skills: Observe, Describe, Participate",
+    shortName: "What Skills",
+    description:
+      "Practice the three What skills — notice experience, put words on it nonjudgmentally, or enter fully into an activity.",
+    icon: "Eye",
+    reference: "Mindfulness Handouts 4, 4a, 4b, 4c / Mindfulness Worksheets 4, 4a, 4b",
+    color: "text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    id: "how-skills",
+    name: "How Skills: Nonjudgmental, One-Mindful, Effective",
+    shortName: "How Skills",
+    description:
+      "Practice the quality you bring to mindfulness — nonjudgmentalness, one-mindfulness, and effectiveness.",
+    icon: "Compass",
+    reference: "Mindfulness Handouts 5, 5a, 5b, 5c / Mindfulness Worksheets 5, 5a, 5b, 5c",
+    color: "text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    id: "loving-kindness",
+    name: "Loving Kindness Practice",
+    shortName: "Loving-Kindness",
+    description:
+      "Silently repeat phrases of well-wishing, starting with yourself and extending outward — even to difficult people.",
+    icon: "Heart",
+    reference: "Mindfulness Handout 8 / Mindfulness Worksheet 6",
+    color: "text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    id: "balancing-doing-being",
+    name: "Balancing Doing Mind and Being Mind",
+    shortName: "Doing & Being Mind",
+    description:
+      "Recognize whether you're in doing mind (goal-focused) or being mind (present-moment) and shift toward balance.",
+    icon: "RefreshCw",
+    reference: "Mindfulness Handouts 9, 9a / Mindfulness Worksheets 7, 7a",
+    color: "text-emerald-600 dark:text-emerald-400",
+  },
+  {
+    id: "stop-skill",
+    name: "STOP Skill Practice",
+    shortName: "STOP Skill",
+    description:
+      "Stop, Take a step back, Observe, Proceed mindfully. The first crisis survival skill — interrupts the autopilot of emotional reaction.",
+    icon: "Octagon",
+    reference: "Distress Tolerance Handout 4 / Distress Tolerance Worksheets 2, 2a",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "tipp",
+    name: "TIPP Skills Log",
+    shortName: "TIPP",
+    description:
+      "Use Temperature, Intense exercise, Paced breathing, and Paired muscle relaxation to rapidly reduce extreme emotional arousal.",
+    icon: "Zap",
+    reference: "Distress Tolerance Handouts 6, 6a, 6b, 6c / Distress Tolerance Worksheets 4, 4a, 4b",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "accepts",
+    name: "Distracting with ACCEPTS",
+    shortName: "ACCEPTS",
+    description:
+      "Seven distraction strategies — Activities, Contributing, Comparisons, Emotions, Pushing away, Thoughts, Sensations.",
+    icon: "Shuffle",
+    reference: "Distress Tolerance Handout 7 / Distress Tolerance Worksheets 5, 5a, 5b",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "self-soothing",
+    name: "Self-Soothing with the Five Senses",
+    shortName: "Self-Soothing",
+    description:
+      "Comfort yourself through the five senses — vision, hearing, smell, taste, touch. Calms the nervous system directly.",
+    icon: "Flower2",
+    reference: "Distress Tolerance Handout 8 / Distress Tolerance Worksheets 6, 6a, 6b",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "improve",
+    name: "IMPROVE the Moment",
+    shortName: "IMPROVE",
+    description:
+      "Imagery, Meaning, Prayer, Relaxation, One thing, Vacation, Encouragement — reshape how you relate to a difficult moment.",
+    icon: "Sparkle",
+    reference: "Distress Tolerance Handout 9 / Distress Tolerance Worksheets 7, 7a, 7b",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "half-smiling",
+    name: "Half-Smiling and Willing Hands",
+    shortName: "Half-Smiling",
+    description:
+      "Body-based cues that support radical acceptance — a slight smile and open palms communicate safety to your nervous system.",
+    icon: "SmilePlus",
+    reference: "Distress Tolerance Handouts 14, 14a / Distress Tolerance Worksheets 11, 11a",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "emotion-model",
+    name: "Model for Describing Emotions",
+    shortName: "Emotion Model",
+    description:
+      "Break down an emotion into its components — prompting event, interpretation, biology, expressions, aftereffects — to find where to intervene.",
+    icon: "Puzzle",
+    reference: "Emotion Regulation Handouts 5, 6 / Emotion Regulation Worksheets 4, 4a",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "problem-solving",
+    name: "Problem Solving",
+    shortName: "Problem Solving",
+    description:
+      "When the emotion fits the facts, solve the problem: define it, brainstorm, evaluate, choose, plan, do it, evaluate the result.",
+    icon: "Lightbulb",
+    reference: "Emotion Regulation Handout 12 / Emotion Regulation Worksheet 8",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "positives-short",
+    name: "Accumulate Positive Emotions — Short Term",
+    shortName: "Positives Short-Term",
+    description:
+      "Plan and track one small pleasant activity per day for a week. Motivation follows action — don't wait until you feel like it.",
+    icon: "Sun",
+    reference: "Emotion Regulation Handouts 15, 16 / Emotion Regulation Worksheets 9, 10, 13",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "positives-long",
+    name: "Accumulating Positive Emotions — Long Term",
+    shortName: "Positives Long-Term",
+    description:
+      "Identify values, set goals connected to them, and take small daily actions toward building a life worth living.",
+    icon: "Mountain",
+    reference: "Emotion Regulation Handouts 17, 18 / Emotion Regulation Worksheets 11, 11a, 11b",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "sleep-hygiene",
+    name: "Sleep Hygiene Tracker",
+    shortName: "Sleep Hygiene",
+    description:
+      "Daily sleep log with hygiene checklist. Good sleep is foundational to emotion regulation — without it, no other skill fully works.",
+    icon: "BedDouble",
+    reference: "Emotion Regulation Handout 20b / Emotion Regulation Worksheet 14b",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "extreme-emotions",
+    name: "Managing Extreme Emotions Plan",
+    shortName: "Extreme Emotions",
+    description:
+      "Create a crisis plan for when emotions reach 8/10+: distress tolerance first, then emotion regulation when intensity drops.",
+    icon: "Siren",
+    reference: "Emotion Regulation Handout 23",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "clear-mind",
+    name: "Clear Mind (Addiction Recovery)",
+    shortName: "Clear Mind",
+    description:
+      "The synthesis of addiction recovery: abstinent AND aware of the vulnerability, prepared, and engaged in ongoing recovery.",
+    icon: "CircleDot",
+    reference: "Distress Tolerance Handouts 18, 18a / Distress Tolerance Worksheet 15",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "finding-people",
+    name: "Finding and Getting People to Like You",
+    shortName: "Finding People",
+    description:
+      "Plan where to meet people who share your interests, how to start conversations, and how to be someone others enjoy being around.",
+    icon: "UserPlus",
+    reference: "Interpersonal Effectiveness Handouts 11, 11a / Interpersonal Effectiveness Worksheet 8",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "mindfulness-others",
+    name: "Mindfulness of Others",
+    shortName: "Mindfulness of Others",
+    description:
+      "Practice being present with another person — noticing their mood, body language, and what they might need. The foundation of attunement.",
+    icon: "ScanEye",
+    reference: "Interpersonal Effectiveness Handouts 12, 12a / Interpersonal Effectiveness Worksheet 9",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "ending-relationships",
+    name: "Ending Relationships",
+    shortName: "Ending Relationships",
+    description:
+      "Guided reflection for ending a relationship skillfully — be clear, preserve the learning, and maintain self-respect.",
+    icon: "UserMinus",
+    reference: "Interpersonal Effectiveness Handouts 13, 13a / Interpersonal Effectiveness Worksheet 10",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "options-problems",
+    name: "Options for Solving Any Problem",
+    shortName: "Options for Problems",
+    description:
+      "Four options for any problem: solve it, feel better about it, radically accept it, or stay miserable. Map your situation to the right skill family.",
+    icon: "GitFork",
+    reference: "General Handout 1a",
+    color: "text-slate-600 dark:text-slate-300",
+  },
+  {
+    id: "dialectical-abstinence",
+    name: "Dialectical Abstinence",
+    shortName: "Dialectical Abstinence",
+    description:
+      "Aim for absolute abstinence AND have a detailed harm reduction plan for slips. The synthesis of recovery.",
+    icon: "ShieldHalf",
+    reference: "Distress Tolerance Handouts 17, 17a / Distress Tolerance Worksheet 14",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "behavior-change",
+    name: "Behavior Change Strategies",
+    shortName: "Behavior Change",
+    description:
+      "To increase a behavior, reinforce it immediately. To decrease a behavior, stop reinforcing it. Be deliberate, consistent, aware.",
+    icon: "Repeat",
+    reference: "Interpersonal Effectiveness Handouts 20, 21, 22, 22a / Interpersonal Effectiveness Worksheets 14, 15",
     color: "text-amber-600 dark:text-amber-400",
   },
 ];
@@ -838,6 +1102,79 @@ export function blankBeingEffectiveData(): Record<string, any> {
   };
 }
 
+export function blankWiseMindData(): Record<string, any> {
+  return { entryDate: "", situation: "", emotionMind: "", reasonableMind: "", wiseMindAnswer: "", confidence: 0, bodyCue: "", practice: "", reflection: "" };
+}
+export function blankWhatSkillsData(): Record<string, any> {
+  return { entryDate: "", situation: "", skill: "", observe: "", describe: "", participate: "", whatHappened: "", presence: 0, reflection: "" };
+}
+export function blankHowSkillsData(): Record<string, any> {
+  return { entryDate: "", situation: "", whatSkill: "", nonjudgmental: "", oneMindful: "", effective: "", whatHappened: "", effectiveness: 0, reflection: "" };
+}
+export function blankLovingKindnessData(): Record<string, any> {
+  return { entryDate: "", setting: "", duration: "", self: "", lovedOne: "", neutralPerson: "", difficultPerson: "", allBeings: "", wandering: "", reflection: "" };
+}
+export function blankBalancingDoingBeingData(): Record<string, any> {
+  return { entryDate: "", currentMode: "", balance: 0, doingDescription: "", doingCost: "", beingDescription: "", beingBenefit: "", shift: "", reflection: "" };
+}
+export function blankStopSkillData(): Record<string, any> {
+  return { entryDate: "", situation: "", aboutToDo: "", stop: "", takeStepBack: "", observe: "", proceed: "", reflection: "" };
+}
+export function blankTippData(): Record<string, any> {
+  return { entryDate: "", situation: "", intensityBefore: 0, temperature: "", intenseExercise: "", pacedBreathing: "", pairedRelaxation: "", intensityAfter: 0, whatHappened: "", reflection: "" };
+}
+export function blankAcceptsData(): Record<string, any> {
+  return { entryDate: "", situation: "", urgency: 0, activities: "", contributing: "", comparisons: "", emotions: "", pushingAway: "", thoughts: "", sensations: "", whatHappened: "" };
+}
+export function blankSelfSoothingData(): Record<string, any> {
+  return { entryDate: "", situation: "", vision: "", hearing: "", smell: "", taste: "", touch: "", whatHappened: "", kitPlan: "" };
+}
+export function blankImproveData(): Record<string, any> {
+  return { entryDate: "", situation: "", imagery: "", meaning: "", prayer: "", relaxation: "", oneThing: "", vacation: "", encouragement: "", reflection: "" };
+}
+export function blankHalfSmilingData(): Record<string, any> {
+  return { entryDate: "", situation: "", practicingWith: "", halfSmile: "", willingHands: "", duration: "", whatShifted: "", reflection: "" };
+}
+export function blankEmotionModelData(): Record<string, any> {
+  return { entryDate: "", emotion: "", intensity: 0, promptingEvent: "", interpretation: "", biologicalChanges: "", expressions: "", aftereffects: "", leverage: "", reflection: "" };
+}
+export function blankProblemSolvingData(): Record<string, any> {
+  return { entryDate: "", problem: "", emotion: "", brainstorm: "", evaluate: "", chosen: "", steps: "", whatHappened: "", evaluateResult: "" };
+}
+export function blankPositivesShortData(): Record<string, any> {
+  return { weekStartDate: "", activitiesList: "", monday: "", tuesday: "", wednesday: "", thursday: "", friday: "", saturday: "", sunday: "", reflection: "" };
+}
+export function blankPositivesLongData(): Record<string, any> {
+  return { entryDate: "", valuesList: "", chosenValue: "", whyImportant: "", goal: "", actionSteps: "", thisWeekAction: "", progressNotes: "", reflection: "" };
+}
+export function blankSleepHygieneData(): Record<string, any> {
+  return { weekStartDate: "", monday: "", tuesday: "", wednesday: "", thursday: "", friday: "", saturday: "", sunday: "", hygienePractices: "", reflection: "" };
+}
+export function blankExtremeEmotionsData(): Record<string, any> {
+  return { entryDate: "", commonEmotions: "", warningSigns: "", dtSkills: "", erSkills: "", contacts: "", whatHappened: "", aftercare: "", reflection: "" };
+}
+export function blankClearMindData(): Record<string, any> {
+  return { entryDate: "", currentstate: "", confidence: 0, triggers: "", complacencySigns: "", recoveryPractices: "", slipPlan: "", reflection: "" };
+}
+export function blankFindingPeopleData(): Record<string, any> {
+  return { entryDate: "", interests: "", whereToLook: "", conversationStarters: "", howToBe: "", thisWeekStep: "", reflection: "" };
+}
+export function blankMindfulnessOthersData(): Record<string, any> {
+  return { entryDate: "", person: "", observations: "", whatHappened: "", beyondWords: "", reflection: "" };
+}
+export function blankEndingRelationshipsData(): Record<string, any> {
+  return { entryDate: "", relationship: "", whyEnd: "", learned: "", howToEnd: "", selfRespect: "", whatHappened: "", reflection: "" };
+}
+export function blankOptionsProblemsData(): Record<string, any> {
+  return { entryDate: "", problem: "", optionSolve: "", optionFeelBetter: "", optionAccept: "", optionStayMiserable: "", myChoice: "" };
+}
+export function blankDialecticalAbstinenceData(): Record<string, any> {
+  return { entryDate: "", substance: "", commitment: "", slipPlan: "", relapsePreventionPlan: "", support: "", reflection: "" };
+}
+export function blankBehaviorChangeData(): Record<string, any> {
+  return { entryDate: "", targetBehavior: "", target: "", reinforcement: "", accidentalReward: "", extinctionPlan: "", reflection: "" };
+}
+
 export function blankData(type: WorksheetType): Record<string, any> {
   switch (type) {
     case "chain-analysis":
@@ -896,6 +1233,54 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankMythsEmotionsData();
     case "being-effective":
       return blankBeingEffectiveData();
+    case "wise-mind":
+      return blankWiseMindData();
+    case "what-skills":
+      return blankWhatSkillsData();
+    case "how-skills":
+      return blankHowSkillsData();
+    case "loving-kindness":
+      return blankLovingKindnessData();
+    case "balancing-doing-being":
+      return blankBalancingDoingBeingData();
+    case "stop-skill":
+      return blankStopSkillData();
+    case "tipp":
+      return blankTippData();
+    case "accepts":
+      return blankAcceptsData();
+    case "self-soothing":
+      return blankSelfSoothingData();
+    case "improve":
+      return blankImproveData();
+    case "half-smiling":
+      return blankHalfSmilingData();
+    case "emotion-model":
+      return blankEmotionModelData();
+    case "problem-solving":
+      return blankProblemSolvingData();
+    case "positives-short":
+      return blankPositivesShortData();
+    case "positives-long":
+      return blankPositivesLongData();
+    case "sleep-hygiene":
+      return blankSleepHygieneData();
+    case "extreme-emotions":
+      return blankExtremeEmotionsData();
+    case "clear-mind":
+      return blankClearMindData();
+    case "finding-people":
+      return blankFindingPeopleData();
+    case "mindfulness-others":
+      return blankMindfulnessOthersData();
+    case "ending-relationships":
+      return blankEndingRelationshipsData();
+    case "options-problems":
+      return blankOptionsProblemsData();
+    case "dialectical-abstinence":
+      return blankDialecticalAbstinenceData();
+    case "behavior-change":
+      return blankBehaviorChangeData();
   }
 }
 
