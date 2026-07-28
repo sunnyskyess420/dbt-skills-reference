@@ -1403,8 +1403,11 @@ export function getEntry(id: string): WorksheetEntry | null {
 }
 
 export function createEntry(type: WorksheetType): WorksheetEntry {
+  // Returns a new entry object WITHOUT persisting to localStorage.
+  // The entry is only saved when the user actually fills in data
+  // (handled by updateEntry's upsert logic).
   const now = new Date().toISOString();
-  const entry: WorksheetEntry = {
+  return {
     id: generateId(),
     type,
     title: defaultTitle(type),
@@ -1412,25 +1415,31 @@ export function createEntry(type: WorksheetType): WorksheetEntry {
     updatedAt: now,
     data: blankData(type),
   };
-  const all = listEntries();
-  all.push(entry);
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  } catch (e) {
-    // ignore
-  }
-  return entry;
 }
 
 export function updateEntry(
   id: string,
-  updates: Partial<Pick<WorksheetEntry, "title" | "data">>
+  updates: Partial<Pick<WorksheetEntry, "title" | "data">>,
+  fallback?: WorksheetEntry
 ): WorksheetEntry | null {
   const all = listEntries();
-  const idx = all.findIndex((e) => e.id === id);
-  if (idx === -1) return null;
+  let idx = all.findIndex((e) => e.id === id);
+  let base: WorksheetEntry;
+
+  if (idx !== -1) {
+    // Entry exists in storage — update it
+    base = all[idx];
+  } else if (fallback) {
+    // Entry is a draft (not yet persisted) — insert it
+    base = fallback;
+    all.unshift(base);
+    idx = 0;
+  } else {
+    return null;
+  }
+
   const updated: WorksheetEntry = {
-    ...all[idx],
+    ...base,
     ...updates,
     updatedAt: new Date().toISOString(),
   };

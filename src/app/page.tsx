@@ -43,11 +43,11 @@ export default function Home() {
   const [bookmarks, setBookmarks] = React.useState<Set<string>>(new Set());
 
   // Worksheets
-  const { entries: worksheetEntries, createEntry, updateEntry, deleteEntry, refresh: refreshWorksheets } = useWorksheets();
+  const { entries: worksheetEntries, createEntry, updateEntry, deleteEntry, findEntry, refresh: refreshWorksheets } = useWorksheets();
 
   const selectedWorksheet = React.useMemo(
-    () => worksheetEntries.find((e) => e.id === selectedWorksheetId) ?? null,
-    [worksheetEntries, selectedWorksheetId]
+    () => (selectedWorksheetId ? findEntry(selectedWorksheetId) : null),
+    [findEntry, selectedWorksheetId]
   );
 
   // Load bookmarks from localStorage on mount
