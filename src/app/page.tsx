@@ -143,9 +143,34 @@ export default function Home() {
       const entry = createEntry(type);
       setSelectedWorksheetId(entry.id);
       setSelectedSkill(null);
+      setSelectedModule("worksheets");
       history.pushState({ type: "worksheet", id: entry.id }, "");
     },
     [createEntry]
+  );
+
+  // Create worksheet from a skill page — switches to worksheets mode
+  const handleCreateWorksheetFromSkill = React.useCallback(
+    (type: WorksheetType) => {
+      const entry = createEntry(type);
+      setSelectedWorksheetId(entry.id);
+      setSelectedSkill(null);
+      setSelectedModule("worksheets");
+      history.pushState({ type: "worksheet", id: entry.id }, "");
+    },
+    [createEntry]
+  );
+
+  // View a skill from a worksheet page — switches out of worksheets mode
+  const handleViewSkillFromWorksheet = React.useCallback(
+    (skillId: string) => {
+      const skill = SKILLS.find((s) => s.id === skillId);
+      if (!skill) return;
+      setSelectedWorksheetId(null);
+      setSelectedModule(skill.module);
+      handleSelectSkill(skill);
+    },
+    [handleSelectSkill]
   );
 
   // When selecting a non-worksheets mode, clear worksheet selection
@@ -423,6 +448,7 @@ export default function Home() {
                 deleteEntry(selectedWorksheet.id);
                 setSelectedWorksheetId(null);
               }}
+              onViewSkill={handleViewSkillFromWorksheet}
             />
           ) : selectedSkill ? (
             <SkillDetail
@@ -431,6 +457,7 @@ export default function Home() {
               isBookmarked={bookmarks.has(selectedSkill.id)}
               onToggleBookmark={toggleBookmark}
               onSelectSkill={handleSelectSkill}
+              onCreateWorksheet={handleCreateWorksheetFromSkill}
             />
           ) : isWorksheetsMode ? (
             <WorksheetsEmptyState onCreate={handleCreateWorksheet} />

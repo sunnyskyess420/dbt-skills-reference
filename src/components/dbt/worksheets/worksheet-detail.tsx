@@ -4,7 +4,9 @@ import * as React from "react";
 import {
   type WorksheetEntry,
   getWorksheetTypeMeta,
+  getSkillForWorksheet,
 } from "@/lib/worksheet-storage";
+import { SKILLS } from "@/data/skills";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,6 +18,7 @@ import {
   BarChart3,
   ListChecks,
   FileDown,
+  GraduationCap,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -96,6 +99,7 @@ interface Props {
   onChangeTitle: (title: string) => void;
   onChangeData: (data: Record<string, any>) => void;
   onDelete: () => void;
+  onViewSkill?: (skillId: string) => void;
 }
 
 export function WorksheetDetail({
@@ -104,8 +108,11 @@ export function WorksheetDetail({
   onChangeTitle,
   onChangeData,
   onDelete,
+  onViewSkill,
 }: Props) {
   const meta = getWorksheetTypeMeta(entry.type);
+  const linkedSkillId = onViewSkill ? getSkillForWorksheet(entry.type) : undefined;
+  const linkedSkill = linkedSkillId ? SKILLS.find((s) => s.id === linkedSkillId) : null;
   const [titleDraft, setTitleDraft] = React.useState(entry.title);
   const [savedFlash, setSavedFlash] = React.useState(false);
   const [view, setView] = React.useState<"form" | "summary">("form");
@@ -267,6 +274,15 @@ export function WorksheetDetail({
               <span className="font-medium">Book reference:</span> {meta.reference}
             </span>
           </div>
+          {linkedSkill && onViewSkill && (
+            <button
+              onClick={() => onViewSkill(linkedSkill.id)}
+              className="mt-2 flex items-center gap-1.5 text-xs text-primary hover:underline w-full text-left"
+            >
+              <GraduationCap className="h-3 w-3 shrink-0" />
+              <span>Related skill: <span className="font-medium">{linkedSkill.name}</span></span>
+            </button>
+          )}
         </div>
       </div>
 

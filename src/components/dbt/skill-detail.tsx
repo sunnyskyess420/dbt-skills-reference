@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { type Skill, MODULES, SKILLS } from "@/data/skills";
+import { getWorksheetForSkill, getWorksheetTypeMeta, type WorksheetType } from "@/lib/worksheet-storage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkCheck, ArrowLeft, BookOpen, Lightbulb, Footprints, CircleHelp, Quote, Clock } from "lucide-react";
+import { Bookmark, BookmarkCheck, ArrowLeft, BookOpen, Lightbulb, Footprints, CircleHelp, Quote, Clock, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SkillDetailProps {
@@ -13,6 +14,7 @@ interface SkillDetailProps {
   isBookmarked: boolean;
   onToggleBookmark: (skillId: string) => void;
   onSelectSkill: (skill: Skill) => void;
+  onCreateWorksheet?: (type: WorksheetType) => void;
 }
 
 export function SkillDetail({
@@ -21,10 +23,13 @@ export function SkillDetail({
   isBookmarked,
   onToggleBookmark,
   onSelectSkill,
+  onCreateWorksheet,
 }: SkillDetailProps) {
   if (!skill) return null;
 
   const moduleInfo = MODULES.find((m) => m.id === skill.module)!;
+  const linkedWsType = onCreateWorksheet ? getWorksheetForSkill(skill.id) : undefined;
+  const linkedWsMeta = linkedWsType ? getWorksheetTypeMeta(linkedWsType) : null;
 
   return (
     <div className="flex flex-col h-full">
@@ -92,6 +97,22 @@ export function SkillDetail({
               <span className="font-medium">Book reference:</span> {skill.reference}
             </span>
           </div>
+
+          {linkedWsMeta && onCreateWorksheet && (
+            <div className="mt-4">
+              <Button
+                onClick={() => onCreateWorksheet(linkedWsType!)}
+                className="w-full sm:w-auto"
+                variant="outline"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Practice with Worksheet
+              </Button>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Opens a <span className="font-medium">{linkedWsMeta.shortName}</span> worksheet to practice this skill
+              </p>
+            </div>
+          )}
 
           {/* Description */}
           <section className="mt-8">

@@ -601,6 +601,82 @@ export function getWorksheetTypeMeta(type: WorksheetType): WorksheetTypeMeta {
   return WORKSHEET_TYPES.find((w) => w.id === type)!;
 }
 
+// =================== Skill ↔ Worksheet linking ===================
+
+/** Map from worksheet type to the skill ID it practices. */
+export const WORKSHEET_TO_SKILL: Partial<Record<WorksheetType, string>> = {
+  // General
+  "chain-analysis": "chain-analysis",
+  "missing-links": "missing-links-analysis",
+  "options-problems": "options-for-solving-any-problem",
+  // Distress Tolerance
+  "pros-cons": "pros-and-cons",
+  "radical-acceptance": "radical-acceptance",
+  "mindfulness-thoughts": "mindfulness-of-current-thoughts",
+  "turning-mind-willingness": "willingness",
+  "stop-skill": "stop",
+  "tipp": "tipp",
+  "accepts": "distracting-accepts",
+  "self-soothing": "self-soothing",
+  "improve": "improve-the-moment",
+  "half-smiling": "half-smiling-willing-hands",
+  "clear-mind": "clear-mind",
+  "dialectical-abstinence": "dialectical-abstinence",
+  // Emotion Regulation
+  "check-the-facts": "check-the-facts",
+  "opposite-action": "opposite-action",
+  "cope-ahead": "cope-ahead",
+  "build-mastery": "build-mastery",
+  "please-tracker": "please",
+  "nightmare-protocol": "nightmare-protocol",
+  "mindfulness-emotions": "mindfulness-of-current-emotions",
+  "myths-emotions": "myths-about-emotions",
+  "emotion-model": "model-for-describing-emotions",
+  "problem-solving": "problem-solving",
+  "positives-short": "accumulate-positive-emotions-short-term",
+  "positives-long": "accumulate-positive-emotions-long-term",
+  "sleep-hygiene": "sleep-hygiene",
+  "extreme-emotions": "managing-extreme-emotions",
+  // Interpersonal Effectiveness
+  "dear-man-script": "dear-man",
+  "dialectics-practice": "dialectics",
+  "self-validation": "validation",
+  "dime-game": "dime-game",
+  "troubleshooting-ie": "troubleshooting-interpersonal",
+  "validating-others": "validation",
+  "being-effective": "fast",
+  "finding-people": "finding-people-to-like-you",
+  "mindfulness-others": "mindfulness-of-others",
+  "ending-relationships": "ending-relationships",
+  "behavior-change": "behavior-change-strategies",
+  // Mindfulness
+  "walking-middle-path": "walking-the-middle-path",
+  "wise-mind": "wise-mind",
+  "what-skills": "what-skills",
+  "how-skills": "how-skills",
+  "loving-kindness": "loving-kindness",
+  "balancing-doing-being": "balancing-doing-and-being-mind",
+};
+
+/** Reverse lookup: skill ID → worksheet type. */
+export const SKILL_TO_WORKSHEET: Record<string, WorksheetType> = {} as Record<string, WorksheetType>;
+for (const [wsType, skillId] of Object.entries(WORKSHEET_TO_SKILL)) {
+  // If multiple worksheets link to the same skill, keep the first (most specific) one
+  if (!(skillId in SKILL_TO_WORKSHEET)) {
+    SKILL_TO_WORKSHEET[skillId] = wsType as WorksheetType;
+  }
+}
+
+/** Get the linked worksheet type for a skill, if one exists. */
+export function getWorksheetForSkill(skillId: string): WorksheetType | undefined {
+  return SKILL_TO_WORKSHEET[skillId];
+}
+
+/** Get the linked skill ID for a worksheet type, if one exists. */
+export function getSkillForWorksheet(worksheetType: WorksheetType): string | undefined {
+  return WORKSHEET_TO_SKILL[worksheetType];
+}
+
 // =================== Blank templates ===================
 
 export function blankChainAnalysisData(): Record<string, any> {
