@@ -50,6 +50,11 @@ export default function Home() {
     [findEntry, selectedWorksheetId]
   );
 
+  // Scroll to top when switching views (skills, worksheets, modules, etc.)
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [selectedModule, selectedSkill?.id, selectedWorksheetId]);
+
   // Load bookmarks from localStorage on mount
   React.useEffect(() => {
     try {
