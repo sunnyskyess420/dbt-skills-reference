@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemePresetApplier } from "@/components/dbt/theme-preset-applier";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -122,6 +123,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} ${lora.variable} ${nunito.variable} ${sourceSans.variable} font-sans antialiased bg-background text-foreground`}
       >
+        <ScrollToTop />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
