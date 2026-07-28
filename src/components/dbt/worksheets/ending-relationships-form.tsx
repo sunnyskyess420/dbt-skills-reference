@@ -62,7 +62,7 @@ export function EndingRelationshipsForm({ entry, onChange }: Props) {
           value={data.howToEnd ?? ""}
           onChange={(v) => update("howToEnd", v)}
           hint="In person? In writing? Not at all (if unsafe)? What will you say?"
-          placeholder="e.g., 'I need to be honest with you about where I stand...'
+          placeholder="e.g., 'I need to be honest with you about where I stand...'"
           rows={3}
         />
         <TextAreaField

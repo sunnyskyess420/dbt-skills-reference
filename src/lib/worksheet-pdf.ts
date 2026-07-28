@@ -500,6 +500,9 @@ export function exportToPdf(entry: WorksheetEntry) {
     case "being-effective":
       generateBeingEffective(doc, entry);
       break;
+    default:
+      generateGenericWorksheet(doc, entry);
+      break;
   }
 
   writeFooter(doc, entry);

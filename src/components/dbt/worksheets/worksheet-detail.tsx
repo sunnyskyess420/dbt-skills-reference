@@ -371,6 +371,78 @@ export function WorksheetDetail({
           {entry.type === "being-effective" && (
             <BeingEffectiveForm entry={entry} onChange={onChangeData} />
           )}
+          {entry.type === "wise-mind" && (
+            <WiseMindForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "what-skills" && (
+            <WhatSkillsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "how-skills" && (
+            <HowSkillsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "loving-kindness" && (
+            <LovingKindnessForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "balancing-doing-being" && (
+            <BalancingDoingBeingForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "stop-skill" && (
+            <StopSkillForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "tipp" && (
+            <TippForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "accepts" && (
+            <AcceptsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "self-soothing" && (
+            <SelfSoothingForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "improve" && (
+            <ImproveForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "half-smiling" && (
+            <HalfSmilingForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "emotion-model" && (
+            <EmotionModelForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "problem-solving" && (
+            <ProblemSolvingForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "positives-short" && (
+            <PositivesShortForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "positives-long" && (
+            <PositivesLongForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "sleep-hygiene" && (
+            <SleepHygieneForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "extreme-emotions" && (
+            <ExtremeEmotionsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "clear-mind" && (
+            <ClearMindForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "finding-people" && (
+            <FindingPeopleForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "mindfulness-others" && (
+            <MindfulnessOthersForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "ending-relationships" && (
+            <EndingRelationshipsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "options-problems" && (
+            <OptionsProblemsForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "dialectical-abstinence" && (
+            <DialecticalAbstinenceForm entry={entry} onChange={onChangeData} />
+          )}
+          {entry.type === "behavior-change" && (
+            <BehaviorChangeForm entry={entry} onChange={onChangeData} />
+          )}
 
           <div className="mt-12 pt-6 border-t text-xs text-muted-foreground print:mt-6">
             <p>

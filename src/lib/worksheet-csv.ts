@@ -163,8 +163,87 @@ function getKeyFields(ws: WorksheetEntry): string[] {
       return [d.situation || "", d.feeling || "", d.level2 || "", d.level4 || "", d.reflection || ""];
     case "dime-game":
       return [d.situation || "", d.mode || "", String(getDimeScore(d)), d.notes || "", ""];
-    default:
-      return ["", "", "", "", ""];
+    case "wise-mind":
+      return [d.situation || "", d.emotionMind || "", d.wiseMindAnswer || "", String(d.confidence ?? 0), d.reflection || ""];
+    case "what-skills":
+      return [d.situation || "", d.skill || "", d.observe || "", d.describe || "", d.reflection || ""];
+    case "how-skills":
+      return [d.situation || "", d.whatSkill || "", d.nonjudgmental || "", d.oneMindful || "", d.reflection || ""];
+    case "loving-kindness":
+      return [d.setting || "", d.self || "", d.lovedOne || "", d.difficultPerson || "", d.reflection || ""];
+    case "balancing-doing-being":
+      return [d.currentMode || "", d.doingDescription || "", d.beingDescription || "", d.shift || "", d.reflection || ""];
+    case "stop-skill":
+      return [d.situation || "", d.aboutToDo || "", d.stop || "", d.proceed || "", d.reflection || ""];
+    case "tipp":
+      return [d.situation || "", d.temperature || "", d.intenseExercise || "", d.pacedBreathing || "", d.reflection || ""];
+    case "accepts":
+      return [d.situation || "", d.activities || "", d.contributing || "", d.comparisons || "", d.whatHappened || ""];
+    case "self-soothing":
+      return [d.situation || "", d.vision || "", d.hearing || "", d.smell || "", d.kitPlan || ""];
+    case "improve":
+      return [d.situation || "", d.imagery || "", d.meaning || "", d.relaxation || "", d.reflection || ""];
+    case "half-smiling":
+      return [d.situation || "", d.practicingWith || "", d.halfSmile || "", d.willingHands || "", d.reflection || ""];
+    case "emotion-model":
+      return [d.emotion || "", String(d.intensity ?? 0), d.promptingEvent || "", d.interpretation || "", d.reflection || ""];
+    case "problem-solving":
+      return [d.problem || "", d.emotion || "", d.brainstorm || "", d.chosen || "", d.whatHappened || ""];
+    case "positives-short":
+      return [d.weekStartDate || "", d.activitiesList || "", d.monday || "", d.wednesday || "", d.reflection || ""];
+    case "positives-long":
+      return [d.chosenValue || "", d.whyImportant || "", d.goal || "", d.thisWeekAction || "", d.reflection || ""];
+    case "sleep-hygiene":
+      return [d.weekStartDate || "", d.monday || "", d.wednesday || "", d.hygienePractices || "", d.reflection || ""];
+    case "extreme-emotions":
+      return [d.commonEmotions || "", d.warningSigns || "", d.dtSkills || "", d.erSkills || "", d.reflection || ""];
+    case "clear-mind":
+      return [d.currentstate || "", d.triggers || "", d.complacencySigns || "", d.recoveryPractices || "", d.reflection || ""];
+    case "finding-people":
+      return [d.interests || "", d.whereToLook || "", d.conversationStarters || "", d.thisWeekStep || "", d.reflection || ""];
+    case "mindfulness-others":
+      return [d.person || "", d.observations || "", d.whatHappened || "", d.beyondWords || "", d.reflection || ""];
+    case "ending-relationships":
+      return [d.relationship || "", d.whyEnd || "", d.howToEnd || "", d.whatHappened || "", d.reflection || ""];
+    case "options-problems":
+      return [d.problem || "", d.optionSolve || "", d.optionFeelBetter || "", d.optionAccept || "", d.myChoice || ""];
+    case "dialectical-abstinence":
+      return [d.substance || "", d.commitment || "", d.slipPlan || "", d.relapsePreventionPlan || "", d.reflection || ""];
+    case "behavior-change":
+      return [d.targetBehavior || "", d.target || "", d.reinforcement || "", d.extinctionPlan || "", d.reflection || ""];
+    case "pleasant-events-diary":
+      return [d.entryDate || "", d.activity || "", d.emotionsBefore || "", d.emotionsAfter || "", d.reflection || ""];
+    case "emotion-diary":
+      return [d.entryDate || "", d.event || "", d.primaryEmotion || "", d.secondaryEmotions || "", d.copingskills || ""];
+    case "cope-ahead":
+      return [d.situation || "", d.emotion || "", d.copeAction || "", d.selfTalk || "", d.outcome || ""];
+    case "build-mastery":
+      return [d.activity || "", d.difficulty || "", d.completed || "", d.nextStep || "", d.reflection || ""];
+    case "please-tracker":
+      return [d.situation || "", d.gentle || "", d.interested || "", d.validate || "", d.easyManner || ""];
+    case "nightmare-protocol":
+      return [d.nightmare || "", d.emotion || "", d.rescripting || "", d.newEnding || "", d.reflection || ""];
+    case "mindfulness-emotions":
+      return [d.emotion || "", d.whereInBody || "", d.intensity || "", d.urge || "", d.reflection || ""];
+    case "mindfulness-thoughts":
+      return [d.thought || "", d.feeling || "", d.letGo || "", d.cameBack || "", d.reflection || ""];
+    case "turning-mind-willingness":
+      return [d.situation || "", d.willing || "", d.willful || "", d.whatHappened || "", d.reflection || ""];
+    case "clarifying-priorities":
+      return [d.situation || "", d.priority || "", d.goal || "", d.bothResponse || "", d.reflection || ""];
+    case "troubleshooting-ie":
+      return [d.situation || "", d.thoughts || "", d.actions || "", d.whatHelped || "", d.nextSteps || ""];
+    case "validating-others":
+      return [d.situation || "", d.whatHappened || "", d.validationLevel || "", d.response || "", d.reflection || ""];
+    case "myths-emotions":
+      return [d.myth || "", d.truth || "", d.beliefBefore || "", d.beliefAfter || "", d.reflection || ""];
+    default: {
+      const d = ws.data;
+      const stringFields = Object.entries(d)
+        .filter(([k, v]) => typeof v === "string" && v.trim() !== "")
+        .map(([k, v]) => [k, v as string]);
+      return stringFields.slice(0, 5).map(([, v]) => v);
+    }
   }
 }
 

@@ -33,11 +33,7 @@ export function PositivesLongForm({ entry, onChange }: Props) {
           value={data.valuesList ?? ""}
           onChange={(v) => update("valuesList", v)}
           hint="What matters most? Relationships, creativity, health, justice, growth, spirituality, community..."
-          placeholder="1. 
-2. 
-3. 
-4. 
-5."
+          placeholder={"1.\n2.\n3.\n4.\n5."}
           rows={5}
         />
         <TextField
@@ -72,10 +68,7 @@ export function PositivesLongForm({ entry, onChange }: Props) {
           label="Small action steps"
           value={data.actionSteps ?? ""}
           hint="Small actions consistently beat large actions occasionally."
-          placeholder="Step 1: 
-Step 2: 
-Step 3: 
-Step 4:"
+          placeholder={"Step 1: \nStep 2: \nStep 3: \nStep 4:"}
           rows={4}
         />
       </section>

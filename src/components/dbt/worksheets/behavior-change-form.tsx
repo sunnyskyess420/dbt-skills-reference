@@ -32,7 +32,7 @@ export function BehaviorChangeForm({ entry, onChange }: Props) {
           label="What behavior do I want to change?"
           value={data.targetBehavior ?? ""}
           onChange={(v) => update("targetBehavior", v)}
-          placeholder="Be specific: 'I want to increase...' or 'I want to decrease...'
+          placeholder="Be specific: 'I want to increase...' or 'I want to decrease...'"
           rows={2}
         />
         <TextAreaField

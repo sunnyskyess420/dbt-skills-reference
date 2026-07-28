@@ -37,11 +37,7 @@ export function PositivesShortForm({ entry, onChange }: Props) {
           value={data.activitiesList ?? ""}
           onChange={(v) => update("activitiesList", v)}
           hint="Small is fine: a cup of tea, a walk, a song. Avoid numbing activities (scrolling, drinking)."
-          placeholder="1. 
-2. 
-3. 
-4. 
-5."
+          placeholder={"1.\n2.\n3.\n4.\n5."}
           rows={5}
         />
         {DAYS.map((day, i) => (
