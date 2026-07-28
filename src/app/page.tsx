@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { SKILLS, type Skill, type Module } from "@/data/skills";
+import { SKILLS, MODULES, type Skill, type Module } from "@/data/skills";
 import { Sidebar } from "@/components/dbt/sidebar";
 import { SkillList } from "@/components/dbt/skill-list";
 import { SkillDetail } from "@/components/dbt/skill-detail";
@@ -21,7 +21,7 @@ import { incrementViewCount } from "@/lib/pinned-worksheets";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -484,6 +484,9 @@ export default function Home() {
               recent={recent}
               onSelectSkill={handleSelectSkill}
               onOpenSearch={() => setSearchOpen(true)}
+              onSelectModule={handleSelectModule}
+              onCreateWorksheet={handleCreateWorksheet}
+              savedWorksheetCount={worksheetEntries.length}
             />
           )}
         </main>
@@ -522,58 +525,217 @@ function EmptyState({
   recent,
   onSelectSkill,
   onOpenSearch,
+  onSelectModule,
+  onCreateWorksheet,
+  savedWorksheetCount,
 }: {
   recent: string[];
   onSelectSkill: (skill: Skill) => void;
   onOpenSearch: () => void;
+  onSelectModule: (m: ViewMode) => void;
+  onCreateWorksheet: (type: WorksheetType) => void;
+  savedWorksheetCount: number;
 }) {
   const recentSkills = React.useMemo(
     () =>
       recent
         .map((id) => SKILLS.find((s) => s.id === id))
         .filter((s): s is Skill => Boolean(s))
-        .slice(0, 5),
+        .slice(0, 4),
     [recent]
   );
 
+  // Pick a few featured worksheets (one per module) for quick-start
+  const featuredWorksheets = React.useMemo(
+    () => [
+      WORKSHEET_TYPES.find((t) => t.id === "diary-card")!,
+      WORKSHEET_TYPES.find((t) => t.id === "chain-analysis")!,
+      WORKSHEET_TYPES.find((t) => t.id === "wise-mind")!,
+      WORKSHEET_TYPES.find((t) => t.id === "cope-ahead")!,
+      WORKSHEET_TYPES.find((t) => t.id === "dear-man-script")!,
+      WORKSHEET_TYPES.find((t) => t.id === "tipp")!,
+    ].filter(Boolean),
+    []
+  );
+
+  const moduleData = React.useMemo(
+    () =>
+      MODULES.map((mod) => ({
+        ...mod,
+        skillCount: SKILLS.filter((s) => s.module === mod.id).length,
+        worksheetCount: WORKSHEET_TYPES.filter((t) =>
+          // Map modules to their worksheet types
+          mod.id === "general"
+            ? ["chain-analysis", "missing-links", "options-problems"].includes(t.id)
+            : mod.id === "mindfulness"
+            ? ["walking-middle-path", "wise-mind", "what-skills", "how-skills", "loving-kindness", "balancing-doing-being"].includes(t.id)
+            : mod.id === "interpersonal"
+            ? ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others", "being-effective", "finding-people", "mindfulness-others", "ending-relationships", "behavior-change"].includes(t.id)
+            : mod.id === "emotion-regulation"
+            ? ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions", "emotion-model", "problem-solving", "positives-short", "positives-long", "sleep-hygiene", "extreme-emotions"].includes(t.id)
+            : mod.id === "distress-tolerance"
+            ? ["pros-cons", "radical-acceptance", "crisis-survival-tracker", "mindfulness-thoughts", "turning-mind-willingness", "stop-skill", "tipp", "accepts", "self-soothing", "improve", "half-smiling", "clear-mind", "dialectical-abstinence"].includes(t.id)
+            : false
+        ).length,
+      })),
+    []
+  );
+
   return (
-    <div className="h-full flex items-center justify-center p-6">
-      <div className="max-w-lg w-full text-center">
-        <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center text-3xl font-bold mx-auto mb-4">
-          D
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
+        {/* Hero */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl font-bold">D</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">DBT Skills & Worksheets</h1>
+          <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+            A fast, searchable library of <strong>{SKILLS.length} DBT skills</strong> and{" "}
+            <strong>{WORKSHEET_TYPES.length} interactive worksheets</strong>. Browse skills during group, fill out worksheets between sessions.
+          </p>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">DBT Skills Reference</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          A fast, searchable library of DBT skills. Built for use during
-          virtual group therapy — pull it up on a second screen, search
-          a skill, and review the steps in seconds.
-        </p>
 
-        <Button
-          size="lg"
-          onClick={onOpenSearch}
-          className="mt-6 w-full sm:w-auto"
-        >
-          <Search className="h-4 w-4 mr-2" />
-          Search skills
-          <KbdShortcut combo="K" className="ml-2 border-0 bg-primary-foreground/20" />
-        </Button>
+        {/* Quick actions — two pillars */}
+        <div className="grid sm:grid-cols-2 gap-3 mb-8">
+          <button
+            onClick={() => onSelectModule("all")}
+            className="group p-4 rounded-xl border-2 border-primary/15 bg-primary/5 hover:border-primary/30 hover:bg-primary/[0.07] transition-all text-left"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                <BookOpen className="h-4.5 w-4.5 text-primary" />
+              </div>
+              <div>
+                <div className="font-semibold text-sm">Skills Library</div>
+                <div className="text-xs text-muted-foreground">{SKILLS.length} skills across 5 modules</div>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Search, browse, and bookmark DBT skills. Review steps, tips, and examples anytime.
+            </p>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-primary mt-2 group-hover:gap-1.5 transition-all">
+              Browse skills <ChevronRight className="h-3 w-3" />
+            </span>
+          </button>
 
-        <div className="mt-6 text-left">
+          <button
+            onClick={() => onSelectModule("worksheets")}
+            className="group p-4 rounded-xl border-2 border-rose-500/15 bg-rose-500/5 hover:border-rose-500/30 hover:bg-rose-500/[0.07] transition-all text-left"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-9 h-9 rounded-lg bg-rose-500/10 flex items-center justify-center">
+                <FileText className="h-4.5 w-4.5 text-rose-500" />
+              </div>
+              <div>
+                <div className="font-semibold text-sm">Interactive Worksheets</div>
+                <div className="text-xs text-muted-foreground">
+                  {WORKSHEET_TYPES.length} types{savedWorksheetCount > 0 && ` · ${savedWorksheetCount} saved`}
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Fill out digital worksheets, auto-saved to your browser. Print or export when you need them.
+            </p>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-rose-500 mt-2 group-hover:gap-1.5 transition-all">
+              Browse worksheets <ChevronRight className="h-3 w-3" />
+            </span>
+          </button>
+        </div>
+
+        {/* Search bar */}
+        <div className="mb-8">
+          <Button
+            variant="outline"
+            className="w-full h-10 justify-start text-muted-foreground font-normal"
+            onClick={onOpenSearch}
+          >
+            <Search className="h-4 w-4 mr-2" />
+            Search skills and worksheets...
+            <KbdShortcut combo="K" className="ml-auto border-0 bg-muted" />
+          </Button>
+        </div>
+
+        {/* DBT Modules grid */}
+        <div className="mb-8">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">
+            DBT Modules
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {moduleData.map((mod) => {
+              const Icon = MODULE_ICONS[mod.id];
+              return (
+                <button
+                  key={mod.id}
+                  onClick={() => onSelectModule(mod.id)}
+                  className="group p-3.5 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+                >
+                  <div className="flex items-center gap-2.5 mb-1.5">
+                    <Icon className={cn("h-4 w-4", mod.color)} />
+                    <span className="text-sm font-medium">{mod.short}</span>
+                    <span className="ml-auto text-[10px] text-muted-foreground">
+                      {mod.skillCount} skills · {mod.worksheetCount} worksheets
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+                    {mod.description}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Featured Worksheets — quick start */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Popular Worksheets
+            </h2>
+            <button
+              onClick={() => onSelectModule("worksheets")}
+              className="text-[11px] text-primary hover:underline"
+            >
+              View all {WORKSHEET_TYPES.length} →
+            </button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {featuredWorksheets.map((ws) => {
+              const Icon = EMPTY_STATE_ICONS[ws.icon] ?? FileText;
+              return (
+                <button
+                  key={ws.id}
+                  onClick={() => onCreateWorksheet(ws.id)}
+                  className="p-3 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+                >
+                  <Icon className={cn("h-3.5 w-3.5 mb-1.5", ws.color)} />
+                  <div className="text-xs font-medium leading-tight">{ws.shortName}</div>
+                  <div className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">
+                    {ws.description}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Skill of the Day */}
+        <div className="mb-8">
           <SkillOfDay onSelectSkill={onSelectSkill} />
         </div>
 
+        {/* Recently viewed */}
         {recentSkills.length > 0 && (
-          <div className="mt-8 text-left">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+          <div className="mb-8">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2 px-1">
               Recently viewed
             </h2>
-            <div className="space-y-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {recentSkills.map((skill) => (
                 <button
                   key={skill.id}
                   onClick={() => onSelectSkill(skill)}
-                  className="w-full text-left p-2.5 rounded-md border hover:bg-muted/50 transition-colors"
+                  className="p-2.5 rounded-lg border hover:bg-muted/50 transition-colors text-left"
                 >
                   <div className="text-sm font-medium">{skill.name}</div>
                   <div className="text-xs text-muted-foreground truncate">
@@ -585,11 +747,12 @@ function EmptyState({
           </div>
         )}
 
-        <div className="mt-8 text-xs text-muted-foreground space-y-1">
+        {/* Footer attribution */}
+        <div className="text-center text-[11px] text-muted-foreground space-y-1 pb-4">
           <p>
-            <strong>{SKILLS.length} skills</strong> across 5 modules:
+            Based on{" "}
+            <span className="italic">Linehan (2014)</span>
           </p>
-          <p>General · Mindfulness · Interpersonal Effectiveness · Emotion Regulation · Distress Tolerance</p>
         </div>
       </div>
     </div>
@@ -627,6 +790,15 @@ const EMPTY_STATE_ICONS: Record<string, React.ComponentType<{ className?: string
   Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench,
   Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus,
   Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat,
+};
+
+// Module icons for the landing page (matches sidebar.tsx)
+const MODULE_ICONS: Record<Module, React.ComponentType<{ className?: string }>> = {
+  general: BookOpen,
+  mindfulness: Brain,
+  interpersonal: Users,
+  "emotion-regulation": Heart,
+  "distress-tolerance": Flame,
 };
 
 function WorksheetsEmptyState({
