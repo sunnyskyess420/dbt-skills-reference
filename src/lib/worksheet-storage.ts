@@ -103,7 +103,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
       "Track urges, actions, emotions, and skills used across a 7-day period. The classic DBT weekly tracking tool. Bring to your individual therapy session.",
     icon: "CalendarRange",
     reference: "Standard DBT Diary Card format",
-    color: "text-emerald-600 dark:text-emerald-400",
+    color: "text-rose-600 dark:text-rose-400",
   },
   {
     id: "walking-middle-path",
@@ -113,7 +113,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
       "Identify two opposing positions, find what's true in each, and articulate a synthesis that integrates both. The core dialectical thinking skill.",
     icon: "GitMerge",
     reference: "Mindfulness Worksheets 10, 10a, 10b / IE Worksheets 11–11b (Handouts 10, 15, 16)",
-    color: "text-violet-600 dark:text-violet-400",
+    color: "text-emerald-600 dark:text-emerald-400",
   },
   {
     id: "missing-links",
@@ -123,7 +123,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
       "When you knew a skill that would have helped but didn't use it: find the precise gap between knowing and doing, and plan a strategy to close it.",
     icon: "Unplug",
     reference: "General Handout 8 / General Worksheet 3",
-    color: "text-orange-600 dark:text-orange-400",
+    color: "text-slate-600 dark:text-slate-300",
   },
   {
     id: "dear-man-script",
@@ -213,7 +213,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
       "Practice finding the synthesis between two opposing positions in a specific relationship conflict. Similar to Walking the Middle Path but focused on one relationship.",
     icon: "GitMerge",
     reference: "IE Handouts 15-16 / IE Worksheet 11",
-    color: "text-violet-600 dark:text-violet-400",
+    color: "text-amber-600 dark:text-amber-400",
   },
   {
     id: "self-validation",

@@ -161,7 +161,7 @@ const WORKSHEET_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
     types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions", "emotion-model", "problem-solving", "positives-short", "positives-long", "sleep-hygiene", "extreme-emotions"].includes(t.id)),
   },
   {
-    label: "Interpersonal",
+    label: "Interpersonal Effectiveness",
     types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others", "being-effective", "finding-people", "mindfulness-others", "ending-relationships", "behavior-change"].includes(t.id)),
   },
   {
