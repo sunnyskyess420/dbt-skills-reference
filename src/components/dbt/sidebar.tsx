@@ -4,7 +4,7 @@ import * as React from "react";
 import { MODULES, SKILLS, type Module, type Skill } from "@/data/skills";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChevronRight, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy } from "lucide-react";
+import { Bookmark, ChevronRight, ChevronDown, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy } from "lucide-react";
 import { UserMenu } from "@/components/dbt/user-menu";
 import type { SyncState } from "@/lib/sync";
 
@@ -45,6 +45,11 @@ export function Sidebar({
     [bookmarks]
   );
 
+  // Modules are expanded when "All Skills" is selected, collapsed otherwise.
+  // Clicking a specific module keeps the section open so you can see where
+  // you are in the hierarchy.
+  const modulesExpanded = selectedModule === "all" || MODULES.some((m) => m.id === selectedModule);
+
   return (
     <nav className="flex flex-col h-full bg-muted/30">
       {/* Brand */}
@@ -66,13 +71,80 @@ export function Sidebar({
       <div className="flex-1 overflow-y-auto px-2 py-3">
         {/* All + Bookmarks + Worksheets */}
         <div className="space-y-0.5 mb-3">
-          <NavButton
-            active={selectedModule === "all"}
+          {/* All Skills — toggles the module groups below it */}
+          <button
             onClick={() => onSelectModule("all")}
-            icon={<BookOpen className="h-4 w-4" />}
-            label="All Skills"
-            count={SKILLS.length}
-          />
+            className={cn(
+              "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm font-medium transition-colors",
+              selectedModule === "all"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+            )}
+          >
+            <BookOpen className="h-4 w-4" />
+            <span className="flex-1 text-left">All Skills</span>
+            <span className="text-[10px] text-muted-foreground">{SKILLS.length}</span>
+            <ChevronDown
+              className={cn(
+                "h-3.5 w-3.5 text-muted-foreground transition-transform",
+                modulesExpanded && "rotate-180"
+              )}
+            />
+          </button>
+
+          {/* Collapsible module groups — only show under All Skills */}
+          {modulesExpanded && (
+            <div className="mt-1 ml-3 pl-2 border-l space-y-0.5">
+              {MODULES.map((module) => {
+                const Icon = MODULE_ICONS[module.id];
+                const skills = SKILLS.filter((s) => s.module === module.id);
+                const isActive = selectedModule === module.id;
+
+                return (
+                  <div key={module.id}>
+                    <button
+                      onClick={() => onSelectModule(module.id)}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                      )}
+                    >
+                      <Icon className={cn("h-4 w-4", isActive ? module.color : "")} />
+                      <span className="flex-1 text-left truncate">{module.short}</span>
+                      <span className="text-[10px] text-muted-foreground">{skills.length}</span>
+                    </button>
+
+                    {isActive && (
+                      <ul className="mt-1 space-y-0.5 pl-2 border-l ml-3">
+                        {skills.map((skill) => (
+                          <li key={skill.id}>
+                            <button
+                              onClick={() => onSelectSkill(skill)}
+                              className={cn(
+                                "w-full flex items-center gap-1.5 px-2 py-1.5 rounded text-left text-xs transition-colors",
+                                selectedSkillId === skill.id
+                                  ? "bg-background text-foreground font-medium shadow-sm"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                              )}
+                            >
+                              {bookmarks.has(skill.id) && (
+                                <Bookmark className="h-3 w-3 fill-amber-500 text-amber-500 shrink-0" />
+                              )}
+                              <span className="flex-1 truncate">{skill.name}</span>
+                              <ChevronRight className="h-3 w-3 shrink-0 opacity-50" />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           <NavButton
             active={selectedModule === "bookmarks"}
             onClick={() => onSelectModule("bookmarks")}
@@ -106,57 +178,6 @@ export function Sidebar({
             icon={<LifeBuoy className="h-4 w-4" />}
             label="Crisis Resources"
           />
-        </div>
-
-        {/* Module sections */}
-        <div className="space-y-4">
-          {MODULES.map((module) => {
-            const Icon = MODULE_ICONS[module.id];
-            const skills = SKILLS.filter((s) => s.module === module.id);
-            const isActive = selectedModule === module.id;
-
-            return (
-              <div key={module.id}>
-                <button
-                  onClick={() => onSelectModule(module.id)}
-                  className={cn(
-                    "w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                  )}
-                >
-                  <Icon className={cn("h-4 w-4", isActive ? module.color : "")} />
-                  <span className="flex-1 text-left truncate">{module.short}</span>
-                  <span className="text-[10px] text-muted-foreground">{skills.length}</span>
-                </button>
-
-                {isActive && (
-                  <ul className="mt-1 space-y-0.5 pl-2 border-l ml-3">
-                    {skills.map((skill) => (
-                      <li key={skill.id}>
-                        <button
-                          onClick={() => onSelectSkill(skill)}
-                          className={cn(
-                            "w-full flex items-center gap-1.5 px-2 py-1.5 rounded text-left text-xs transition-colors",
-                            selectedSkillId === skill.id
-                              ? "bg-background text-foreground font-medium shadow-sm"
-                              : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                          )}
-                        >
-                          {bookmarks.has(skill.id) && (
-                            <Bookmark className="h-3 w-3 fill-amber-500 text-amber-500 shrink-0" />
-                          )}
-                          <span className="flex-1 truncate">{skill.name}</span>
-                          <ChevronRight className="h-3 w-3 shrink-0 opacity-50" />
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
         </div>
       </div>
 
