@@ -205,7 +205,7 @@ function NavButton({
   onClick: () => void;
   icon: React.ReactNode;
   label: string;
-  count: number;
+  count?: number;
   highlight?: boolean;
 }) {
   return (
