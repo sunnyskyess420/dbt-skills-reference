@@ -59,10 +59,10 @@ export function AuthDialog({ open, onOpenChange, onGuest }: AuthDialogProps) {
           </TabsList>
 
           <TabsContent value="signin" className="mt-4">
-            <SignInForm onSuccess={() => onOpenChange(false)} />
+            <SignInForm onSuccess={() => { onOpenChange(false); window.location.reload(); }} />
           </TabsContent>
           <TabsContent value="signup" className="mt-4">
-            <SignUpForm onSuccess={() => onOpenChange(false)} />
+            <SignUpForm onSuccess={() => { onOpenChange(false); window.location.reload(); }} />
           </TabsContent>
         </Tabs>
 
