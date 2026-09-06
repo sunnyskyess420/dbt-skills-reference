@@ -1374,6 +1374,18 @@ export function defaultTitle(type: WorksheetType, date = new Date()): string {
 
 const STORAGE_KEY = "dbt-skills:worksheets";
 
+// Fire a custom event whenever local storage changes. The sync layer listens
+// for this to trigger a debounced push to the server when the user is signed
+// in. Safe to call on the server (no window) — the guard skips silently.
+function notifyLocalChange(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(new CustomEvent("dbt-local-changed"));
+  } catch {
+    // ignore — this is best-effort
+  }
+}
+
 function generateId(): string {
   // Prefer crypto.randomUUID when available
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -1446,6 +1458,7 @@ export function updateEntry(
   all[idx] = updated;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    notifyLocalChange();
   } catch (e) {
     // ignore
   }
@@ -1456,6 +1469,7 @@ export function deleteEntry(id: string): void {
   const all = listEntries().filter((e) => e.id !== id);
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    notifyLocalChange();
   } catch (e) {
     // ignore
   }

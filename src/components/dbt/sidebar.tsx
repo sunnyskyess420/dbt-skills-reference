@@ -5,6 +5,8 @@ import { MODULES, SKILLS, type Module, type Skill } from "@/data/skills";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Bookmark, ChevronRight, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy } from "lucide-react";
+import { UserMenu } from "@/components/dbt/user-menu";
+import type { SyncState } from "@/lib/sync";
 
 interface SidebarProps {
   selectedModule: Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep" | "crisis";
@@ -13,6 +15,10 @@ interface SidebarProps {
   onSelectSkill: (skill: Skill) => void;
   bookmarks: Set<string>;
   worksheetCount: number;
+  // Auth/sync wiring
+  onOpenAuth: () => void;
+  sync: SyncState;
+  onSyncNow: () => void;
 }
 
 const MODULE_ICONS: Record<Module, React.ComponentType<{ className?: string }>> = {
@@ -30,6 +36,9 @@ export function Sidebar({
   onSelectSkill,
   bookmarks,
   worksheetCount,
+  onOpenAuth,
+  sync,
+  onSyncNow,
 }: SidebarProps) {
   const bookmarkedSkills = React.useMemo(
     () => SKILLS.filter((s) => bookmarks.has(s.id)),
@@ -152,8 +161,9 @@ export function Sidebar({
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t text-[11px] text-muted-foreground shrink-0">
-        <p>
+      <div className="px-3 py-2 border-t shrink-0 space-y-2">
+        <UserMenu onOpenAuth={onOpenAuth} sync={sync} onSyncNow={onSyncNow} />
+        <p className="px-1 text-[11px] text-muted-foreground">
           Based on{" "}
           <span className="italic">Linehan (2014)</span>
         </p>
