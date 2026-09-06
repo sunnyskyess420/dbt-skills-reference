@@ -43,8 +43,19 @@ interface UserMenuProps {
 export function UserMenu({ onOpenAuth, sync, onSyncNow }: UserMenuProps) {
   const { data: session, status } = useSession();
 
-  // Loading state — keep the slot reserved so the footer doesn't jump.
-  if (status === "loading") {
+  // useSession() returns "loading" on the server but immediately resolves
+  // to "authenticated" or "unauthenticated" on the client. This causes a
+  // hydration mismatch (server renders "Loading…", client renders the user
+  // or sign-in button). Fix: render a stable placeholder until mounted,
+  // so server HTML and first client render match.
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Before mount, render the same placeholder the server would render.
+  // After mount, show the actual session state.
+  if (!mounted || status === "loading") {
     return (
       <div className="h-9 flex items-center gap-2 px-2 text-xs text-muted-foreground">
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
