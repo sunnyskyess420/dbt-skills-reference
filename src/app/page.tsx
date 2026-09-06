@@ -709,7 +709,8 @@ function EmptyState({
               </div>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Fill out digital worksheets, auto-saved to your browser. Print or export when you need them.
+              Fill out digital worksheets that save automatically and sync when
+              you sign in. Print or export when you need them.
             </p>
             <span className="inline-flex items-center gap-1 text-xs font-medium text-rose-500 mt-2 group-hover:gap-1.5 transition-all">
               Browse worksheets <ChevronRight className="h-3 w-3" />
@@ -889,8 +890,9 @@ function WorksheetsEmptyState({
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Interactive Worksheets</h1>
           <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-            Fill out digital versions of the DBT worksheets. Autosave to your browser,
-            print when you need to. Saved entries appear in the list on the left.
+            Fill out digital versions of the DBT worksheets. Entries save
+            automatically — and sync when you&apos;re signed in. Print when you
+            need to. Saved entries appear in the list on the left.
           </p>
         </div>
 

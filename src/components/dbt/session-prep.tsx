@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ClipboardList, Printer, FileDown, CheckCircle2 } from "lucide-react";
 import { exportToPdf } from "@/lib/worksheet-pdf";
+import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -63,6 +64,11 @@ const CHECKLIST_ITEMS: { key: keyof SessionPrepState; label: string; description
 
 export function SessionPrep({ entries, onSelectWorksheet }: Props) {
   const [state, setState] = React.useState<SessionPrepState>(defaultState);
+
+  // Sync-aware badge copy: signed-in users see cloud wording, guests see
+  // device wording.
+  const { status: authStatus } = useSession();
+  const isSignedIn = authStatus === "authenticated";
 
   // Load from localStorage on mount
   React.useEffect(() => {
@@ -282,7 +288,9 @@ export function SessionPrep({ entries, onSelectWorksheet }: Props) {
             Clear all
           </Button>
           <span className="text-[11px] text-muted-foreground ml-auto">
-            Saved automatically to your browser
+            {isSignedIn
+              ? "Saved automatically · synced to your account"
+              : "Saved automatically on this device"}
           </span>
         </div>
 

@@ -32,6 +32,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 import { ChainAnalysisForm } from "./chain-analysis-form";
 import { ProsConsForm } from "./pros-cons-form";
 import { DiaryCardForm } from "./diary-card-form";
@@ -111,6 +112,12 @@ export function WorksheetDetail({
   onViewSkill,
 }: Props) {
   const meta = getWorksheetTypeMeta(entry.type);
+
+  // Sync-aware footer copy: signed-in users see cloud wording, guests see
+  // device wording.
+  const { status: authStatus } = useSession();
+  const isSignedIn = authStatus === "authenticated";
+
   const linkedSkillId = onViewSkill ? getSkillForWorksheet(entry.type) : undefined;
   const linkedSkill = linkedSkillId ? SKILLS.find((s) => s.id === linkedSkillId) : null;
   const [titleDraft, setTitleDraft] = React.useState(entry.title);
@@ -466,8 +473,10 @@ export function WorksheetDetail({
               <span className="italic">
                 DBT Skills Training Handouts and Worksheets, Second Edition
               </span>{" "}
-              by Marsha M. Linehan (Guilford Press, 2014). Not a substitute for treatment.
-              Your entries are saved in this browser only.
+              by Marsha M. Linehan (Guilford Press, 2014). Not a substitute for treatment.{" "}
+              {isSignedIn
+                ? "Your entries are saved automatically and sync to your account."
+                : "Your entries are saved on this device."}
             </p>
           </div>
         </div>

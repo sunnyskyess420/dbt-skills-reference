@@ -32,6 +32,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useTheme } from "next-themes";
+import { useSession } from "next-auth/react";
 import { Settings, Download, Trash2, Sun, Moon, Monitor, MonitorSmartphone, Palette } from "lucide-react";
 import {
   type AppSettings,
@@ -69,6 +70,10 @@ const STORAGE_KEYS = [
 
 export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntries }: Props) {
   const { theme: nextTheme, setTheme } = useTheme();
+
+  // Signed-in users get sync-aware copy; guests keep the device-only wording.
+  const { status: authStatus } = useSession();
+  const isSignedIn = authStatus === "authenticated";
   const [settings, setSettings] = React.useState<AppSettings>(DEFAULT_SETTINGS);
   const [loaded, setLoaded] = React.useState(false);
   const [selectedPreset, setSelectedPreset] = React.useState<string>("default");
@@ -150,7 +155,9 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
           </DialogTitle>
           <DialogDescription>
             Adjust backup reminders, appearance, and data management. Changes
-            are saved automatically to your browser.
+            are saved automatically{isSignedIn
+              ? " and sync to your account."
+              : " on this device."}
           </DialogDescription>
         </DialogHeader>
 
@@ -284,7 +291,9 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
                 </h3>
                 <p className="text-[11px] text-muted-foreground mt-0.5">
                   Pick a coordinated color palette and font pairing. Changes apply
-                  instantly and are saved to your browser.
+                  instantly{isSignedIn
+                    ? " and sync to your account."
+                    : " and are saved on this device."}
                 </p>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -306,15 +315,18 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
               <div>
                 <h3 className="text-sm font-semibold">Data management</h3>
                 <p className="text-[11px] text-muted-foreground mt-0.5">
-                  All your data is stored locally in your browser. Export a backup
-                  before clearing anything.
+                  {isSignedIn
+                    ? "Your data lives on this device and syncs to your account. Export a backup before clearing anything."
+                    : "All your data is stored locally in your browser. Export a backup before clearing anything."}
                 </p>
               </div>
 
               {/* What's stored */}
               <div className="rounded-md border bg-muted/30 p-3 space-y-1.5">
                 <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  What&apos;s stored in your browser
+                  {isSignedIn
+                    ? "What's stored on this device · synced to your account"
+                    : "What's stored in your browser"}
                 </div>
                 <ul className="text-[11px] text-muted-foreground space-y-0.5">
                   {STORAGE_KEYS.map((entry) => (
@@ -346,10 +358,9 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
                   <AlertDialogHeader>
                     <AlertDialogTitle>Clear worksheets and bookmarks?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete all saved worksheets, skill
-                      bookmarks, recently-viewed history, and backup reminder state.
-                      App settings will be preserved. Consider exporting a backup
-                      first. This action cannot be undone.
+                      {isSignedIn
+                        ? "This will delete all saved worksheets, skill bookmarks, recently-viewed history, and backup reminder state on this device. Because you're signed in, your data will be restored from your account the next time the app syncs (for example, after reloading). To remove something everywhere, delete it directly — deletes sync across devices. App settings will be preserved."
+                        : "This will permanently delete all saved worksheets, skill bookmarks, recently-viewed history, and backup reminder state. App settings will be preserved. Consider exporting a backup first. This action cannot be undone."}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -390,10 +401,9 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
                   <AlertDialogHeader>
                     <AlertDialogTitle>Clear ALL data and reset settings?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This will permanently delete everything stored in your browser
-                      by this app: all worksheets, bookmarks, recent history, backup
-                      reminder state, AND your settings. The app will return to its
-                      default state. This action cannot be undone.
+                      {isSignedIn
+                        ? "This will delete everything this app has stored on this device: all worksheets, bookmarks, recent history, backup reminder state, AND your settings. The app will return to its default state. Because you're signed in, your data will be restored from your account the next time the app syncs — sign out first if you want a fresh start on this device."
+                        : "This will permanently delete everything stored in your browser by this app: all worksheets, bookmarks, recent history, backup reminder state, AND your settings. The app will return to its default state. This action cannot be undone."}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -421,10 +431,20 @@ export function SettingsModal({ open, onOpenChange, onDataCleared, worksheetEntr
             </section>
 
             <div className="border-t pt-3 text-[10px] text-muted-foreground">
-              <p>
-                All data stays in your browser. Nothing is sent to any server.
-                Clearing your browser&apos;s site data will also clear this app&apos;s data.
-              </p>
+              {isSignedIn ? (
+                <p>
+                  Your data syncs to your account and reaches your other devices.
+                  This browser also keeps a local copy so the app works offline —
+                  clearing your browser&apos;s site data removes that copy until the
+                  next sync restores it.
+                </p>
+              ) : (
+                <p>
+                  All data stays in your browser. Nothing is sent to any server.
+                  Sign in to sync your data across devices. Clearing your
+                  browser&apos;s site data will also clear this app&apos;s data.
+                </p>
+              )}
             </div>
           </div>
         )}

@@ -8,6 +8,7 @@ import {
   getWorksheetTypeMeta,
 } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
+import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import {
   Link2,
@@ -188,6 +189,10 @@ export function WorksheetList({
   onOpenCompare,
 }: Props) {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Sync-aware copy: signed-in users see cloud wording, guests see device wording.
+  const { status: authStatus } = useSession();
+  const isSignedIn = authStatus === "authenticated";
   const [importResult, setImportResult] = React.useState<ImportResult | null>(null);
   const [showBackupReminder, setShowBackupReminder] = React.useState(false);
   const [pinnedIds, setPinnedIds] = React.useState<Set<string>>(new Set());
@@ -370,7 +375,11 @@ export function WorksheetList({
           />
         </div>
         <p className="text-[11px] text-muted-foreground mb-3">
-          Fill out, save, and print interactive versions of the core DBT worksheets. Saved to your browser only.
+          Fill out, save, and print interactive versions of the core DBT
+          worksheets.{" "}
+          {isSignedIn
+            ? "Saved automatically and synced to your account."
+            : "Saved on this device — sign in to sync."}
         </p>
 
         {importResult && (
@@ -399,8 +408,10 @@ export function WorksheetList({
           </div>
         )}
 
-        {/* Auto-backup reminder */}
-        {showBackupReminder && (
+        {/* Auto-backup reminder — only for guests. Signed-in users have a
+            server copy of their worksheets, so a cleared browser no longer
+            means lost data. */}
+        {!isSignedIn && showBackupReminder && (
           <div className="mb-3 rounded-md border border-amber-500/50 bg-amber-500/10 p-2.5 text-[11px] text-amber-800 dark:text-amber-200">
             <div className="flex items-start gap-1.5">
               <span className="text-base leading-none mt-0.5" aria-hidden>⚠</span>

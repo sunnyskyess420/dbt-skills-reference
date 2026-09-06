@@ -20,6 +20,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 const STORAGE_KEY = "dbt-skills:safety-plan";
 
@@ -202,6 +203,10 @@ export function CrisisResources() {
   const [expandedExercise, setExpandedExercise] = React.useState<string | null>("breathing");
   const [showSafetyPlan, setShowSafetyPlan] = React.useState(false);
 
+  // Sync-aware copy: signed-in users see cloud wording, guests see device wording.
+  const { status: authStatus } = useSession();
+  const isSignedIn = authStatus === "authenticated";
+
   // Load safety plan from localStorage
   React.useEffect(() => {
     try {
@@ -360,7 +365,10 @@ export function CrisisResources() {
               </div>
             </div>
             <p className="text-[11px] text-muted-foreground mt-1">
-              Fill this in ahead of time, when you're calm. It's saved to your browser.
+              Fill this in ahead of time, when you're calm.{" "}
+              {isSignedIn
+                ? "It's saved automatically and syncs to your account."
+                : "It's saved on this device."}{" "}
               Print it and keep it where you can find it. Your therapist can help you complete it.
             </p>
           </CardHeader>
