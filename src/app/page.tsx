@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSession } from "next-auth/react";
 import { SKILLS, MODULES, type Skill, type Module } from "@/data/skills";
 import { Sidebar } from "@/components/dbt/sidebar";
 import { SkillList } from "@/components/dbt/skill-list";
@@ -17,8 +18,10 @@ import { ProgressDashboard } from "@/components/dbt/progress-dashboard";
 import { SessionPrep } from "@/components/dbt/session-prep";
 import { SkillOfDay } from "@/components/dbt/skill-of-day";
 import { CrisisResources } from "@/components/dbt/crisis-resources";
+import { AuthDialog } from "@/components/dbt/auth-dialog";
 import { incrementViewCount } from "@/lib/pinned-worksheets";
 import { useWorksheets } from "@/hooks/use-worksheets";
+import { useSync, useAutoPush } from "@/lib/sync";
 import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta } from "@/lib/worksheet-storage";
 import { Button } from "@/components/ui/button";
 import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight } from "lucide-react";
@@ -38,6 +41,39 @@ export default function Home() {
   const [compareOpen, setCompareOpen] = React.useState(false); // diary card comparison modal
   const [settingsOpen, setSettingsOpen] = React.useState(false); // settings modal
   const [helpOpen, setHelpOpen] = React.useState(false); // keyboard shortcut help modal
+  const [authOpen, setAuthOpen] = React.useState(false); // sign-in / sign-up dialog
+
+  // Auth + sync wiring.
+  // `status` flips to "authenticated" once NextAuth resolves the JWT cookie.
+  // We only enable server sync in that state. `userKey` is the signed-in
+  // user's email — when it changes (account switch, or sign-in after sign-out)
+  // the sync hook re-pulls from the server.
+  const { data: sessionData, status: authStatus } = useSession();
+  const isSignedIn = authStatus === "authenticated";
+  const userKey = sessionData?.user?.email ?? undefined;
+  const { state: syncState, syncNow } = useSync(isSignedIn, userKey);
+  useAutoPush(isSignedIn, syncNow);
+
+  // First-visit welcome prompt. Shows once per browser until dismissed
+  // (either by signing in or by continuing as guest). localStorage flag
+  // keeps it from nagging returning visitors.
+  const [welcomeOpen, setWelcomeOpen] = React.useState(false);
+  React.useEffect(() => {
+    try {
+      const seen = localStorage.getItem("dbt-skills:welcome-seen");
+      if (!seen) setWelcomeOpen(true);
+    } catch {
+      // ignore
+    }
+  }, []);
+  const dismissWelcome = React.useCallback(() => {
+    try {
+      localStorage.setItem("dbt-skills:welcome-seen", "1");
+    } catch {
+      // ignore
+    }
+    setWelcomeOpen(false);
+  }, []);
 
   // Bookmarks persisted to localStorage
   const [bookmarks, setBookmarks] = React.useState<Set<string>>(new Set());
@@ -201,6 +237,20 @@ export default function Home() {
     reloadRecent();
     setSelectedWorksheetId(null);
     setSelectedSkill(null);
+  }, [refreshWorksheets, reloadBookmarks, reloadRecent]);
+
+  // After a server pull (sign-in on a new device) we overwrite localStorage
+  // with the merged payload. Listen for that event and refresh all UI state
+  // so the user immediately sees their cloud data instead of the old local
+  // values.
+  React.useEffect(() => {
+    const handler = () => {
+      refreshWorksheets();
+      reloadBookmarks();
+      reloadRecent();
+    };
+    window.addEventListener("dbt-sync-restored", handler);
+    return () => window.removeEventListener("dbt-sync-restored", handler);
   }, [refreshWorksheets, reloadBookmarks, reloadRecent]);
 
   // Cmd+K / Ctrl+K to open search, '/' to focus search, '?' to open help
@@ -371,6 +421,9 @@ export default function Home() {
             onSelectSkill={handleSelectSkill}
             bookmarks={bookmarks}
             worksheetCount={worksheetEntries.length}
+            onOpenAuth={() => setAuthOpen(true)}
+            sync={syncState}
+            onSyncNow={() => void syncNow()}
           />
         </aside>
 
@@ -404,6 +457,12 @@ export default function Home() {
                 }}
                 bookmarks={bookmarks}
                 worksheetCount={worksheetEntries.length}
+                onOpenAuth={() => {
+                  setSidebarOpen(false);
+                  setAuthOpen(true);
+                }}
+                sync={syncState}
+                onSyncNow={() => void syncNow()}
               />
             </div>
           </div>
@@ -522,6 +581,16 @@ export default function Home() {
 
       {/* Keyboard shortcuts help dialog */}
       <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
+
+      {/* Auth dialog — opened from sidebar footer or first-visit welcome */}
+      <AuthDialog
+        open={authOpen || welcomeOpen}
+        onOpenChange={(open) => {
+          setAuthOpen(open);
+          if (!open) dismissWelcome();
+        }}
+        onGuest={dismissWelcome}
+      />
     </div>
   );
 }

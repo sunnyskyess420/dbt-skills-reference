@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemePresetApplier } from "@/components/dbt/theme-preset-applier";
+import { Providers } from "@/components/providers";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -128,9 +129,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ThemePresetApplier />
-          {children}
-          <Toaster />
+          <Providers>
+            <ThemePresetApplier />
+            {children}
+            <Toaster />
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

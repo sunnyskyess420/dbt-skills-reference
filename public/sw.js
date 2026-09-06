@@ -3,7 +3,7 @@
 // This is intentionally simple — the app is fully client-side and works offline
 // once the assets are cached.
 
-const CACHE_NAME = "dbt-skills-v1";
+const CACHE_NAME = "dbt-skills-v2";
 const PRECACHE_URLS = [
   "/",
   "/manifest.json",
