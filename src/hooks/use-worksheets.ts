@@ -8,6 +8,7 @@ import {
   createEntry as createEntryStorage,
   updateEntry as updateEntryStorage,
   deleteEntry as deleteEntryStorage,
+  pruneTombstones,
 } from "@/lib/worksheet-storage";
 
 export function useWorksheets() {
@@ -16,8 +17,10 @@ export function useWorksheets() {
   // Track draft entries not yet persisted to localStorage
   const draftsRef = React.useRef<Map<string, WorksheetEntry>>(new Map());
 
-  // Load from localStorage on mount
+  // Load from localStorage on mount. Also prune tombstones older than 90 days
+  // so the deleted-entry tracking list doesn't grow without bound.
   React.useEffect(() => {
+    pruneTombstones();
     setEntries(listEntries());
     setLoaded(true);
   }, []);

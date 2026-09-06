@@ -1374,6 +1374,28 @@ export function defaultTitle(type: WorksheetType, date = new Date()): string {
 
 const STORAGE_KEY = "dbt-skills:worksheets";
 
+// Tombstones record which worksheet ids have been intentionally deleted.
+// Without them, the cross-device sync merge logic (see src/lib/sync.ts)
+// cannot tell the difference between "entry exists locally but not on the
+// server because it was just created offline on this device" and "entry
+// exists locally but not on the server because *another* device deleted
+// it". The merge would then resurrect the deleted entry on the next sync.
+// Each tombstone is `{ id, deletedAt }` and lives under the dbt-skills:
+// prefix so it flows through the same snapshot/restore/push pipeline as
+// the worksheets themselves.
+const TOMBSTONE_KEY = "dbt-skills:worksheet-tombstones";
+
+// How long to keep tombstones around. After this many days a tombstone is
+// considered safe to drop — every device the user actually uses will have
+// seen it by then, and any device that has been offline longer than this
+// is unlikely to come back with a stale entry that needs to be re-deleted.
+const TOMBSTONE_TTL_DAYS = 90;
+
+export interface WorksheetTombstone {
+  id: string;
+  deletedAt: string; // ISO timestamp
+}
+
 // Fire a custom event whenever local storage changes. The sync layer listens
 // for this to trigger a debounced push to the server when the user is signed
 // in. Safe to call on the server (no window) — the guard skips silently.
@@ -1412,6 +1434,73 @@ export function listEntries(): WorksheetEntry[] {
 
 export function getEntry(id: string): WorksheetEntry | null {
   return listEntries().find((e) => e.id === id) ?? null;
+}
+
+// ---- Tombstones ----
+
+// Read the raw tombstone list. Returns [] on any error / missing key.
+export function listTombstones(): WorksheetTombstone[] {
+  try {
+    const raw = localStorage.getItem(TOMBSTONE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    // Defensive: drop malformed entries so a single bad tombstone doesn't
+    // break the whole sync pipeline.
+    return parsed.filter(
+      (t): t is WorksheetTombstone =>
+        !!t && typeof t === "object" && typeof t.id === "string" && typeof t.deletedAt === "string"
+    );
+  } catch {
+    return [];
+  }
+}
+
+// Convenience: just the set of tombstoned ids, for quick membership checks
+// (used by the sync merge logic).
+export function listTombstoneIds(): Set<string> {
+  return new Set(listTombstones().map((t) => t.id));
+}
+
+// Write the tombstone array without firing a change event. Used internally
+// by addTombstone / clearTombstone / pruneTombstones so they can compose
+// with other writes (e.g. deleteEntry writes both worksheets and tombstones
+// and fires exactly one change event at the end).
+function writeTombstonesRaw(all: WorksheetTombstone[]): void {
+  try {
+    localStorage.setItem(TOMBSTONE_KEY, JSON.stringify(all));
+  } catch {
+    // ignore — quota or private mode
+  }
+}
+
+// Mark a worksheet id as deleted. Idempotent — if a tombstone already exists
+// for this id, we update its `deletedAt` to now (so a re-delete after a sync
+// conflict still wins). Fires `dbt-local-changed` so the sync layer pushes.
+export function addTombstone(id: string): void {
+  const rest = listTombstones().filter((t) => t.id !== id);
+  rest.push({ id, deletedAt: new Date().toISOString() });
+  writeTombstonesRaw(rest);
+  notifyLocalChange();
+}
+
+// Remove a tombstone (used if you ever implement "undo delete" or "restore
+// from trash"). Also fires `dbt-local-changed` so the un-deletion propagates.
+export function clearTombstone(id: string): void {
+  const rest = listTombstones().filter((t) => t.id !== id);
+  writeTombstonesRaw(rest);
+  notifyLocalChange();
+}
+
+// Drop tombstones older than TOMBSTONE_TTL_DAYS. Safe to call periodically
+// (e.g. on app load). Does NOT fire a change event — pruning is a
+// housekeeping task, not a user action.
+export function pruneTombstones(olderThanDays = TOMBSTONE_TTL_DAYS): void {
+  const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
+  const kept = listTombstones().filter(
+    (t) => new Date(t.deletedAt).getTime() > cutoff
+  );
+  writeTombstonesRaw(kept);
 }
 
 export function createEntry(type: WorksheetType): WorksheetEntry {
@@ -1469,6 +1558,14 @@ export function deleteEntry(id: string): void {
   const all = listEntries().filter((e) => e.id !== id);
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+    // Record a tombstone so other devices know this entry was deleted
+    // intentionally. Without it, the cross-device merge logic in sync.ts
+    // would see "entry exists locally on Device B but not on server" and
+    // wrongly assume Device B created it offline — then push it back to
+    // the server, resurrecting the deletion.
+    const tombstones = listTombstones().filter((t) => t.id !== id);
+    tombstones.push({ id, deletedAt: new Date().toISOString() });
+    writeTombstonesRaw(tombstones);
     notifyLocalChange();
   } catch (e) {
     // ignore

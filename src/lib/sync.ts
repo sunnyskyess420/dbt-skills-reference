@@ -89,16 +89,49 @@ export function restoreLocalState(payload: Record<string, unknown>): void {
 // Merge two payloads. Server wins for any key the server has; local keys
 // that the server doesn't have are preserved. This is what we use when both
 // sides have data on first sign-in.
+//
+// Worksheets are special-cased: we union local + server by id (server wins
+// on conflict by `updatedAt`) AND then drop any entry whose id appears in
+// either side's tombstone set. Without this tombstone filter, an entry
+// deleted on Device A would be resurrected by Device B's stale local cache
+// on the next merge.
 export function mergePayloads(
   local: Record<string, unknown>,
   server: Record<string, unknown>
 ): Record<string, unknown> {
-  // For per-key merge: server overrides local for the same key, but local
-  // keeps keys the server doesn't have. For worksheet arrays we go further
-  // — union by entry id, server wins on conflicts.
+  // Step 1: union tombstones across local + server. Each tombstone is
+  // `{ id, deletedAt }`; we keep the latest `deletedAt` per id (a re-delete
+  // should win over an older tombstone).
+  const TOMBSTONE_KEY = "dbt-skills:worksheet-tombstones";
+  const tombstoneTs = new Map<string, number>();
+  for (const side of [local, server]) {
+    const arr = side[TOMBSTONE_KEY];
+    if (!Array.isArray(arr)) continue;
+    for (const t of arr as Array<{ id?: string; deletedAt?: string }>) {
+      if (!t || typeof t.id !== "string") continue;
+      const ts = new Date(t.deletedAt ?? 0).getTime();
+      if (Number.isNaN(ts)) continue;
+      const prev = tombstoneTs.get(t.id) ?? 0;
+      if (ts > prev) tombstoneTs.set(t.id, ts);
+    }
+  }
+  const tombstoneIds = new Set(tombstoneTs.keys());
+
+  // Step 2: standard per-key merge.
   const merged: Record<string, unknown> = { ...local };
 
+  // Always overwrite the tombstone key with the union we just computed.
+  // (If both sides are empty we just delete the key — no tombstones to track.)
+  if (tombstoneTs.size > 0) {
+    merged[TOMBSTONE_KEY] = Array.from(tombstoneTs.entries()).map(
+      ([id, ts]) => ({ id, deletedAt: new Date(ts).toISOString() })
+    );
+  } else {
+    delete merged[TOMBSTONE_KEY];
+  }
+
   for (const [key, serverValue] of Object.entries(server)) {
+    if (key === TOMBSTONE_KEY) continue; // already handled above
     if (!(key in merged)) {
       merged[key] = serverValue;
       continue;
@@ -110,12 +143,25 @@ export function mergePayloads(
       const serverArr = Array.isArray(serverValue) ? serverValue : [];
       merged[key] = mergeWorksheetArrays(
         localArr as WorksheetEntryLike[],
-        serverArr as WorksheetEntryLike[]
+        serverArr as WorksheetEntryLike[],
+        tombstoneIds
       );
       continue;
     }
     // For everything else (bookmarks, recent, settings, ...), server wins.
     merged[key] = serverValue;
+  }
+
+  // Step 3: defensive sweep — if `dbt-skills:worksheets` survived from the
+  // local side untouched (server didn't include it) but we have tombstones,
+  // filter out any tombstoned entries. This covers the case where Device B
+  // has a stale worksheet that Device A deleted AND the server payload
+  // didn't include worksheets at all (e.g. partial payload).
+  const ws = merged["dbt-skills:worksheets"];
+  if (Array.isArray(ws) && tombstoneIds.size > 0) {
+    merged["dbt-skills:worksheets"] = (ws as WorksheetEntryLike[]).filter(
+      (e) => !tombstoneIds.has(e.id)
+    );
   }
 
   return merged;
@@ -128,11 +174,19 @@ interface WorksheetEntryLike {
 
 function mergeWorksheetArrays(
   local: WorksheetEntryLike[],
-  server: WorksheetEntryLike[]
+  server: WorksheetEntryLike[],
+  tombstoneIds?: Set<string>
 ): WorksheetEntryLike[] {
   const byId = new Map<string, WorksheetEntryLike>();
-  for (const entry of server) byId.set(entry.id, entry);
+  for (const entry of server) {
+    // Skip tombstoned entries coming from the server — a tombstone on the
+    // local side (or in the merged set from another device) means this id
+    // was intentionally deleted and should stay deleted.
+    if (tombstoneIds?.has(entry.id)) continue;
+    byId.set(entry.id, entry);
+  }
   for (const entry of local) {
+    if (tombstoneIds?.has(entry.id)) continue;
     const existing = byId.get(entry.id);
     if (!existing) {
       byId.set(entry.id, entry);
