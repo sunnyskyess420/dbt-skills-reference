@@ -16,6 +16,7 @@ import { HelpDialog } from "@/components/dbt/help-dialog";
 import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
 import { ProgressDashboard } from "@/components/dbt/progress-dashboard";
 import { SessionPrep } from "@/components/dbt/session-prep";
+import { Goals } from "@/components/dbt/goals";
 import { SkillOfDay } from "@/components/dbt/skill-of-day";
 import { CrisisResources } from "@/components/dbt/crisis-resources";
 import { AuthDialog } from "@/components/dbt/auth-dialog";
@@ -30,7 +31,7 @@ import { cn } from "@/lib/utils";
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
 const STORAGE_KEY_RECENT = "dbt-skills:recent";
 
-type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep" | "crisis";
+type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "goals" | "dashboard" | "session-prep" | "crisis";
 
 export default function Home() {
   const [selectedModule, setSelectedModule] = React.useState<ViewMode>("all");
@@ -214,6 +215,17 @@ export default function Home() {
     [handleSelectSkill]
   );
 
+  // View a skill from the My Goals section — switches to that skill's module
+  const handleViewSkillFromGoal = React.useCallback(
+    (skillId: string) => {
+      const skill = SKILLS.find((s) => s.id === skillId);
+      if (!skill) return;
+      setSelectedModule(skill.module);
+      handleSelectSkill(skill);
+    },
+    [handleSelectSkill]
+  );
+
   // When selecting a non-worksheets mode, clear worksheet selection
   const handleSelectModule = React.useCallback((m: ViewMode) => {
     setSelectedModule(m);
@@ -342,6 +354,8 @@ export default function Home() {
                   <span className="text-muted-foreground">DBT Skills</span>
                 ) : isWorksheetsMode ? (
                   "Worksheets"
+                ) : selectedModule === "goals" ? (
+                  "My Goals"
                 ) : selectedModule === "dashboard" ? (
                   "Dashboard"
                 ) : selectedModule === "session-prep" ? (
@@ -468,8 +482,8 @@ export default function Home() {
           </div>
         )}
 
-        {/* Middle pane — hidden for full-width views (dashboard, session-prep, crisis) */}
-        {(selectedModule !== "dashboard" && selectedModule !== "session-prep" && selectedModule !== "crisis") && (
+        {/* Middle pane — hidden for full-width views (goals, dashboard, session-prep, crisis) */}
+        {(selectedModule !== "goals" && selectedModule !== "dashboard" && selectedModule !== "session-prep" && selectedModule !== "crisis") && (
         <section
           className={cn(
             "shrink-0 border-r w-full sm:w-80 lg:w-80 xl:w-96 print:hidden",
@@ -525,6 +539,8 @@ export default function Home() {
             />
           ) : isWorksheetsMode ? (
             <WorksheetsEmptyState onCreate={handleCreateWorksheet} />
+          ) : selectedModule === "goals" ? (
+            <Goals onViewSkill={handleViewSkillFromGoal} />
           ) : selectedModule === "dashboard" ? (
             <ProgressDashboard
               entries={worksheetEntries}

@@ -4,13 +4,13 @@ import * as React from "react";
 import { MODULES, SKILLS, type Module, type Skill } from "@/data/skills";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChevronRight, ChevronDown, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy } from "lucide-react";
+import { Bookmark, ChevronRight, ChevronDown, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy, Target } from "lucide-react";
 import { UserMenu } from "@/components/dbt/user-menu";
 import type { SyncState } from "@/lib/sync";
 
 interface SidebarProps {
-  selectedModule: Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep" | "crisis";
-  onSelectModule: (m: Module | "all" | "bookmarks" | "worksheets" | "dashboard" | "session-prep" | "crisis") => void;
+  selectedModule: Module | "all" | "bookmarks" | "worksheets" | "goals" | "dashboard" | "session-prep" | "crisis";
+  onSelectModule: (m: Module | "all" | "bookmarks" | "worksheets" | "goals" | "dashboard" | "session-prep" | "crisis") => void;
   selectedSkillId: string | null;
   onSelectSkill: (skill: Skill) => void;
   bookmarks: Set<string>;
@@ -159,6 +159,12 @@ export function Sidebar({
             icon={<FileText className="h-4 w-4" />}
             label="Worksheets"
             count={worksheetCount}
+          />
+          <NavButton
+            active={selectedModule === "goals"}
+            onClick={() => onSelectModule("goals")}
+            icon={<Target className="h-4 w-4" />}
+            label="My Goals"
           />
           <NavButton
             active={selectedModule === "dashboard"}

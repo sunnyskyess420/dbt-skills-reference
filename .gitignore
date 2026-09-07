@@ -67,3 +67,13 @@ server.log
 .env.local
 .env.*.local
 scripts/git-ssh-wrapper.py
+
+# Workspace-only files (never publish)
+/scripts/
+/examples/
+/tests/
+/worklog.md
+Caddyfile
+# Local-only sqlite variant for sandbox development
+prisma/schema.local.prisma
+public/*.zip

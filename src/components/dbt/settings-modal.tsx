@@ -62,6 +62,7 @@ interface Props {
 
 const STORAGE_KEYS = [
   { key: "dbt-skills:worksheets", label: "Worksheets (all entries)" },
+  { key: "dbt-skills:goals", label: "My Goals (goals, steps & breakdowns)" },
   { key: "dbt-skills:bookmarks", label: "Skill bookmarks" },
   { key: "dbt-skills:recent", label: "Recently viewed skills" },
   { key: "dbt-skills:backup-reminder", label: "Backup reminder state" },
