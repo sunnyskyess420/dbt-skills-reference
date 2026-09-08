@@ -10,6 +10,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import ZAI from "z-ai-web-dev-sdk";
 import { SKILLS } from "@/data/skills";
+import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
 
 interface PlanStep {
   text: string;
@@ -105,6 +108,27 @@ export async function POST(req: NextRequest) {
     .join("\n");
 
   try {
+    // On Vercel (or any hosted env), the SDK's three search paths
+    // (./.z-ai-config, ~/.z-ai-config, /etc/.z-ai-config) aren't deployed.
+    // So when env vars are present, we write a temp .z-ai-config to
+    // os.homedir() (which IS writable on Vercel serverless functions) and
+    // then call ZAI.create() which will find and parse it. Local dev keeps
+    // using the existing .z-ai-config file at /etc/.z-ai-config.
+    const envApiKey = process.env.ZAI_API_KEY;
+    const envBaseUrl = process.env.ZAI_BASE_URL;
+    if (envApiKey && envBaseUrl) {
+      const configPath = path.join(os.homedir(), ".z-ai-config");
+      try {
+        fs.writeFileSync(
+          configPath,
+          JSON.stringify({ apiKey: envApiKey, baseUrl: envBaseUrl }),
+          { mode: 0o600 }
+        );
+      } catch (writeErr) {
+        console.error("[goals/breakdown] could not write temp z-ai-config:", writeErr);
+      }
+    }
+
     const zai = await ZAI.create();
     const completion = await zai.chat.completions.create({
       messages: [
