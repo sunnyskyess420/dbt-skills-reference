@@ -64,7 +64,7 @@ export function SkillList({
           className="w-full justify-start text-muted-foreground font-normal"
         >
           <SearchIcon className="h-4 w-4 mr-2" />
-          <span className="flex-1 text-left">Search skills…</span>
+          <span className="flex-1 text-left">Search skills & worksheets…</span>
           <KbdShortcut combo="K" className="ml-2" />
         </Button>
       </div>
