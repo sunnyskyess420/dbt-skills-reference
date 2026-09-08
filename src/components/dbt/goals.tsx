@@ -12,17 +12,12 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
   Target,
-  Sparkles,
   Plus,
   X,
   Trash2,
   Compass,
-  CheckCircle2,
   Users,
   CalendarDays,
-  Lightbulb,
-  TrendingUp,
-  ListChecks,
   Printer,
   FileDown,
   Download,
@@ -33,13 +28,11 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import {
   type Goal,
-  type GoalGuidance,
   loadGoals,
   saveGoals,
   emptyGoal,
   newId,
   matchSkillsForGoal,
-  offlineBreakdownWithSkills,
   recordGoalTombstones,
   MAX_GOALS,
 } from "@/lib/goals-storage";
@@ -364,67 +357,6 @@ export function Goals({ onViewSkill }: Props) {
     });
   };
 
-  // ----- breakdown (on-device, free) ---------------------------------------
-
-  const adoptGuidance = (goal: Goal, guidance: GoalGuidance, skills: { skillId: string; reason?: string }[]) => {
-    // If the goal has no checklist yet, adopt the suggested steps directly.
-    const adoptSteps = goal.steps.length === 0 && guidance.steps.length > 0;
-    const nextSteps = adoptSteps
-      ? guidance.steps.map((s) => ({ id: newId(), text: s.text, done: false }))
-      : goal.steps;
-    const nextGuidance: GoalGuidance = adoptSteps
-      ? { ...guidance, steps: [] }
-      : guidance;
-    return {
-      ...goal,
-      guidance: nextGuidance,
-      skills,
-      steps: nextSteps,
-      updatedAt: new Date().toISOString(),
-    };
-  };
-
-  const runBreakdown = (goalId: string) => {
-    const goal = goals.find((g) => g.id === goalId);
-    if (!goal || !goal.title.trim()) return;
-
-    // Breakdowns run entirely on this device — no AI service, no API costs.
-    // The built-in DBT template turns the goal into small steps, and the
-    // keyword matcher pairs it with skills from the app's catalog.
-    const { guidance, skills } = offlineBreakdownWithSkills(
-      goal.title,
-      goal.description
-    );
-    const nextGoal = adoptGuidance(goal, guidance, skills);
-    commit(goals.map((g) => (g.id === goalId ? nextGoal : g)));
-  };
-
-  const addSuggestedStep = (goalId: string, index: number) => {
-    const goal = goals.find((g) => g.id === goalId);
-    if (!goal?.guidance) return;
-    const suggestion = goal.guidance.steps[index];
-    if (!suggestion) return;
-    updateGoal(goalId, {
-      steps: [...goal.steps, { id: newId(), text: suggestion.text, done: false }],
-      guidance: {
-        ...goal.guidance,
-        steps: goal.guidance.steps.filter((_, i) => i !== index),
-      },
-    });
-  };
-
-  const addAllSuggestedSteps = (goalId: string) => {
-    const goal = goals.find((g) => g.id === goalId);
-    if (!goal?.guidance) return;
-    updateGoal(goalId, {
-      steps: [
-        ...goal.steps,
-        ...goal.guidance.steps.map((s) => ({ id: newId(), text: s.text, done: false })),
-      ],
-      guidance: { ...goal.guidance, steps: [] },
-    });
-  };
-
   // ----- render helpers ----------------------------------------------------
 
   const moduleMeta = (moduleId: string) => MODULES.find((m) => m.id === moduleId);
@@ -467,97 +399,6 @@ export function Goals({ onViewSkill }: Props) {
     );
   };
 
-  const renderGuidance = (goal: Goal) => {
-    const g = goal.guidance;
-    if (!g) return null;
-    return (
-      <div className="rounded-lg border bg-muted/30 p-3 space-y-3">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-3.5 w-3.5 text-primary" />
-          <span className="text-xs font-semibold">Breakdown</span>
-          <span className="text-[10px] text-muted-foreground">on-device</span>
-          <span className="ml-auto text-[10px] text-muted-foreground">
-            {format(new Date(g.generatedAt), "MMM d, h:mm a")}
-          </span>
-        </div>
-
-        {g.summary && (
-          <p className="text-sm italic text-muted-foreground leading-relaxed">{g.summary}</p>
-        )}
-
-        {g.obstacles && (
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-medium">
-              <Lightbulb className="h-3.5 w-3.5" />
-              Watch out for
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">{g.obstacles}</p>
-          </div>
-        )}
-
-        {g.progressSignals && g.progressSignals.length > 0 && (
-          <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-medium">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Signs of progress
-            </div>
-            <ul className="space-y-1">
-              {g.progressSignals.map((sig, i) => (
-                <li key={i} className="flex items-start gap-1.5 text-xs text-muted-foreground">
-                  <CheckCircle2 className="h-3 w-3 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                  <span className="leading-snug">{sig}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {g.steps.length > 0 && (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-medium">
-                <ListChecks className="h-3.5 w-3.5" />
-                Suggested steps
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 text-[11px] px-2"
-                onClick={() => addAllSuggestedSteps(goal.id)}
-              >
-                <Plus className="h-3 w-3 mr-1" />
-                Add all
-              </Button>
-            </div>
-            <ul className="space-y-1">
-              {g.steps.map((s, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-2 rounded-md border bg-background px-2 py-1.5"
-                >
-                  <button
-                    onClick={() => addSuggestedStep(goal.id, i)}
-                    className="mt-0.5 rounded-sm p-0.5 text-muted-foreground hover:text-foreground hover:bg-muted"
-                    title="Add to checklist"
-                    aria-label="Add to checklist"
-                  >
-                    <Plus className="h-3 w-3" />
-                  </button>
-                  <div className="min-w-0">
-                    <div className="text-xs leading-snug">{s.text}</div>
-                    {s.hint && (
-                      <div className="text-[11px] text-muted-foreground leading-snug mt-0.5">{s.hint}</div>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   const renderGoalCard = (goal: Goal, index: number) => {
     const doneCount = goal.steps.filter((s) => s.done).length;
     const progressPct = goal.steps.length > 0 ? (doneCount / goal.steps.length) * 100 : 0;
@@ -582,7 +423,7 @@ export function Goals({ onViewSkill }: Props) {
               <Textarea
                 value={goal.description}
                 onChange={(e) => updateGoal(goal.id, { description: e.target.value })}
-                placeholder="What is this goal about? What makes it hard? The more you write, the better the breakdown and skill matches."
+                placeholder="What is this goal about? What makes it hard? The more you write, the better the skill matches."
                 rows={2}
                 className="text-sm resize-none"
                 aria-label={`Goal ${index + 1} description`}
@@ -694,7 +535,7 @@ export function Goals({ onViewSkill }: Props) {
                     <AlertDialogTitle>Delete this goal?</AlertDialogTitle>
                     <AlertDialogDescription>
                       This will permanently delete &quot;{goal.title.trim() || `Goal ${index + 1}`}&quot; along
-                      with its steps and breakdown. This action cannot be undone.
+                      with its steps and saved skills. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -715,27 +556,15 @@ export function Goals({ onViewSkill }: Props) {
           <div className="flex flex-wrap items-center gap-2 print:hidden">
             <Button
               size="sm"
-              onClick={() => runBreakdown(goal.id)}
-              disabled={!goal.title.trim()}
-              title="Instant on-device breakdown — no AI, no waiting"
-            >
-              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-              {goal.guidance ? "Regenerate breakdown" : "Break it down"}
-            </Button>
-            <Button
-              size="sm"
               variant="outline"
               onClick={() => findSkillsOffline(goal.id)}
-              title="Instant offline skill matching — no AI"
+              title="Instant skill matching — runs on your device"
             >
               <Compass className="h-3.5 w-3.5 mr-1.5" />
               Find matching skills
             </Button>
             {error && <span className="text-xs text-destructive">{error}</span>}
           </div>
-
-          {/* Guidance */}
-          {goal.guidance && renderGuidance(goal)}
 
           <Separator />
 
@@ -810,10 +639,9 @@ export function Goals({ onViewSkill }: Props) {
               </div>
             ) : (
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Run <span className="font-medium">Break it down</span> to get suggested steps and
-                skill matches, or <span className="font-medium">Find matching skills</span> for
-                matches only — both run instantly on your device and are editable. Click any skill
-                to open its full reference page.
+                Use <span className="font-medium">Find matching skills</span> for instant,
+                editable matches — they run on your device. Click any skill to open its full
+                reference page.
               </p>
             )}
           </div>
@@ -948,7 +776,7 @@ export function Goals({ onViewSkill }: Props) {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Clear all goals?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      This removes every goal, step and breakdown. This action cannot be undone.
+                      This removes every goal, step and saved skill. This action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -1066,9 +894,9 @@ export function Goals({ onViewSkill }: Props) {
               </div>
               <h2 className="text-base font-semibold">No goals yet</h2>
               <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
-                Add up to {MAX_GOALS} goals you&apos;re working on right now. For each one, the
-                app can break it into small, doable steps and suggest skills from this app that
-                might help. Everything stays on this device, and you can edit or clear it any time.
+                Add up to {MAX_GOALS} goals you&apos;re working on right now. For each one, list
+                your own small, doable steps and match skills from this app that might help.
+                Everything stays on this device, and you can edit or clear it any time.
               </p>
             </CardContent>
           </Card>
@@ -1086,7 +914,7 @@ export function Goals({ onViewSkill }: Props) {
             <span className="text-sm font-medium">
               Add goal {goals.length === 0 ? "" : `(${goals.length} of ${MAX_GOALS})`}
             </span>
-            <span className="text-xs">Name what you&apos;re working toward — the app helps with the rest</span>
+            <span className="text-xs">Name what you&apos;re working toward — add steps, support requests and skills</span>
           </button>
         )}
 
@@ -1098,11 +926,11 @@ export function Goals({ onViewSkill }: Props) {
 
         {/* Footnote */}
         <p className="text-[11px] text-muted-foreground leading-relaxed border-t pt-3">
-          Breakdowns are generated on your device using built-in DBT templates and matched against
-          the {SKILLS.length} skills in this app — no AI service, no waiting. Skill suggestions are
-          editable and skill pages open with a click. Your goals stay on this device, and signed-in
-          accounts back them up automatically through cloud sync. This tool supports — never
-          replaces — your work with your therapist and group.
+          Skill suggestions are matched on your device against the {SKILLS.length} skills in this
+          app — no AI service, no waiting. Suggestions are editable and skill pages open with a
+          click. Your goals stay on this device, and signed-in accounts back them up automatically
+          through cloud sync. This tool supports — never replaces — your work with your therapist
+          and group.
         </p>
       </div>
     </div>

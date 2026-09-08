@@ -181,37 +181,6 @@ function writeGoalToDoc(doc: jsPDF, goal: Goal, index: number | undefined) {
     supportEntries.forEach((entry) => writeBullet(doc, entry, { checkbox: false }));
   }
 
-  // ----- Breakdown (generated on-device) -----
-  const g = goal.guidance;
-  if (g) {
-    writeSectionTitle(doc, undefined, "Breakdown");
-    writeLabel(doc, `Generated ${new Date(g.generatedAt).toLocaleString()}`);
-    if (g.summary.trim()) writeValue(doc, g.summary, { italic: true });
-    if (g.obstacles?.trim()) {
-      writeLabel(doc, "Watch out for");
-      writeValue(doc, g.obstacles);
-    }
-    if (g.progressSignals && g.progressSignals.length > 0) {
-      writeLabel(doc, "Signs of progress");
-      g.progressSignals.forEach((sig) => writeBullet(doc, sig, { done: false }));
-    }
-    if (g.steps.length > 0) {
-      writeLabel(doc, "Suggested steps (not yet added)");
-      g.steps.forEach((s) => {
-        writeBullet(doc, s.text);
-        if (s.hint) {
-          doc.setFont("helvetica", "italic");
-          doc.setFontSize(9);
-          doc.setTextColor(120);
-          const lines = doc.splitTextToSize(s.hint, CONTENT_WIDTH - 24);
-          ensureSpace(doc, lines.length * 11 + 2);
-          doc.text(lines, PAGE_MARGIN + 24, y);
-          y += lines.length * 11 + 2;
-        }
-      });
-    }
-  }
-
   // ----- Checklist (current steps) -----
   writeSectionTitle(doc, undefined, "My steps");
   if (goal.steps.length === 0) {

@@ -1,5 +1,5 @@
 // My Goals — data model, localStorage persistence and the
-// offline (fallback) goal → skill matching engine.
+// offline goal → skill matching engine.
 //
 // Goals are stored locally on this device (same pattern as Session Prep)
 // under the key below. Up to MAX_GOALS active goal slots are supported.
@@ -46,17 +46,6 @@ export function normalizeGroupSupport(value: unknown): string[] {
   return [];
 }
 
-/** Result of a breakdown (AI-generated or the offline template). */
-export interface GoalGuidance {
-  source: "ai" | "offline";
-  generatedAt: string;
-  summary: string;
-  /** Suggested steps — appended to the checklist when the goal has none. */
-  steps: { text: string; hint?: string }[];
-  obstacles?: string;
-  progressSignals?: string[];
-}
-
 export interface Goal {
   id: string;
   title: string;
@@ -66,7 +55,6 @@ export interface Goal {
   groupSupport: string[];
   steps: GoalStep[];
   skills: GoalSkillLink[];
-  guidance?: GoalGuidance;
   createdAt: string;
   updatedAt: string;
 }
@@ -109,15 +97,21 @@ export function loadGoals(): Goal[] | null {
     if (!parsed || !Array.isArray(parsed.goals)) return null;
     // Basic shape repair so older/partial entries never crash the UI.
     // (groupSupport normalization migrates the old single-string field to
-    // the new per-bullet entries format in place.)
+    // the new per-bullet entries format in place; the removed breakdown
+    // feature's `guidance` blob is stripped from older saves.)
     return parsed.goals
       .slice(0, MAX_GOALS)
-      .map((g: Partial<Goal>) => ({
-        ...emptyGoal(),
-        ...g,
-        id: g.id || newId(),
-        groupSupport: normalizeGroupSupport(g.groupSupport),
-      }));
+      // Older saves may still carry the removed breakdown feature's
+      // `guidance` blob — accept and strip it so it doesn't ride along.
+      .map((g: Partial<Goal> & { guidance?: unknown }) => {
+        const { guidance: _legacyGuidance, ...rest } = g;
+        return {
+          ...emptyGoal(),
+          ...rest,
+          id: rest.id || newId(),
+          groupSupport: normalizeGroupSupport(rest.groupSupport),
+        };
+      });
   } catch {
     return null;
   }
@@ -219,8 +213,8 @@ export function getFilledGoalCount(): number {
 
 // ---------------------------------------------------------------------------
 // Offline skill matching — keyword rules → skill suggestions.
-// Used as the instant "Find skills" action and as the fallback whenever the
-// AI breakdown is unavailable. Scores are additive; best matches first.
+// Used by the "Find matching skills" action on the My Goals page.
+// Scores are additive; best matches first.
 // ---------------------------------------------------------------------------
 
 interface MatchRule {
@@ -440,86 +434,4 @@ export function matchSkillsForGoal(
     .map(([skillId, { score, reason }]) => ({ skillId, reason, score }))
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
-}
-
-// ---------------------------------------------------------------------------
-// Offline breakdown template — used when the AI endpoint is unavailable.
-// ---------------------------------------------------------------------------
-
-function templateSteps(title: string, description: string): { text: string; hint?: string }[] {
-  const text = `${normalize(title)} ${normalize(description)}`;
-  const steps: { text: string; hint?: string }[] = [
-    {
-      text: "Write down what success for this goal would look like this week — one sentence.",
-      hint: "Keep it small and observable — something you could actually check off this week.",
-    },
-    {
-      text: "Break it into the smallest step you can do today (10 minutes or less).",
-      hint: "A step that feels challenging but possible is the right size.",
-    },
-  ];
-
-  if (/(anxiety|anxious|fear|afraid|panic|exposure|leave the house|leave home)/.test(text)) {
-    steps.push({
-      text: "Rate your anxiety 1–10 before and after the step, and note predicted vs. actual outcome.",
-      hint: "This is your evidence log — it's how anxious predictions get tested.",
-    });
-  }
-  if (/(thought|reframe|negative|catastrophiz|mind-reading)/.test(text)) {
-    steps.push({
-      text: "Fill out one thought record: situation → automatic thought → emotion → balanced thought.",
-      hint: "Check the Facts is the skill for this.",
-    });
-  }
-  if (/(glimmer|savor|positive moment|gratitude|joy)/.test(text)) {
-    steps.push({
-      text: "When you notice a good moment, pause for 10–30 seconds and let it land before moving on.",
-      hint: "Notice body sensations and the feeling that comes with it.",
-    });
-  }
-
-  steps.push(
-    {
-      text: "Pick the skill you'll use first, and exactly when you'll use it.",
-      hint: "Linking a skill to a moment ('when I reach the door') makes it far more likely to happen.",
-    },
-    {
-      text: "After practicing, note one thing that helped and one thing that was hard.",
-      hint: "Bring it to group or your therapist — that's where problem-solving happens.",
-    }
-  );
-  return steps;
-}
-
-const OFFLINE_SIGNALS = [
-  "You did the smallest step even though you didn't feel like it",
-  "Anxiety came down a few points before/after practicing",
-  "You used a skill without being prompted",
-  "You noticed a pattern (thought, urge, or trigger) earlier than usual",
-];
-
-/**
- * Deterministic fallback breakdown when the AI service can't be reached.
- */
-export function offlineBreakdown(title: string, description: string): GoalGuidance {
-  return {
-    source: "offline",
-    generatedAt: new Date().toISOString(),
-    summary: `Here is a starting breakdown for “${title.trim()}” using DBT's build-a-life-worth-living approach: make the goal small, pair it with a skill, and measure what happens.`,
-    steps: templateSteps(title, description),
-    obstacles:
-      "Common obstacles: the step feels too big (shrink it), avoidance shows up (that's information, not failure — use opposite action), or you forget in the moment (link the skill to a specific cue, like a time or place).",
-    progressSignals: OFFLINE_SIGNALS,
-  };
-}
-
-/**
- * Offline breakdown including matched skills — one call for the fallback path.
- */
-export function offlineBreakdownWithSkills(
-  title: string,
-  description: string
-): { guidance: GoalGuidance; skills: SkillMatch[] } {
-  const skills = matchSkillsForGoal(title, description, 6);
-  return { guidance: offlineBreakdown(title, description), skills };
 }
