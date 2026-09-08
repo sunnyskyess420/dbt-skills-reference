@@ -25,6 +25,10 @@ import {
   Lightbulb,
   TrendingUp,
   ListChecks,
+  Printer,
+  FileDown,
+  Download,
+  Upload,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -39,6 +43,29 @@ import {
   offlineBreakdown,
   MAX_GOALS,
 } from "@/lib/goals-storage";
+import { exportGoalToPdf, exportAllGoalsToPdf } from "@/lib/goals-pdf";
+import {
+  downloadGoalsJsonBackup,
+  importGoalsFromJson,
+  type GoalsImportResult,
+} from "@/lib/goals-export";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   /** Navigate to a skill's detail page from a suggestion chip. */
@@ -52,6 +79,8 @@ export function Goals({ onViewSkill }: Props) {
   const [fallbackIds, setFallbackIds] = React.useState<Set<string>>(new Set());
   const [errorIds, setErrorIds] = React.useState<Record<string, string>>({});
   const [stepDrafts, setStepDrafts] = React.useState<Record<string, string>>({});
+  const [importResult, setImportResult] = React.useState<GoalsImportResult | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Load on first mount. The section starts empty — users add their own
   // goals. (loadGoals also wipes any leftover auto-seeded example data.)
@@ -82,13 +111,53 @@ export function Goals({ onViewSkill }: Props) {
   };
 
   const deleteGoal = (id: string) => {
-    if (!window.confirm("Remove this goal? Its steps and breakdown will be deleted.")) return;
     commit(goals.filter((g) => g.id !== id));
   };
 
   const clearAll = () => {
-    if (!window.confirm("Clear all goals? This removes every goal, step and breakdown.")) return;
     commit([]);
+  };
+
+  // ----- print / pdf -------------------------------------------------------
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleExportAllPdf = () => {
+    const usable = goals.filter(
+      (g) => g.title.trim() || g.description.trim() || g.steps.length > 0
+    );
+    if (usable.length === 0) return;
+    exportAllGoalsToPdf(usable);
+  };
+
+  const handleExportGoalPdf = (goal: Goal) => {
+    exportGoalToPdf(goal);
+  };
+
+  // ----- json backup / restore ---------------------------------------------
+
+  const handleExportJson = () => {
+    downloadGoalsJsonBackup();
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    const result = importGoalsFromJson(text);
+    setImportResult(result);
+    if (result.success && result.imported > 0) {
+      // Refresh in-memory state from storage so the new goals appear.
+      setGoals(loadGoals() ?? []);
+    }
+    // Reset input so the same file can be re-selected.
+    e.target.value = "";
   };
 
   // ----- steps -------------------------------------------------------------
@@ -440,15 +509,55 @@ export function Goals({ onViewSkill }: Props) {
                 />
               </div>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive print:hidden"
-              onClick={() => deleteGoal(goal.id)}
-              aria-label={`Delete goal ${index + 1}`}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-0.5 shrink-0 print:hidden">
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                      onClick={() => handleExportGoalPdf(goal)}
+                      aria-label={`Save goal ${index + 1} as PDF`}
+                      disabled={!goal.title.trim() && !goal.description.trim() && goal.steps.length === 0}
+                    >
+                      <FileDown className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Save this goal as PDF</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                    aria-label={`Delete goal ${index + 1}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete this goal?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete &quot;{goal.title.trim() || `Goal ${index + 1}`}&quot; along
+                      with its steps and breakdown. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => deleteGoal(goal.id)}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
 
           {/* Action row */}
@@ -593,27 +702,181 @@ export function Goals({ onViewSkill }: Props) {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-3 print:hidden">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              <Target className="h-6 w-6" />
+      {/* Sticky action bar — hidden on print */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b print:hidden">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Target className="h-4 w-4 text-primary shrink-0" />
+            <span className="text-xs font-semibold uppercase tracking-wider truncate">
               My Goals
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
-              Track up to {MAX_GOALS} goals you&apos;re working on. Break each one into small
-              steps and see which skills from this app can help.
-            </p>
+              {goals.length > 0 && (
+                <span className="ml-1.5 text-muted-foreground font-normal">({goals.length})</span>
+              )}
+            </span>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handlePrint}
+              disabled={goals.length === 0}
+              aria-label="Print goals"
+            >
+              <Printer className="h-4 w-4" />
+              <span className="ml-1 hidden sm:inline">Print</span>
+            </Button>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleExportAllPdf}
+                    disabled={
+                      goals.length === 0 ||
+                      !goals.some(
+                        (g) => g.title.trim() || g.description.trim() || g.steps.length > 0
+                      )
+                    }
+                    aria-label="Save all goals as PDF"
+                  >
+                    <FileDown className="h-4 w-4" />
+                    <span className="ml-1 hidden sm:inline">PDF</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Download all goals as a formatted PDF</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleExportJson}
+                    disabled={goals.length === 0}
+                    aria-label="Export goals as JSON backup"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span className="ml-1 hidden sm:inline">Backup</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Export all goals as a JSON backup file</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="application/json,.json"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <TooltipProvider delayDuration={300}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleImportClick}
+                    disabled={goals.length >= MAX_GOALS}
+                    aria-label="Import goals from JSON backup"
+                  >
+                    <Upload className="h-4 w-4" />
+                    <span className="ml-1 hidden sm:inline">Restore</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Import goals from a JSON backup (skips duplicates)
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             {goals.length > 0 && (
-              <Button variant="ghost" size="sm" onClick={clearAll} className="text-muted-foreground">
-                Clear all
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-destructive"
+                    aria-label="Clear all goals"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span className="ml-1 hidden sm:inline">Clear all</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Clear all goals?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This removes every goal, step and breakdown. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={clearAll}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      Clear all
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
         </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        {/* Print-only header */}
+        <div className="hidden print:block mb-6 pb-3 border-b">
+          <h1 className="text-xl font-bold flex items-center gap-2">
+            <Target className="h-5 w-5" />
+            My Goals
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {goals.length} goal{goals.length === 1 ? "" : "s"} · Printed {new Date().toLocaleString()}
+          </p>
+        </div>
+
+        {/* Header */}
+        <div className="print:hidden">
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <Target className="h-6 w-6" />
+            My Goals
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+            Track up to {MAX_GOALS} goals you&apos;re working on. Break each one into small
+            steps and see which skills from this app can help.
+          </p>
+        </div>
+
+        {/* Import result banner — mirrors the worksheets list pattern */}
+        {importResult && (
+          <div
+            className={cn(
+              "print:hidden rounded-md border p-2.5 text-xs",
+              importResult.success
+                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                : "border-rose-500/50 bg-rose-500/10 text-rose-700 dark:text-rose-300"
+            )}
+          >
+            {importResult.success ? (
+              <>
+                Imported {importResult.imported} goal{importResult.imported === 1 ? "" : "s"}
+                {importResult.skipped > 0 &&
+                  `, skipped ${importResult.skipped} duplicate or empty ${importResult.skipped === 1 ? "entry" : "entries"}`}.
+              </>
+            ) : (
+              <>Import failed: {importResult.error}</>
+            )}
+            <button
+              className="ml-2 underline"
+              onClick={() => setImportResult(null)}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {/* Empty state */}
         {goals.length === 0 && (
