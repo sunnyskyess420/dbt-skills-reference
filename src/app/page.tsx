@@ -26,11 +26,13 @@ import { useSync, useAutoPush } from "@/lib/sync";
 import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta } from "@/lib/worksheet-storage";
 import { getFilledGoalCount, GOALS_CHANGED_EVENT } from "@/lib/goals-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight } from "lucide-react";
+import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight, LifeBuoy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
 const STORAGE_KEY_RECENT = "dbt-skills:recent";
+// One-time dismissal flag for the guest "sign in to back up" nudge.
+const GUEST_NUDGE_DISMISSED_KEY = "dbt-skills:sync-nudge-dismissed";
 
 type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "goals" | "dashboard" | "session-prep" | "crisis";
 
@@ -103,8 +105,33 @@ export default function Home() {
   // Bookmarks persisted to localStorage
   const [bookmarks, setBookmarks] = React.useState<Set<string>>(new Set());
 
+  // Guest data-safety nudge. When a guest has saved a few worksheets,
+  // gently surface sign-in as a *backup* option (one-time, dismissible).
+  // Starts dismissed so the card never flashes before we've checked.
+  const [guestNudgeDismissed, setGuestNudgeDismissed] = React.useState(true);
+  React.useEffect(() => {
+    try {
+      setGuestNudgeDismissed(!!localStorage.getItem(GUEST_NUDGE_DISMISSED_KEY));
+    } catch {
+      // ignore
+    }
+  }, []);
+  const dismissGuestNudge = React.useCallback(() => {
+    try {
+      localStorage.setItem(GUEST_NUDGE_DISMISSED_KEY, "1");
+    } catch {
+      // ignore
+    }
+    setGuestNudgeDismissed(true);
+  }, []);
+
   // Worksheets
   const { entries: worksheetEntries, createEntry, updateEntry, deleteEntry, findEntry, refresh: refreshWorksheets } = useWorksheets();
+
+  // Derived from saved entries — placed after the worksheets hook because
+  // it reads worksheetEntries.
+  const showGuestNudge =
+    !isSignedIn && worksheetEntries.length >= 3 && !guestNudgeDismissed;
 
   const selectedWorksheet = React.useMemo(
     () => (selectedWorksheetId ? findEntry(selectedWorksheetId) : null),
@@ -406,6 +433,17 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-1">
+            {/* Crisis resources — one tap away from any screen */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-amber-600 hover:text-amber-600 hover:bg-amber-500/10"
+              onClick={() => handleSelectModule("crisis")}
+              aria-label="Crisis Resources"
+              title="Crisis Resources"
+            >
+              <LifeBuoy className="h-4 w-4" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -428,7 +466,7 @@ export default function Home() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="hidden sm:inline-flex h-8 w-8"
               onClick={() => setHelpOpen(true)}
               aria-label="Keyboard shortcuts help"
             >
@@ -463,6 +501,9 @@ export default function Home() {
             onOpenAuth={() => setAuthOpen(true)}
             sync={syncState}
             onSyncNow={() => void syncNow()}
+            showGuestNudge={showGuestNudge}
+            guestNudgeCount={worksheetEntries.length}
+            onDismissGuestNudge={dismissGuestNudge}
           />
         </aside>
 
@@ -503,6 +544,9 @@ export default function Home() {
                 }}
                 sync={syncState}
                 onSyncNow={() => void syncNow()}
+                showGuestNudge={showGuestNudge}
+                guestNudgeCount={worksheetEntries.length}
+                onDismissGuestNudge={dismissGuestNudge}
               />
             </div>
           </div>
@@ -604,6 +648,9 @@ export default function Home() {
         onOpenChange={setSearchOpen}
         onSelect={handleSelectSkill}
         bookmarks={bookmarks}
+        worksheetEntries={worksheetEntries}
+        onSelectWorksheetEntry={handleSelectWorksheet}
+        onCreateWorksheet={handleCreateWorksheet}
       />
 
       {/* Diary card comparison modal */}
@@ -624,9 +671,12 @@ export default function Home() {
       {/* Keyboard shortcuts help dialog */}
       <HelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
 
-      {/* Auth dialog — opened from sidebar footer or first-visit welcome */}
+      {/* Auth dialog — opened from sidebar footer or first-visit welcome.
+          The first-visit welcome leads with "Get started" (guest); the
+          sidebar entry point leads with the sign-in tabs. */}
       <AuthDialog
         open={authOpen || welcomeOpen}
+        welcomeMode={welcomeOpen && !authOpen}
         onOpenChange={(open) => {
           setAuthOpen(open);
           if (!open) dismissWelcome();

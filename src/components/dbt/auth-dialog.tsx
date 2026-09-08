@@ -31,58 +31,113 @@ interface AuthDialogProps {
   // Called when the user picks "Continue as Guest". Closes the dialog
   // and (optionally) dismisses any first-visit prompt.
   onGuest?: () => void;
+  /**
+   * First-visit mode: leads with a primary "Get started" (guest) action
+   * and keeps sign-in as a quiet secondary step. Account mode (the
+   * default, e.g. opened from the sidebar) leads with the sign-in tabs.
+   */
+  welcomeMode?: boolean;
 }
 
-export function AuthDialog({ open, onOpenChange, onGuest }: AuthDialogProps) {
+export function AuthDialog({
+  open,
+  onOpenChange,
+  onGuest,
+  welcomeMode = false,
+}: AuthDialogProps) {
+  // Welcome mode starts on the guest-first view and only shows the
+  // account tabs if the user explicitly asks for them.
+  const [showAccount, setShowAccount] = React.useState(!welcomeMode);
+
+  // Reset the view every time the dialog opens, so re-opening never
+  // "remembers" a stale view from a previous session of the dialog.
+  React.useEffect(() => {
+    if (open) setShowAccount(!welcomeMode);
+  }, [open, welcomeMode]);
+
+  const handleGuest = () => {
+    onGuest?.();
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[440px]">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Welcome to DBT Skills</DialogTitle>
-          <DialogDescription>
-            Sign in to sync your worksheets, bookmarks, and progress across
-            all your devices. Or continue as a guest — your data stays on
-            this device only.
-          </DialogDescription>
-        </DialogHeader>
+        {showAccount ? (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-xl">Sign in to DBT Skills</DialogTitle>
+              <DialogDescription>
+                Sync your worksheets, bookmarks, and progress across all your
+                devices. Everything also keeps working offline on this device.
+              </DialogDescription>
+            </DialogHeader>
 
-        <Tabs defaultValue="signin" className="mt-2">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin" className="gap-1.5">
-              <LogIn className="h-3.5 w-3.5" />
-              Sign In
-            </TabsTrigger>
-            <TabsTrigger value="signup" className="gap-1.5">
-              <UserPlus className="h-3.5 w-3.5" />
-              Create Account
-            </TabsTrigger>
-          </TabsList>
+            <Tabs defaultValue="signin" className="mt-2">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin" className="gap-1.5">
+                  <LogIn className="h-3.5 w-3.5" />
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger value="signup" className="gap-1.5">
+                  <UserPlus className="h-3.5 w-3.5" />
+                  Create Account
+                </TabsTrigger>
+              </TabsList>
 
-          <TabsContent value="signin" className="mt-4">
-            <SignInForm onSuccess={() => { onOpenChange(false); window.location.reload(); }} />
-          </TabsContent>
-          <TabsContent value="signup" className="mt-4">
-            <SignUpForm onSuccess={() => { onOpenChange(false); window.location.reload(); }} />
-          </TabsContent>
-        </Tabs>
+              <TabsContent value="signin" className="mt-4">
+                <SignInForm onSuccess={() => { onOpenChange(false); window.location.reload(); }} />
+              </TabsContent>
+              <TabsContent value="signup" className="mt-4">
+                <SignUpForm onSuccess={() => { onOpenChange(false); window.location.reload(); }} />
+              </TabsContent>
+            </Tabs>
 
-        <div className="mt-2 pt-3 border-t">
-          <Button
-            variant="ghost"
-            className="w-full gap-2 text-muted-foreground"
-            onClick={() => {
-              onGuest?.();
-              onOpenChange(false);
-            }}
-          >
-            <UserRound className="h-4 w-4" />
-            Continue as guest
-          </Button>
-          <p className="text-[11px] text-muted-foreground text-center mt-2">
-            Your data stays on this device. You can sign in later from the
-            sidebar to enable sync.
-          </p>
-        </div>
+            {welcomeMode && (
+              <div className="mt-2 pt-3 border-t">
+                <Button
+                  variant="ghost"
+                  className="w-full gap-2 text-muted-foreground"
+                  onClick={handleGuest}
+                >
+                  <UserRound className="h-4 w-4" />
+                  Back — continue as guest
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle className="text-xl">Welcome to DBT Skills</DialogTitle>
+              <DialogDescription>
+                A quick companion for group: look up skills, fill worksheets,
+                and track your week. Everything saves on this device — no
+                account needed to start.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="mt-3 space-y-2">
+              <Button size="lg" className="w-full gap-2" onClick={handleGuest}>
+                <UserRound className="h-4 w-4" />
+                Get started
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full gap-2"
+                onClick={() => setShowAccount(true)}
+              >
+                <LogIn className="h-4 w-4" />
+                Sign in or create an account
+              </Button>
+            </div>
+
+            <p className="text-[11px] text-muted-foreground text-center mt-3">
+              Guest data stays on this device. Sign in anytime from the sidebar
+              to back it up and sync across devices.
+            </p>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

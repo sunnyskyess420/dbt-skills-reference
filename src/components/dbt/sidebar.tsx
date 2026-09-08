@@ -4,7 +4,7 @@ import * as React from "react";
 import { MODULES, SKILLS, type Module, type Skill } from "@/data/skills";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChevronRight, ChevronDown, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy, Target } from "lucide-react";
+import { Bookmark, ChevronRight, ChevronDown, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy, Target, X } from "lucide-react";
 import { UserMenu } from "@/components/dbt/user-menu";
 import type { SyncState } from "@/lib/sync";
 
@@ -22,6 +22,11 @@ interface SidebarProps {
   onOpenAuth: () => void;
   sync: SyncState;
   onSyncNow: () => void;
+  // Guest data-safety nudge — shown once a guest has saved a few
+  // worksheets, framing sign-in as a *backup* option. Dismissible.
+  showGuestNudge?: boolean;
+  guestNudgeCount?: number;
+  onDismissGuestNudge?: () => void;
 }
 
 const MODULE_ICONS: Record<Module, React.ComponentType<{ className?: string }>> = {
@@ -43,6 +48,9 @@ export function Sidebar({
   onOpenAuth,
   sync,
   onSyncNow,
+  showGuestNudge = false,
+  guestNudgeCount = 0,
+  onDismissGuestNudge,
 }: SidebarProps) {
   const bookmarkedSkills = React.useMemo(
     () => SKILLS.filter((s) => bookmarks.has(s.id)),
@@ -195,6 +203,28 @@ export function Sidebar({
 
       {/* Footer */}
       <div className="px-3 py-2 border-t shrink-0 space-y-2">
+        {showGuestNudge && (
+          <div className="relative rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-2">
+            <button
+              onClick={onDismissGuestNudge}
+              className="absolute right-1 top-1 rounded p-0.5 text-muted-foreground hover:text-foreground"
+              aria-label="Dismiss sign-in reminder"
+            >
+              <X className="h-3 w-3" />
+            </button>
+            <p className="pr-4 text-[11px] leading-snug text-foreground/80">
+              {guestNudgeCount} worksheet{guestNudgeCount === 1 ? "" : "s"} saved on this device.
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-1.5 h-7 w-full text-xs"
+              onClick={onOpenAuth}
+            >
+              Sign in to back them up
+            </Button>
+          </div>
+        )}
         <UserMenu onOpenAuth={onOpenAuth} sync={sync} onSyncNow={onSyncNow} />
         <p className="px-1 text-[11px] text-muted-foreground">
           Based on{" "}
