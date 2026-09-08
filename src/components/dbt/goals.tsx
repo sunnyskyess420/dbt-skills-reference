@@ -30,6 +30,7 @@ import {
   Download,
   Upload,
   Check,
+  Construction,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -936,6 +937,48 @@ export function Goals({ onViewSkill }: Props) {
           <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
             Track up to {MAX_GOALS} goals you&apos;re working on. Break each one into small
             steps and see which skills from this app can help.
+          </p>
+        </div>
+
+        {/* Under Construction banner — be honest with users that saves
+            aren't reliably persisting right now. Tells them what works,
+            what doesn't, and how to keep their data safe in the meantime. */}
+        <div className="print:hidden rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 space-y-2">
+          <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+            <Construction className="h-4 w-4 shrink-0" />
+            <span className="text-sm font-semibold">My Goals is under construction</span>
+          </div>
+          <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
+            We&apos;re tracking down a bug where goals don&apos;t always persist across page
+            navigation. The team is on it — sorry for the friction in the meantime.
+          </p>
+          <div className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed space-y-1">
+            <p className="font-medium">What works right now:</p>
+            <ul className="space-y-0.5 ml-4 list-disc">
+              <li>Adding goals, steps, and skill suggestions while you&apos;re on this page</li>
+              <li>Breakdowns (offline template — same steps for every goal until AI is wired up)</li>
+              <li>Sidebar goal count, Print, PDF export, and JSON Backup / Restore</li>
+            </ul>
+          </div>
+          <div className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed space-y-1">
+            <p className="font-medium">To keep your goals safe right now:</p>
+            <ol className="space-y-0.5 ml-4 list-decimal">
+              <li>
+                Fill out your goals as usual — you should see a green &quot;Saved ✓&quot;
+                flash after each edit
+              </li>
+              <li>
+                Click the <span className="font-medium">Backup</span> button at the top of this
+                page to download a JSON file with your goals
+              </li>
+              <li>
+                Next time you come back, click <span className="font-medium">Restore</span> and
+                pick that file — your goals will come right back
+              </li>
+            </ol>
+          </div>
+          <p className="text-[11px] text-amber-700/80 dark:text-amber-300/80 pt-1">
+            Thanks for your patience while we get this stable. ♥
           </p>
         </div>
 
