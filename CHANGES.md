@@ -101,3 +101,48 @@ npm install        # or bun install
 npm run dev        # dev server on http://localhost:3000
 npm run build      # production build (package.json's build script uses cp; on Windows run: npx prisma generate && npx next build)
 ```
+
+---
+
+# Round 2 — daily-use refinements
+
+## A. Tap-based 0–5 ratings (all worksheets)
+
+- `src/components/dbt/worksheets/form-primitives.tsx`: `ScaleField` now
+  renders six segmented 0–5 buttons instead of a slider — faster and more
+  accurate on touch screens, with radiogroup semantics for keyboard and
+  screen-reader users. Used consistently by all 23 worksheets that take
+  ratings (diary card, TIPP, pros & cons, emotion diaries, etc.).
+- `src/components/dbt/worksheets/diary-card-form.tsx`: added the hint
+  "Tap a number to rate it. Untouched ratings count as 0 (none)." so the
+  0-default is explicit.
+
+## B. Fixed day-tab "filled" detection (diary card)
+
+- A day tab previously only looked filled if a date or notes were
+  entered — filling all 12 ratings alone left the tab looking empty.
+  Any non-zero rating or skills checkbox now marks the tab.
+
+## C. Persistent save indicator + draft clarity
+
+- `src/components/dbt/worksheets/worksheet-detail.tsx`: the 1.2s "Saved"
+  flash is now a persistent "Saved · just now / 2m ago / …" status that
+  flashes emerald on each autosave and refreshes itself every 30s.
+- Never-edited entries show "Draft — saves automatically once you start
+  typing." so a blank worksheet no longer feels like it silently vanished.
+- `src/lib/relative-time.ts` (new): shared relative-time formatter used by
+  the worksheet list, search palette, and the save indicator.
+
+## D. Resume instead of duplicate
+
+- `src/app/page.tsx` + `src/components/dbt/skill-detail.tsx`:
+  "Practice with Worksheet" now opens your most recent worksheet of that
+  type (label switches to "Open your worksheet") instead of always
+  creating a new one, with a "start a blank copy" link when you truly
+  want a fresh copy. Homepage and search "new worksheet" actions still
+  always create new.
+
+## E. Skill of the Day above the fold
+
+- Moved directly under the hero on the home screen so it's visible
+  without scrolling on phones.

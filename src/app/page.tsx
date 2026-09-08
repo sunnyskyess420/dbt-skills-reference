@@ -23,7 +23,7 @@ import { AuthDialog } from "@/components/dbt/auth-dialog";
 import { incrementViewCount } from "@/lib/pinned-worksheets";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { useSync, useAutoPush } from "@/lib/sync";
-import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta } from "@/lib/worksheet-storage";
+import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta, getWorksheetForSkill } from "@/lib/worksheet-storage";
 import { getFilledGoalCount, GOALS_CHANGED_EVENT } from "@/lib/goals-storage";
 import { Button } from "@/components/ui/button";
 import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight, LifeBuoy } from "lucide-react";
@@ -242,8 +242,36 @@ export default function Home() {
     [createEntry]
   );
 
-  // Create worksheet from a skill page — switches to worksheets mode
+  // Create worksheet from a skill page — switches to worksheets mode.
+  // If the user already has a worksheet of this type, open the most
+  // recent one instead of creating an accidental duplicate; the skill
+  // page offers a separate "start a blank copy" link for the rare
+  // new-copy case.
   const handleCreateWorksheetFromSkill = React.useCallback(
+    (type: WorksheetType) => {
+      const existing = worksheetEntries
+        .filter((e) => e.type === type)
+        .sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        )[0];
+      if (existing) {
+        setSelectedModule("worksheets");
+        handleSelectWorksheet(existing);
+        return;
+      }
+      const entry = createEntry(type);
+      setSelectedWorksheetId(entry.id);
+      setSelectedSkill(null);
+      setSelectedModule("worksheets");
+      history.pushState({ type: "worksheet", id: entry.id }, "");
+    },
+    [createEntry, handleSelectWorksheet, worksheetEntries]
+  );
+
+  // Force-create a blank entry, even when an existing one would be
+  // resumed (the skill page's "start a blank copy" link).
+  const handleStartBlankWorksheetFromSkill = React.useCallback(
     (type: WorksheetType) => {
       const entry = createEntry(type);
       setSelectedWorksheetId(entry.id);
@@ -606,6 +634,14 @@ export default function Home() {
               onToggleBookmark={toggleBookmark}
               onSelectSkill={handleSelectSkill}
               onCreateWorksheet={handleCreateWorksheetFromSkill}
+              onStartBlankWorksheet={handleStartBlankWorksheetFromSkill}
+              linkedWorksheetExists={
+                selectedSkill
+                  ? worksheetEntries.some(
+                      (e) => e.type === getWorksheetForSkill(selectedSkill.id)
+                    )
+                  : false
+              }
             />
           ) : isWorksheetsMode ? (
             <WorksheetsEmptyState onCreate={handleCreateWorksheet} />
@@ -762,6 +798,12 @@ function EmptyState({
           </p>
         </div>
 
+        {/* Skill of the Day — kept high so it's visible without scrolling
+            on mobile, where it was previously buried below the worksheets */}
+        <div className="mb-8">
+          <SkillOfDay onSelectSkill={onSelectSkill} />
+        </div>
+
         {/* Quick actions — two pillars */}
         <div className="grid sm:grid-cols-2 gap-3 mb-8">
           <button
@@ -884,11 +926,6 @@ function EmptyState({
               );
             })}
           </div>
-        </div>
-
-        {/* Skill of the Day */}
-        <div className="mb-8">
-          <SkillOfDay onSelectSkill={onSelectSkill} />
         </div>
 
         {/* Recently viewed */}

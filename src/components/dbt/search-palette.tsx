@@ -11,6 +11,7 @@ import {
   type WorksheetType,
 } from "@/lib/worksheet-storage";
 import { Search, Bookmark, FileText, Plus } from "lucide-react";
+import { formatRelativeTime } from "@/lib/relative-time";
 
 interface SearchPaletteProps {
   open: boolean;
@@ -30,20 +31,6 @@ interface SearchPaletteProps {
 // entry-id lookups compare case-insensitively.
 function searchableValue(kind: "skill" | "wstype" | "wsentry", id: string, text: string[]) {
   return `${kind}:${id}|${text.join(" ").toLowerCase()}`;
-}
-
-function formatRelative(iso: string): string {
-  const then = new Date(iso).getTime();
-  if (Number.isNaN(then)) return "";
-  const diffMs = Date.now() - then;
-  const mins = Math.round(diffMs / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.round(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.round(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
 }
 
 export function SearchPalette({
@@ -182,7 +169,7 @@ export function SearchPalette({
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground truncate mt-0.5">
-                            {meta.shortName} · updated {formatRelative(entry.updatedAt)}
+                            {meta.shortName} · updated {formatRelativeTime(entry.updatedAt)}
                           </p>
                         </div>
                       </div>

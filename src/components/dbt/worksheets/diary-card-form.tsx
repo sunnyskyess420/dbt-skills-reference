@@ -58,11 +58,39 @@ export function DiaryCardForm({ entry, onChange }: Props) {
 
       {/* 7-day tabs */}
       <section>
+        <p className="text-[11px] text-muted-foreground mb-2">
+          Tap a number to rate it. Untouched ratings count as 0 (none).
+        </p>
         <Tabs defaultValue="0" className="w-full">
           <TabsList className="grid grid-cols-7 w-full h-auto">
             {DAY_LABELS.map((label, idx) => {
               const day = days[idx];
-              const hasData = day && (day.date || day.notes);
+              // A day counts as "filled" when ANY rating, skill checkbox,
+              // date, or note was entered — not just date/notes (previously
+              // filling all ratings alone left the tab looking empty).
+              const hasData =
+                day &&
+                (Boolean(day.date || day.notes) ||
+                  [
+                    day.urgeSelfHarm,
+                    day.urgeSuicide,
+                    day.urgeSubstances,
+                    day.urgeQuitTherapy,
+                    day.actSelfHarm,
+                    day.actSubstances,
+                    day.actOther,
+                    day.emoAnger,
+                    day.emoSadness,
+                    day.emoFear,
+                    day.emoShame,
+                    day.emoJoy,
+                  ].some((v) => typeof v === "number" && v > 0) ||
+                  Boolean(
+                    day.skillMindfulness ||
+                      day.skillDistressTolerance ||
+                      day.skillEmotionRegulation ||
+                      day.skillInterpersonal
+                  ));
               return (
                 <TabsTrigger
                   key={idx}

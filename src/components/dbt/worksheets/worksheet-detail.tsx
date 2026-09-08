@@ -32,6 +32,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/relative-time";
 import { useSession } from "next-auth/react";
 import { ChainAnalysisForm } from "./chain-analysis-form";
 import { ProsConsForm } from "./pros-cons-form";
@@ -121,8 +122,15 @@ export function WorksheetDetail({
   const linkedSkillId = onViewSkill ? getSkillForWorksheet(entry.type) : undefined;
   const linkedSkill = linkedSkillId ? SKILLS.find((s) => s.id === linkedSkillId) : null;
   const [titleDraft, setTitleDraft] = React.useState(entry.title);
-  const [savedFlash, setSavedFlash] = React.useState(false);
+  // Persistent save indicator: always shows "Saved · just now / 2m ago / …",
+  // flashing emerald briefly whenever the entry autosaves. Replaces the old
+  // 1.2s flash that was easy to miss.
+  const [, setSaveTick] = React.useState(0);
+  const [savedHighlight, setSavedHighlight] = React.useState(false);
   const [view, setView] = React.useState<"form" | "summary">("form");
+  // A never-updated entry is an unsaved draft: it only persists to
+  // localStorage (and the worksheet list) after the first edit.
+  const isDraft = entry.updatedAt === entry.createdAt;
 
   // Reset to form view when entry changes
   React.useEffect(() => {
@@ -139,11 +147,18 @@ export function WorksheetDetail({
   React.useEffect(() => {
     if (entry.updatedAt !== lastSavedRef.current) {
       lastSavedRef.current = entry.updatedAt;
-      setSavedFlash(true);
-      const t = setTimeout(() => setSavedFlash(false), 1200);
+      setSavedHighlight(true);
+      const t = setTimeout(() => setSavedHighlight(false), 2000);
       return () => clearTimeout(t);
     }
   }, [entry.updatedAt]);
+
+  // Re-render periodically so the relative "Saved · Xm ago" label stays
+  // truthful without waiting for an edit.
+  React.useEffect(() => {
+    const t = setInterval(() => setSaveTick((n) => n + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
 
   const handleTitleBlur = () => {
     if (titleDraft !== entry.title) {
@@ -173,10 +188,17 @@ export function WorksheetDetail({
             <span className={cn("text-xs font-semibold uppercase tracking-wider", meta.color)}>
               {meta.shortName}
             </span>
-            {savedFlash && (
-              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
+            {!isDraft && (
+              <span
+                className={cn(
+                  "text-[11px] flex items-center gap-0.5",
+                  savedHighlight
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-muted-foreground"
+                )}
+              >
                 <Check className="h-3 w-3" />
-                Saved
+                Saved · {formatRelativeTime(entry.updatedAt)}
               </span>
             )}
           </div>
@@ -275,6 +297,11 @@ export function WorksheetDetail({
             placeholder="Worksheet title..."
             className="text-base font-semibold border-0 px-0 focus-visible:ring-0 h-auto py-0"
           />
+          {isDraft && (
+            <p className="text-[11px] text-amber-600 dark:text-amber-400 mb-1">
+              Draft — saves automatically once you start typing.
+            </p>
+          )}
           <div className="flex items-start gap-2 text-xs text-muted-foreground mt-1.5">
             <BookOpen className="h-3 w-3 mt-0.5 shrink-0" />
             <span>
