@@ -93,14 +93,6 @@ export function Goals({ onViewSkill }: Props) {
   const [showBackupReminder, setShowBackupReminder] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  // "Filled" = a goal with actual content (title, description, or ≥1 step).
-  // Empty slots the user clicked "Add goal" on but hasn't typed into yet
-  // don't count — this powers the X/Y badge in the header so you can see at
-  // a glance how many of your slots are actually in use.
-  const filledCount = goals.filter(
-    (g) => g.title.trim() || g.description.trim() || g.steps.length > 0
-  ).length;
-
   // Load on first mount. The section starts empty — users add their own
   // goals. (loadGoals also wipes any leftover auto-seeded example data.)
   React.useEffect(() => {
@@ -804,19 +796,6 @@ export function Goals({ onViewSkill }: Props) {
             <span className="text-xs font-semibold uppercase tracking-wider truncate">
               My Goals
             </span>
-            {/* Filled / total badge — only counts goals with actual content
-                (title, description, or at least one step). Empty slots the
-                user clicked "Add goal" on but hasn't filled in yet don't
-                count toward the filled number, so you can see at a glance
-                how many of your 3 slots are actually in use. */}
-            {goals.length > 0 && (
-              <span
-                className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground shrink-0 tabular-nums min-w-[2rem] text-center"
-                title={`${filledCount} of ${goals.length} goal ${goals.length === 1 ? "slot" : "slots"} filled (of ${MAX_GOALS} max)`}
-              >
-                {filledCount}/{goals.length}
-              </span>
-            )}
             {savedFlash && (
               <span className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 shrink-0">
                 <Check className="h-3 w-3" />

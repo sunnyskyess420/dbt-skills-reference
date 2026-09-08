@@ -96,6 +96,10 @@ export interface SaveGoalsResult {
   error?: "quota" | "private-mode" | "unknown";
 }
 
+/** Custom event name broadcast on every successful save so listeners
+ *  (like the sidebar's goal counter) can react in real time without polling. */
+export const GOALS_CHANGED_EVENT = "dbt-skills:goals-changed";
+
 /**
  * Persist goals to localStorage. Returns a result so callers can surface
  * failures (instead of silently swallowing them). Callers that ignore the
@@ -107,6 +111,11 @@ export function saveGoals(goals: Goal[]): SaveGoalsResult {
       GOALS_STORAGE_KEY,
       JSON.stringify({ goals, savedAt: new Date().toISOString() })
     );
+    // Broadcast a window event so other components (sidebar counter,
+    // dashboard, etc.) can refresh their derived state without polling.
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent(GOALS_CHANGED_EVENT));
+    }
     return { ok: true };
   } catch (e: unknown) {
     // QuotaExceededError or SecurityError (private mode / disabled storage)
@@ -119,6 +128,17 @@ export function saveGoals(goals: Goal[]): SaveGoalsResult {
     }
     return { ok: false, error: "unknown" };
   }
+}
+
+/** Returns the count of goals that have actual content (title, description,
+ *  or ≥1 step). Empty slots the user clicked "Add goal" on but hasn't filled
+ *  in yet don't count. Use this from the sidebar so the count reflects
+ *  real entries, not phantom slots. */
+export function getFilledGoalCount(): number {
+  const goals = loadGoals() ?? [];
+  return goals.filter(
+    (g) => g.title.trim() || g.description.trim() || g.steps.length > 0
+  ).length;
 }
 
 // ---------------------------------------------------------------------------

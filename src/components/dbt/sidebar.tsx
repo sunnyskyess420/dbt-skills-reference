@@ -15,6 +15,9 @@ interface SidebarProps {
   onSelectSkill: (skill: Skill) => void;
   bookmarks: Set<string>;
   worksheetCount: number;
+  /** Number of goals with actual content (title, description, or steps).
+   *  Empty slots don't count — only goals the user has actually filled in. */
+  goalCount: number;
   // Auth/sync wiring
   onOpenAuth: () => void;
   sync: SyncState;
@@ -36,6 +39,7 @@ export function Sidebar({
   onSelectSkill,
   bookmarks,
   worksheetCount,
+  goalCount,
   onOpenAuth,
   sync,
   onSyncNow,
@@ -165,6 +169,8 @@ export function Sidebar({
             onClick={() => onSelectModule("goals")}
             icon={<Target className="h-4 w-4" />}
             label="My Goals"
+            count={goalCount}
+            highlight={goalCount > 0}
           />
           <NavButton
             active={selectedModule === "dashboard"}

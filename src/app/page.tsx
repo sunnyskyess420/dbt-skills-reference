@@ -24,6 +24,7 @@ import { incrementViewCount } from "@/lib/pinned-worksheets";
 import { useWorksheets } from "@/hooks/use-worksheets";
 import { useSync, useAutoPush } from "@/lib/sync";
 import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta } from "@/lib/worksheet-storage";
+import { getFilledGoalCount, GOALS_CHANGED_EVENT } from "@/lib/goals-storage";
 import { Button } from "@/components/ui/button";
 import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -43,6 +44,24 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = React.useState(false); // settings modal
   const [helpOpen, setHelpOpen] = React.useState(false); // keyboard shortcut help modal
   const [authOpen, setAuthOpen] = React.useState(false); // sign-in / sign-up dialog
+
+  // Goal count for the sidebar badge. Listens to the GOALS_CHANGED_EVENT
+  // that goals-storage.saveGoals() dispatches on every successful write, so
+  // the sidebar count updates in real time as the user types in a goal —
+  // no polling, no manual refresh. Only counts goals with actual content
+  // (title, description, or steps), not empty slots.
+  const [goalCount, setGoalCount] = React.useState(0);
+  React.useEffect(() => {
+    const refresh = () => setGoalCount(getFilledGoalCount());
+    refresh();
+    window.addEventListener(GOALS_CHANGED_EVENT, refresh);
+    // Also listen to native storage events — fires when another tab edits goals.
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener(GOALS_CHANGED_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
 
   // Auth + sync wiring.
   // `status` flips to "authenticated" once NextAuth resolves the JWT cookie.
@@ -435,6 +454,7 @@ export default function Home() {
             onSelectSkill={handleSelectSkill}
             bookmarks={bookmarks}
             worksheetCount={worksheetEntries.length}
+            goalCount={goalCount}
             onOpenAuth={() => setAuthOpen(true)}
             sync={syncState}
             onSyncNow={() => void syncNow()}
@@ -471,6 +491,7 @@ export default function Home() {
                 }}
                 bookmarks={bookmarks}
                 worksheetCount={worksheetEntries.length}
+                goalCount={goalCount}
                 onOpenAuth={() => {
                   setSidebarOpen(false);
                   setAuthOpen(true);
