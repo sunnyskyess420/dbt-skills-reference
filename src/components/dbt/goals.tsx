@@ -811,7 +811,7 @@ export function Goals({ onViewSkill }: Props) {
                 how many of your 3 slots are actually in use. */}
             {goals.length > 0 && (
               <span
-                className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-primary/10 text-primary shrink-0 tabular-nums"
+                className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary text-primary-foreground shrink-0 tabular-nums min-w-[2rem] text-center"
                 title={`${filledCount} of ${goals.length} goal ${goals.length === 1 ? "slot" : "slots"} filled (of ${MAX_GOALS} max)`}
               >
                 {filledCount}/{goals.length}
