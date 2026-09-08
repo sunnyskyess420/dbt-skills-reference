@@ -5,8 +5,13 @@ import { type Skill, MODULES, SKILLS } from "@/data/skills";
 import { getWorksheetForSkill, getWorksheetTypeMeta, type WorksheetType } from "@/lib/worksheet-storage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkCheck, ArrowLeft, BookOpen, Lightbulb, Footprints, CircleHelp, Quote, Clock, FileText } from "lucide-react";
+import { Bookmark, BookmarkCheck, ArrowLeft, BookOpen, Lightbulb, Footprints, CircleHelp, Quote, Clock, FileText, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Reader-mode text scale steps (1x → 1.12x → 1.25x → back). Persisted so
+// the chosen size survives reloads — handy mid-session on a small screen.
+const READER_SCALE_KEY = "dbt-skills:reader-scale";
+const READER_SCALES: number[] = [1, 1.12, 1.25];
 
 interface SkillDetailProps {
   skill: Skill | null;
@@ -31,6 +36,49 @@ export function SkillDetail({
   linkedWorksheetExists = false,
   onStartBlankWorksheet,
 }: SkillDetailProps) {
+  // Reader mode: persisted text scale, cycled with the "Aa" button.
+  const [readerScale, setReaderScale] = React.useState(1);
+  // Collapsible skill sections — resets to defaults when the skill changes.
+  const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({});
+
+  React.useEffect(() => {
+    try {
+      const raw = localStorage.getItem(READER_SCALE_KEY);
+      if (raw) {
+        const n = Number(raw);
+        if (READER_SCALES.includes(n)) setReaderScale(n);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  React.useEffect(() => {
+    setOpenSections({});
+  }, [skill?.id]);
+
+  const cycleReaderScale = React.useCallback(() => {
+    setReaderScale((prev) => {
+      const idx = READER_SCALES.indexOf(prev);
+      const next = READER_SCALES[(idx + 1) % READER_SCALES.length];
+      try {
+        localStorage.setItem(READER_SCALE_KEY, String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleSection = React.useCallback((key: string, def: boolean) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !(prev[key] ?? def) }));
+  }, []);
+
+  const isSectionOpen = React.useCallback(
+    (key: string, def: boolean) => openSections[key] ?? def,
+    [openSections]
+  );
+
   if (!skill) return null;
 
   const moduleInfo = MODULES.find((m) => m.id === skill.module)!;
@@ -60,31 +108,46 @@ export function SkillDetail({
             <span className="text-muted-foreground text-xs">/</span>
             <span className="text-xs text-muted-foreground truncate">{skill.category}</span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onToggleBookmark(skill.id)}
-            className="shrink-0"
-            aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
-          >
-            {isBookmarked ? (
-              <>
-                <BookmarkCheck className="h-4 w-4 fill-amber-500 text-amber-500" />
-                <span className="ml-1 hidden sm:inline">Saved</span>
-              </>
-            ) : (
-              <>
-                <Bookmark className="h-4 w-4" />
-                <span className="ml-1 hidden sm:inline">Save</span>
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={cycleReaderScale}
+              className="px-2"
+              title={`Text size ${Math.round(readerScale * 100)}% — click to change`}
+              aria-label={`Text size ${Math.round(readerScale * 100)} percent. Click to change`}
+            >
+              <span className="font-semibold">Aa</span>
+              <span className="text-[10px] text-muted-foreground ml-1 hidden sm:inline">
+                {Math.round(readerScale * 100)}%
+              </span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onToggleBookmark(skill.id)}
+              className="shrink-0"
+              aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+            >
+              {isBookmarked ? (
+                <>
+                  <BookmarkCheck className="h-4 w-4 fill-amber-500 text-amber-500" />
+                  <span className="ml-1 hidden sm:inline">Saved</span>
+                </>
+              ) : (
+                <>
+                  <Bookmark className="h-4 w-4" />
+                  <span className="ml-1 hidden sm:inline">Save</span>
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto" style={{ zoom: readerScale }}>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             {skill.name}
           </h1>
@@ -143,20 +206,26 @@ export function SkillDetail({
           )}
 
           {/* Description */}
-          <section className="mt-8">
-            <h2 className="text-base font-semibold mb-2">What it is</h2>
+          <CollapsibleSection
+            title="What it is"
+            defaultOpen
+            open={isSectionOpen("what", true)}
+            onToggle={() => toggleSection("what", true)}
+          >
             <p className="text-sm sm:text-base leading-relaxed text-foreground/90">
               {skill.description}
             </p>
-          </section>
+          </CollapsibleSection>
 
           {/* When to use */}
           {skill.whenToUse && skill.whenToUse.length > 0 && (
-            <section className="mt-8">
-              <h2 className="flex items-center gap-2 text-base font-semibold mb-3">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                When to use it
-              </h2>
+            <CollapsibleSection
+              title="When to use it"
+              icon={<Clock className="h-4 w-4 text-muted-foreground" />}
+              defaultOpen
+              open={isSectionOpen("when", true)}
+              onToggle={() => toggleSection("when", true)}
+            >
               <ul className="space-y-2">
                 {skill.whenToUse.map((item, i) => (
                   <li key={i} className="text-sm sm:text-base leading-relaxed flex gap-2">
@@ -165,16 +234,18 @@ export function SkillDetail({
                   </li>
                 ))}
               </ul>
-            </section>
+            </CollapsibleSection>
           )}
 
           {/* Steps */}
           {skill.steps && skill.steps.length > 0 && (
-            <section className="mt-8">
-              <h2 className="flex items-center gap-2 text-base font-semibold mb-3">
-                <Footprints className="h-4 w-4 text-muted-foreground" />
-                How to do it
-              </h2>
+            <CollapsibleSection
+              title="How to do it"
+              icon={<Footprints className="h-4 w-4 text-muted-foreground" />}
+              defaultOpen
+              open={isSectionOpen("steps", true)}
+              onToggle={() => toggleSection("steps", true)}
+            >
               <ol className="space-y-2">
                 {skill.steps.map((step, i) => (
                   <li
@@ -188,16 +259,17 @@ export function SkillDetail({
                   </li>
                 ))}
               </ol>
-            </section>
+            </CollapsibleSection>
           )}
 
           {/* Examples */}
           {skill.examples && skill.examples.length > 0 && (
-            <section className="mt-8">
-              <h2 className="flex items-center gap-2 text-base font-semibold mb-3">
-                <Quote className="h-4 w-4 text-muted-foreground" />
-                Examples
-              </h2>
+            <CollapsibleSection
+              title="Examples"
+              icon={<Quote className="h-4 w-4 text-muted-foreground" />}
+              open={isSectionOpen("examples", false)}
+              onToggle={() => toggleSection("examples", false)}
+            >
               <div className="space-y-2">
                 {skill.examples.map((ex, i) => (
                   <blockquote
@@ -208,16 +280,17 @@ export function SkillDetail({
                   </blockquote>
                 ))}
               </div>
-            </section>
+            </CollapsibleSection>
           )}
 
           {/* Tips */}
           {skill.tips && skill.tips.length > 0 && (
-            <section className="mt-8">
-              <h2 className="flex items-center gap-2 text-base font-semibold mb-3">
-                <Lightbulb className="h-4 w-4 text-amber-500" />
-                Tips & common pitfalls
-              </h2>
+            <CollapsibleSection
+              title="Tips & common pitfalls"
+              icon={<Lightbulb className="h-4 w-4 text-amber-500" />}
+              open={isSectionOpen("tips", false)}
+              onToggle={() => toggleSection("tips", false)}
+            >
               <ul className="space-y-2">
                 {skill.tips.map((tip, i) => (
                   <li key={i} className="text-sm sm:text-base leading-relaxed flex gap-2">
@@ -226,7 +299,7 @@ export function SkillDetail({
                   </li>
                 ))}
               </ul>
-            </section>
+            </CollapsibleSection>
           )}
 
           {/* Tags */}
@@ -258,6 +331,49 @@ export function SkillDetail({
         </div>
       </div>
     </div>
+  );
+}
+
+// Collapsible reader section for skill pages — lets members collapse what
+// they don't need mid-session. Content always prints in full regardless
+// of collapse state (see .reader-section-content in globals.css).
+function CollapsibleSection({
+  title,
+  icon,
+  defaultOpen = false,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  icon?: React.ReactNode;
+  defaultOpen?: boolean;
+  open?: boolean;
+  onToggle?: () => void;
+  children: React.ReactNode;
+}) {
+  const isOpen = open ?? defaultOpen;
+  return (
+    <section className="mt-8">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="w-full flex items-center gap-2 text-base font-semibold mb-2 text-left rounded-md px-1.5 py-1 -mx-1.5 hover:bg-muted/60 transition-colors"
+      >
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+            !isOpen && "-rotate-90"
+          )}
+        />
+        {icon}
+        {title}
+      </button>
+      <div className={cn("reader-section-content", !isOpen && "hidden")}>
+        {children}
+      </div>
+    </section>
   );
 }
 
