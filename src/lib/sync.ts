@@ -14,6 +14,10 @@
 //     even after logging out.
 
 import * as React from "react";
+import {
+  GOALS_TOMBSTONES_KEY,
+  type GoalTombstone,
+} from "./goals-storage";
 
 // All client-side localStorage keys for the DBT app start with this prefix.
 // We sync any key that matches, which keeps the sync logic future-proof as
@@ -95,6 +99,12 @@ export function restoreLocalState(payload: Record<string, unknown>): void {
 // either side's tombstone set. Without this tombstone filter, an entry
 // deleted on Device A would be resurrected by Device B's stale local cache
 // on the next merge.
+//
+// Goals get the same treatment (per-goal newest-updatedAt-wins merge plus
+// their own tombstone set). Previously goals fell into the "server wins"
+// bucket, so if goal edits hadn't been pushed yet (or the push failed), the
+// next pull replaced newer local goals with the stale server copy — that was
+// the reported "my goals page is not saving" data loss.
 export function mergePayloads(
   local: Record<string, unknown>,
   server: Record<string, unknown>
@@ -117,6 +127,21 @@ export function mergePayloads(
   }
   const tombstoneIds = new Set(tombstoneTs.keys());
 
+  // Same union for the goals tombstone set.
+  const goalTombstoneTs = new Map<string, number>();
+  for (const side of [local, server]) {
+    const arr = side[GOALS_TOMBSTONES_KEY];
+    if (!Array.isArray(arr)) continue;
+    for (const t of arr as GoalTombstone[]) {
+      if (!t || typeof t.id !== "string") continue;
+      const ts = new Date(t.deletedAt ?? 0).getTime();
+      if (Number.isNaN(ts)) continue;
+      const prev = goalTombstoneTs.get(t.id) ?? 0;
+      if (ts > prev) goalTombstoneTs.set(t.id, ts);
+    }
+  }
+  const goalTombstoneIds = new Set(goalTombstoneTs.keys());
+
   // Step 2: standard per-key merge.
   const merged: Record<string, unknown> = { ...local };
 
@@ -128,6 +153,15 @@ export function mergePayloads(
     );
   } else {
     delete merged[TOMBSTONE_KEY];
+  }
+
+  // Same for goal tombstones.
+  if (goalTombstoneTs.size > 0) {
+    merged[GOALS_TOMBSTONES_KEY] = Array.from(goalTombstoneTs.entries()).map(
+      ([id, ts]) => ({ id, deletedAt: new Date(ts).toISOString() })
+    );
+  } else {
+    delete merged[GOALS_TOMBSTONES_KEY];
   }
 
   for (const [key, serverValue] of Object.entries(server)) {
@@ -148,6 +182,13 @@ export function mergePayloads(
       );
       continue;
     }
+    // Special-case goals: merge per-goal with newest `updatedAt` winning,
+    // then drop tombstoned ids. Without this, any goal edit that hadn't
+    // reached the server yet was wiped by the stale server copy on pull.
+    if (key === "dbt-skills:goals") {
+      merged[key] = mergeGoalsPayload(local[key], serverValue, goalTombstoneIds);
+      continue;
+    }
     // For everything else (bookmarks, recent, settings, ...), server wins.
     merged[key] = serverValue;
   }
@@ -164,7 +205,95 @@ export function mergePayloads(
     );
   }
 
+  // Defensive sweep for goals too (same rationale as worksheets above).
+  const goalsVal = merged["dbt-skills:goals"];
+  if (goalsVal && goalTombstoneIds.size > 0) {
+    merged["dbt-skills:goals"] = applyGoalTombstones(goalsVal, goalTombstoneIds);
+  }
+
   return merged;
+}
+
+// ---------------------------------------------------------------------------
+// Goals merge helpers.
+//
+// The goals storage key holds `{ goals: Goal[], savedAt: string }` (see
+// goals-storage.ts saveGoals). Be defensive: also accept a raw array in case
+// an older/foreign payload ever stored the list directly.
+// ---------------------------------------------------------------------------
+
+interface GoalLike {
+  id?: string;
+  updatedAt?: string;
+}
+
+interface GoalsPayloadLike {
+  goals?: unknown;
+  savedAt?: string;
+}
+
+function extractGoalList(value: unknown): GoalLike[] {
+  if (Array.isArray(value)) return value as GoalLike[];
+  if (value && typeof value === "object" && Array.isArray((value as GoalsPayloadLike).goals)) {
+    return (value as GoalsPayloadLike).goals as GoalLike[];
+  }
+  return [];
+}
+
+function applyGoalTombstones(
+  value: unknown,
+  tombstoneIds: Set<string>
+): unknown {
+  if (tombstoneIds.size === 0) return value;
+  const filtered = extractGoalList(value).filter(
+    (g) => !(g && typeof g.id === "string" && tombstoneIds.has(g.id))
+  );
+  if (Array.isArray(value)) return filtered;
+  return { goals: filtered, savedAt: new Date().toISOString() };
+}
+
+function mergeGoalsPayload(
+  localValue: unknown,
+  serverValue: unknown,
+  tombstoneIds: Set<string>
+): unknown {
+  const localGoals = extractGoalList(localValue);
+  const serverGoals = extractGoalList(serverValue);
+
+  const byId = new Map<string, GoalLike>();
+  const put = (goal: GoalLike) => {
+    if (!goal || typeof goal.id !== "string" || !goal.id) return;
+    if (tombstoneIds.has(goal.id)) return; // deleted — never resurrect
+    const existing = byId.get(goal.id);
+    if (!existing) {
+      byId.set(goal.id, goal);
+      return;
+    }
+    // Newest updatedAt wins; fall back to keeping the incoming (server)
+    // copy when timestamps are missing/unparseable, matching the
+    // "server is source of truth" convention used elsewhere.
+    const a = new Date(existing.updatedAt ?? 0).getTime();
+    const b = new Date(goal.updatedAt ?? 0).getTime();
+    if (Number.isNaN(a) || b >= a) byId.set(goal.id, goal);
+  };
+  for (const g of localGoals) put(g);
+  for (const g of serverGoals) put(g);
+
+  const mergedGoals = Array.from(byId.values());
+  if (Array.isArray(localValue) && Array.isArray(serverValue)) {
+    // Legacy raw-array shape — preserve it.
+    return mergedGoals;
+  }
+  const savedAtCandidates = [
+    (localValue as GoalsPayloadLike | undefined)?.savedAt,
+    (serverValue as GoalsPayloadLike | undefined)?.savedAt,
+  ].filter((s): s is string => typeof s === "string");
+  // Sort lexicographically (ISO strings sort correctly) and take the latest.
+  // Avoid Array.prototype.at() — not supported on older Safari/webviews.
+  savedAtCandidates.sort();
+  const savedAt =
+    savedAtCandidates[savedAtCandidates.length - 1] ?? new Date().toISOString();
+  return { goals: mergedGoals, savedAt };
 }
 
 interface WorksheetEntryLike {

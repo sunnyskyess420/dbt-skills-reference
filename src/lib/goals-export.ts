@@ -9,6 +9,7 @@ import {
   saveGoals,
   emptyGoal,
   newId,
+  normalizeGroupSupport,
   MAX_GOALS,
   GOALS_STORAGE_KEY,
 } from "./goals-storage";
@@ -117,23 +118,27 @@ export function importGoalsFromJson(jsonString: string): GoalsImportResult {
         skipped++;
         continue;
       }
-      // Skipper: a goal with no title, no description and no steps is empty
-      // noise from a backup slot that was never filled in.
+      // Skipper: a goal with no title, no description, no support entries and
+      // no steps is empty noise from a backup slot that was never filled in.
       if (
         !(g.title ?? "").trim() &&
         !(g.description ?? "").trim() &&
-        (g.steps ?? []).length === 0
+        (g.steps ?? []).length === 0 &&
+        normalizeGroupSupport(g.groupSupport).length === 0
       ) {
         skipped++;
         continue;
       }
       // Merge against emptyGoal() so any missing field gets a safe default.
+      // groupSupport is normalized so legacy string backups become bullet
+      // entries on the way in.
       const safeGoal: Goal = {
         ...emptyGoal(),
         ...g,
         id: g.id || newId(),
         createdAt: g.createdAt ?? new Date().toISOString(),
         updatedAt: g.updatedAt ?? new Date().toISOString(),
+        groupSupport: normalizeGroupSupport(g.groupSupport),
         steps: Array.isArray(g.steps)
           ? g.steps.map((s) => ({
               id: s?.id || newId(),

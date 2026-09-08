@@ -46,6 +46,7 @@ export function OptionsProblemsForm({ entry, onChange }: Props) {
         <TextAreaField
           label="Option 1: Solve the problem"
           value={data.optionSolve ?? ""}
+          onChange={(v) => update("optionSolve", v)}
           hint="Change the situation or your reaction. Use Problem Solving, behavior change strategies."
           placeholder="How could you change the situation itself?"
           rows={3}
@@ -53,6 +54,7 @@ export function OptionsProblemsForm({ entry, onChange }: Props) {
         <TextAreaField
           label="Option 2: Feel better about the problem"
           value={data.optionFeelBetter ?? ""}
+          onChange={(v) => update("optionFeelBetter", v)}
           hint="Change how you feel without changing the situation. Use Opposite Action, Check the Facts, Accumulate Positives, Cope Ahead."
           placeholder="How could you change your emotional response?"
           rows={3}
@@ -60,6 +62,7 @@ export function OptionsProblemsForm({ entry, onChange }: Props) {
         <TextAreaField
           label="Option 3: Radically accept the problem"
           value={data.optionAccept ?? ""}
+          onChange={(v) => update("optionAccept", v)}
           hint="Accept the situation as it is, with no goal of changing it. Use Radical Acceptance, Turning the Mind."
           placeholder="What would full acceptance look like here?"
           rows={3}
@@ -67,6 +70,7 @@ export function OptionsProblemsForm({ entry, onChange }: Props) {
         <TextAreaField
           label="Option 4: Stay miserable (do nothing different)"
           value={data.optionStayMiserable ?? ""}
+          onChange={(v) => update("optionStayMiserable", v)}
           hint="This is what happens by default. Is that really what you want?"
           placeholder="If you keep doing what you're doing now, what happens?"
           rows={2}
@@ -78,6 +82,7 @@ export function OptionsProblemsForm({ entry, onChange }: Props) {
         <TextAreaField
           label="Which option am I choosing?"
           value={data.myChoice ?? ""}
+          onChange={(v) => update("myChoice", v)}
           placeholder="Which option (or combination) will you commit to? Which skills will you use?"
           rows={3}
         />

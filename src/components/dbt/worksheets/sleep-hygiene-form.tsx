@@ -53,6 +53,7 @@ export function SleepHygieneForm({ entry, onChange }: Props) {
         <TextAreaField
           label="Hygiene practices I'm using"
           value={data.hygienePractices ?? ""}
+          onChange={(v) => update("hygienePractices", v)}
           hint="Consistent schedule, dark/cool room, no screens before bed, no caffeine late, exercise, bed=sleep only."
           placeholder="Which practices am I following? Which am I not?"
           rows={3}

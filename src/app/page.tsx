@@ -57,9 +57,14 @@ export default function Home() {
     window.addEventListener(GOALS_CHANGED_EVENT, refresh);
     // Also listen to native storage events — fires when another tab edits goals.
     window.addEventListener("storage", refresh);
+    // And to cloud-sync restores — a fresh sign-in / "Sync now" can write
+    // goals straight into localStorage; without this the badge stayed at 0
+    // until the next full page reload even though the goals were restored.
+    window.addEventListener("dbt-sync-restored", refresh);
     return () => {
       window.removeEventListener(GOALS_CHANGED_EVENT, refresh);
       window.removeEventListener("storage", refresh);
+      window.removeEventListener("dbt-sync-restored", refresh);
     };
   }, []);
 

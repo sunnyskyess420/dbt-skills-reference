@@ -3,7 +3,7 @@
 // This is intentionally simple — the app is fully client-side and works offline
 // once the assets are cached.
 
-const CACHE_NAME = "dbt-skills-v3";
+const CACHE_NAME = "dbt-skills-v5";
 const PRECACHE_URLS = [
   "/",
   "/manifest.json",
@@ -40,6 +40,14 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   // Only handle same-origin requests
   if (url.origin !== self.location.origin) return;
+
+  // NEVER intercept API routes. They are dynamic and auth-dependent
+  // (NextAuth session checks, cloud sync). The cache-first strategy below
+  // poisoned /api/auth/session with the signed-out `{}` response, so the
+  // app never noticed sign-ins and cloud sync never activated; /api/sync
+  // GETs were similarly frozen at whatever the first response was. API
+  // responses must always come from the network.
+  if (url.pathname.startsWith("/api/")) return;
 
   // Navigation requests: network-first, fall back to cached root
   if (request.mode === "navigate") {

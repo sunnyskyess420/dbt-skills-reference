@@ -67,6 +67,7 @@ export function PositivesLongForm({ entry, onChange }: Props) {
         <TextAreaField
           label="Small action steps"
           value={data.actionSteps ?? ""}
+          onChange={(v) => update("actionSteps", v)}
           hint="Small actions consistently beat large actions occasionally."
           placeholder={"Step 1: \nStep 2: \nStep 3: \nStep 4:"}
           rows={4}

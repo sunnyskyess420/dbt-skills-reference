@@ -91,6 +91,7 @@ export function ExtremeEmotionsForm({ entry, onChange }: Props) {
         <TextAreaField
           label="Aftercare plan"
           value={data.aftercare ?? ""}
+          onChange={(v) => update("aftercare", v)}
           hint="Physical illness treated? Eating? Mood-altering substances avoided? Sleep? Exercise? (PLEASE)"
           placeholder="What self-care do I need right now? Rest, food, a walk, a shower..."
           rows={3}

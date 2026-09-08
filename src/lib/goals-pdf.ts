@@ -6,7 +6,7 @@
 
 import { jsPDF } from "jspdf";
 import { SKILLS, MODULES } from "@/data/skills";
-import { type Goal } from "./goals-storage";
+import { type Goal, normalizeGroupSupport } from "./goals-storage";
 
 // ============ Helpers ============
 
@@ -92,9 +92,9 @@ function writeKeyValue(doc: jsPDF, label: string, value: string | undefined) {
   y += 6;
 }
 
-function writeBullet(doc: jsPDF, text: string, opts?: { done?: boolean; indent?: number }) {
+function writeBullet(doc: jsPDF, text: string, opts?: { done?: boolean; indent?: number; checkbox?: boolean }) {
   const indent = opts?.indent ?? 0;
-  const prefix = opts?.done ? "[x]  " : "[ ]  ";
+  const prefix = opts?.checkbox === false ? "\u2022  " : opts?.done ? "[x]  " : "[ ]  ";
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);
   doc.setTextColor(30);
@@ -175,16 +175,17 @@ function writeGoalToDoc(doc: jsPDF, goal: Goal, index: number | undefined) {
     writeValue(doc, goal.description, { italic: true });
   }
 
-  if (goal.groupSupport.trim()) {
+  const supportEntries = normalizeGroupSupport(goal.groupSupport);
+  if (supportEntries.length > 0) {
     writeSectionTitle(doc, undefined, "How my group / therapist can support me");
-    writeValue(doc, goal.groupSupport);
+    supportEntries.forEach((entry) => writeBullet(doc, entry, { checkbox: false }));
   }
 
-  // ----- AI / offline breakdown -----
+  // ----- Breakdown (generated on-device) -----
   const g = goal.guidance;
   if (g) {
     writeSectionTitle(doc, undefined, "Breakdown");
-    writeLabel(doc, `Source: ${g.source === "ai" ? "AI" : "Offline template"} · Generated ${new Date(g.generatedAt).toLocaleString()}`);
+    writeLabel(doc, `Generated ${new Date(g.generatedAt).toLocaleString()}`);
     if (g.summary.trim()) writeValue(doc, g.summary, { italic: true });
     if (g.obstacles?.trim()) {
       writeLabel(doc, "Watch out for");

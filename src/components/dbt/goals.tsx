@@ -8,13 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
   Target,
   Sparkles,
-  Loader2,
   Plus,
   X,
   Trash2,
@@ -30,7 +28,6 @@ import {
   Download,
   Upload,
   Check,
-  Construction,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -42,7 +39,8 @@ import {
   emptyGoal,
   newId,
   matchSkillsForGoal,
-  offlineBreakdown,
+  offlineBreakdownWithSkills,
+  recordGoalTombstones,
   MAX_GOALS,
 } from "@/lib/goals-storage";
 import { exportGoalToPdf, exportAllGoalsToPdf } from "@/lib/goals-pdf";
@@ -85,10 +83,9 @@ interface Props {
 export function Goals({ onViewSkill }: Props) {
   const [goals, setGoals] = React.useState<Goal[]>([]);
   const [loaded, setLoaded] = React.useState(false);
-  const [busyId, setBusyId] = React.useState<string | null>(null);
-  const [fallbackIds, setFallbackIds] = React.useState<Set<string>>(new Set());
   const [errorIds, setErrorIds] = React.useState<Record<string, string>>({});
   const [stepDrafts, setStepDrafts] = React.useState<Record<string, string>>({});
+  const [supportDrafts, setSupportDrafts] = React.useState<Record<string, string>>({});
   const [importResult, setImportResult] = React.useState<GoalsImportResult | null>(null);
   const [savedFlash, setSavedFlash] = React.useState(false);
   const [showBackupReminder, setShowBackupReminder] = React.useState(false);
@@ -107,7 +104,12 @@ export function Goals({ onViewSkill }: Props) {
   }, []);
 
   // Track the latest updatedAt across all goals — when it changes, flash "Saved ✓".
+  // The flash only fires after a save that ACTUALLY succeeded (see saveOkRef in
+  // commit): previously it flashed on any state change, so it appeared even when
+  // the localStorage write failed — the exact "green checkmark but nothing saved"
+  // report. lastSavedRef still guards against flashing on hydration/restore.
   const lastSavedRef = React.useRef<string>("");
+  const saveOkRef = React.useRef(false);
   React.useEffect(() => {
     if (goals.length === 0) return;
     // Find the latest updatedAt without using Array.prototype.at(), which
@@ -120,8 +122,8 @@ export function Goals({ onViewSkill }: Props) {
     if (latest !== lastSavedRef.current) {
       const isFirstHydration = lastSavedRef.current === "";
       lastSavedRef.current = latest;
-      // Don't flash on the very first hydration (it's just the load, not a save).
-      if (!isFirstHydration) {
+      // Don't flash on hydration/restore, and never flash for a failed write.
+      if (!isFirstHydration && saveOkRef.current) {
         setSavedFlash(true);
         const t = setTimeout(() => setSavedFlash(false), 1200);
         return () => clearTimeout(t);
@@ -129,9 +131,36 @@ export function Goals({ onViewSkill }: Props) {
     }
   }, [goals]);
 
+  // Re-read storage after a cloud sync restore (sign-in, account switch,
+  // manual "Sync now") or when another tab edits goals — otherwise this
+  // component kept showing its pre-restore in-memory copy until a full reload.
+  React.useEffect(() => {
+    const reloadFromStorage = () => {
+      const fresh = loadGoals() ?? [];
+      setGoals(fresh);
+      // Reset the flash baseline so restoring doesn't look like a fresh save.
+      let latest = "";
+      for (const g of fresh) {
+        if (g.updatedAt > latest) latest = g.updatedAt;
+      }
+      if (latest) lastSavedRef.current = latest;
+      saveOkRef.current = false;
+    };
+    window.addEventListener("dbt-sync-restored", reloadFromStorage);
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === "dbt-skills:goals") reloadFromStorage();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      window.removeEventListener("dbt-sync-restored", reloadFromStorage);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
   const commit = React.useCallback((next: Goal[]) => {
     setGoals(next);
     const res = saveGoals(next);
+    saveOkRef.current = res.ok; // the "Saved ✓" flash only fires when this is true
     if (!res.ok) {
       // Surface save failures so users know their data didn't persist —
       // previously these were silently swallowed.
@@ -172,10 +201,16 @@ export function Goals({ onViewSkill }: Props) {
   };
 
   const deleteGoal = (id: string) => {
+    // Tombstone the deletion first so a later sync merge (pull from the
+    // server, merge across devices) can't resurrect this goal from a stale
+    // server-side copy.
+    recordGoalTombstones([id]);
     commit(goals.filter((g) => g.id !== id));
   };
 
   const clearAll = () => {
+    // Tombstone every existing goal — same resurrection guard as deleteGoal.
+    recordGoalTombstones(goals.map((g) => g.id));
     commit([]);
     // Clearing all goals effectively resets the reminder counter — a user who
     // wipes everything doesn't need to be nagged about backups for stale data.
@@ -302,7 +337,34 @@ export function Goals({ onViewSkill }: Props) {
     });
   };
 
-  // ----- AI breakdown ------------------------------------------------------
+  // ----- support entries ("how my group / therapist can help") ------------
+
+  const addSupportItem = (goalId: string, text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    const goal = goals.find((g) => g.id === goalId);
+    if (!goal) return;
+    updateGoal(goalId, { groupSupport: [...goal.groupSupport, trimmed] });
+    setSupportDrafts((d) => ({ ...d, [goalId]: "" }));
+  };
+
+  const updateSupportItem = (goalId: string, index: number, text: string) => {
+    const goal = goals.find((g) => g.id === goalId);
+    if (!goal) return;
+    updateGoal(goalId, {
+      groupSupport: goal.groupSupport.map((item, i) => (i === index ? text : item)),
+    });
+  };
+
+  const removeSupportItem = (goalId: string, index: number) => {
+    const goal = goals.find((g) => g.id === goalId);
+    if (!goal) return;
+    updateGoal(goalId, {
+      groupSupport: goal.groupSupport.filter((_, i) => i !== index),
+    });
+  };
+
+  // ----- breakdown (on-device, free) ---------------------------------------
 
   const adoptGuidance = (goal: Goal, guidance: GoalGuidance, skills: { skillId: string; reason?: string }[]) => {
     // If the goal has no checklist yet, adopt the suggested steps directly.
@@ -322,64 +384,19 @@ export function Goals({ onViewSkill }: Props) {
     };
   };
 
-  const runBreakdown = async (goalId: string) => {
+  const runBreakdown = (goalId: string) => {
     const goal = goals.find((g) => g.id === goalId);
-    if (!goal || !goal.title.trim() || busyId) return;
+    if (!goal || !goal.title.trim()) return;
 
-    setBusyId(goalId);
-    setErrorIds((e) => {
-      const { [goalId]: _drop, ...rest } = e;
-      return rest;
-    });
-
-    let nextGoal: Goal | null = null;
-    let usedFallback = false;
-
-    try {
-      const res = await fetch("/api/goals/breakdown", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: goal.title, description: goal.description }),
-        signal: AbortSignal.timeout(90_000),
-      });
-      const data = await res.json();
-      if (!res.ok || !data?.ok) throw new Error(data?.error || "AI request failed");
-
-      const plan = data.plan;
-      const reasons = plan.skillReasons || {};
-      const skills = (plan.skillIds as string[]).map((skillId) => ({
-        skillId,
-        reason: reasons[skillId] || "Recommended for this goal",
-      }));
-      const guidance: GoalGuidance = {
-        source: "ai",
-        generatedAt: new Date().toISOString(),
-        summary: plan.summary || "",
-        steps: plan.steps || [],
-        obstacles: plan.obstacles,
-        progressSignals: plan.progressSignals,
-      };
-      nextGoal = adoptGuidance(goal, guidance, skills);
-    } catch {
-      // Offline fallback: deterministic template + keyword skill matching.
-      usedFallback = true;
-      const guidance = offlineBreakdown(goal.title, goal.description);
-      const matches = matchSkillsForGoal(goal.title, goal.description, 6);
-      const skills = matches.map((m) => ({ skillId: m.skillId, reason: m.reason }));
-      nextGoal = adoptGuidance(goal, guidance, skills);
-    } finally {
-      setBusyId(null);
-    }
-
-    if (nextGoal) {
-      commit(goals.map((g) => (g.id === goalId ? nextGoal! : g)));
-      setFallbackIds((prev) => {
-        const next = new Set(prev);
-        if (usedFallback) next.add(goalId);
-        else next.delete(goalId);
-        return next;
-      });
-    }
+    // Breakdowns run entirely on this device — no AI service, no API costs.
+    // The built-in DBT template turns the goal into small steps, and the
+    // keyword matcher pairs it with skills from the app's catalog.
+    const { guidance, skills } = offlineBreakdownWithSkills(
+      goal.title,
+      goal.description
+    );
+    const nextGoal = adoptGuidance(goal, guidance, skills);
+    commit(goals.map((g) => (g.id === goalId ? nextGoal : g)));
   };
 
   const addSuggestedStep = (goalId: string, index: number) => {
@@ -458,9 +475,7 @@ export function Goals({ onViewSkill }: Props) {
         <div className="flex items-center gap-2">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
           <span className="text-xs font-semibold">Breakdown</span>
-          <Badge variant={g.source === "ai" ? "default" : "secondary"} className="text-[10px] px-1.5 py-0">
-            {g.source === "ai" ? "AI" : "Offline template"}
-          </Badge>
+          <span className="text-[10px] text-muted-foreground">on-device</span>
           <span className="ml-auto text-[10px] text-muted-foreground">
             {format(new Date(g.generatedAt), "MMM d, h:mm a")}
           </span>
@@ -546,8 +561,6 @@ export function Goals({ onViewSkill }: Props) {
   const renderGoalCard = (goal: Goal, index: number) => {
     const doneCount = goal.steps.filter((s) => s.done).length;
     const progressPct = goal.steps.length > 0 ? (doneCount / goal.steps.length) * 100 : 0;
-    const isBusy = busyId === goal.id;
-    const fallback = fallbackIds.has(goal.id);
     const error = errorIds[goal.id];
 
     return (
@@ -585,15 +598,66 @@ export function Goals({ onViewSkill }: Props) {
                 />
               </div>
               <div className="flex items-start gap-2">
-                <Users className="h-4 w-4 text-muted-foreground mt-2.5 shrink-0" />
-                <Textarea
-                  value={goal.groupSupport}
-                  onChange={(e) => updateGoal(goal.id, { groupSupport: e.target.value })}
-                  placeholder="How can my group / therapist support me with this?"
-                  rows={2}
-                  className="text-xs resize-none border-dashed"
-                  aria-label={`Goal ${index + 1} group support`}
-                />
+                <Users className="h-4 w-4 text-muted-foreground mt-2 shrink-0" />
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  {/* Support requests as individual bullet entries — one
+                      editable item per line, add/remove at will. Replaces the
+                      old single free-text box. */}
+                  {goal.groupSupport.map((item, i) => (
+                    <div
+                      key={i}
+                      className="group/support flex items-center gap-1.5"
+                    >
+                      <span
+                        className="h-1.5 w-1.5 rounded-full bg-muted-foreground/60 shrink-0"
+                        aria-hidden
+                      />
+                      <Input
+                        value={item}
+                        onChange={(e) => updateSupportItem(goal.id, i, e.target.value)}
+                        placeholder="Support entry…"
+                        className="h-8 text-xs border-dashed bg-transparent"
+                        aria-label={`Goal ${index + 1} support entry ${i + 1}`}
+                      />
+                      <button
+                        onClick={() => removeSupportItem(goal.id, i)}
+                        className="rounded-sm p-1 text-muted-foreground hover:text-foreground shrink-0"
+                        aria-label={`Remove support entry ${i + 1}`}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={supportDrafts[goal.id] ?? ""}
+                      onChange={(e) =>
+                        setSupportDrafts((d) => ({ ...d, [goal.id]: e.target.value }))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") addSupportItem(goal.id, supportDrafts[goal.id] ?? "");
+                      }}
+                      placeholder="How can my group / therapist support me? Add an entry…"
+                      className="h-8 text-xs border-dashed"
+                      aria-label={`Add support entry to goal ${index + 1}`}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 shrink-0"
+                      onClick={() => addSupportItem(goal.id, supportDrafts[goal.id] ?? "")}
+                      disabled={!(supportDrafts[goal.id] ?? "").trim()}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                  {goal.groupSupport.length === 0 && (
+                    <p className="text-[11px] text-muted-foreground leading-snug">
+                      Each entry is its own bullet — e.g. “check in on how exposure homework
+                      went” or “text me the morning of”. Press Enter to add.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-0.5 shrink-0 print:hidden">
@@ -651,37 +715,23 @@ export function Goals({ onViewSkill }: Props) {
           <div className="flex flex-wrap items-center gap-2 print:hidden">
             <Button
               size="sm"
-              onClick={() => void runBreakdown(goal.id)}
-              disabled={isBusy || !goal.title.trim() || busyId !== null}
+              onClick={() => runBreakdown(goal.id)}
+              disabled={!goal.title.trim()}
+              title="Instant on-device breakdown — no AI, no waiting"
             >
-              {isBusy ? (
-                <>
-                  <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
-                  Breaking it down…
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                  {goal.guidance ? "Regenerate breakdown" : "Break it down"}
-                </>
-              )}
+              <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+              {goal.guidance ? "Regenerate breakdown" : "Break it down"}
             </Button>
             <Button
               size="sm"
               variant="outline"
               onClick={() => findSkillsOffline(goal.id)}
-              disabled={isBusy}
               title="Instant offline skill matching — no AI"
             >
               <Compass className="h-3.5 w-3.5 mr-1.5" />
               Find matching skills
             </Button>
             {error && <span className="text-xs text-destructive">{error}</span>}
-            {fallback && (
-              <span className="text-xs text-muted-foreground">
-                AI wasn&apos;t reachable — used the offline template instead.
-              </span>
-            )}
           </div>
 
           {/* Guidance */}
@@ -760,9 +810,10 @@ export function Goals({ onViewSkill }: Props) {
               </div>
             ) : (
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Run <span className="font-medium">Break it down</span> for AI suggestions, or{" "}
-                <span className="font-medium">Find matching skills</span> for instant offline matches —
-                both are editable. Click any skill to open its full reference page.
+                Run <span className="font-medium">Break it down</span> to get suggested steps and
+                skill matches, or <span className="font-medium">Find matching skills</span> for
+                matches only — both run instantly on your device and are editable. Click any skill
+                to open its full reference page.
               </p>
             )}
           </div>
@@ -940,48 +991,6 @@ export function Goals({ onViewSkill }: Props) {
           </p>
         </div>
 
-        {/* Under Construction banner — be honest with users that saves
-            aren't reliably persisting right now. Tells them what works,
-            what doesn't, and how to keep their data safe in the meantime. */}
-        <div className="print:hidden rounded-lg border border-amber-500/40 bg-amber-500/10 p-4 space-y-2">
-          <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
-            <Construction className="h-4 w-4 shrink-0" />
-            <span className="text-sm font-semibold">My Goals is under construction</span>
-          </div>
-          <p className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed">
-            We&apos;re tracking down a bug where goals don&apos;t always persist across page
-            navigation. The team is on it — sorry for the friction in the meantime.
-          </p>
-          <div className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed space-y-1">
-            <p className="font-medium">What works right now:</p>
-            <ul className="space-y-0.5 ml-4 list-disc">
-              <li>Adding goals, steps, and skill suggestions while you&apos;re on this page</li>
-              <li>Breakdowns (offline template — same steps for every goal until AI is wired up)</li>
-              <li>Sidebar goal count, Print, PDF export, and JSON Backup / Restore</li>
-            </ul>
-          </div>
-          <div className="text-xs text-amber-800 dark:text-amber-200 leading-relaxed space-y-1">
-            <p className="font-medium">To keep your goals safe right now:</p>
-            <ol className="space-y-0.5 ml-4 list-decimal">
-              <li>
-                Fill out your goals as usual — you should see a green &quot;Saved ✓&quot;
-                flash after each edit
-              </li>
-              <li>
-                Click the <span className="font-medium">Backup</span> button at the top of this
-                page to download a JSON file with your goals
-              </li>
-              <li>
-                Next time you come back, click <span className="font-medium">Restore</span> and
-                pick that file — your goals will come right back
-              </li>
-            </ol>
-          </div>
-          <p className="text-[11px] text-amber-700/80 dark:text-amber-300/80 pt-1">
-            Thanks for your patience while we get this stable. ♥
-          </p>
-        </div>
-
         {/* Import result banner — mirrors the worksheets list pattern */}
         {importResult && (
           <div
@@ -1089,10 +1098,11 @@ export function Goals({ onViewSkill }: Props) {
 
         {/* Footnote */}
         <p className="text-[11px] text-muted-foreground leading-relaxed border-t pt-3">
-          Breakdowns use AI and are matched against the {SKILLS.length} skills in this app; skill
-          suggestions are editable and skill pages open with a click. Your goals stay on this
-          device (like Session Prep). This tool supports — never replaces — your work with your
-          therapist and group.
+          Breakdowns are generated on your device using built-in DBT templates and matched against
+          the {SKILLS.length} skills in this app — no AI service, no waiting. Skill suggestions are
+          editable and skill pages open with a click. Your goals stay on this device, and signed-in
+          accounts back them up automatically through cloud sync. This tool supports — never
+          replaces — your work with your therapist and group.
         </p>
       </div>
     </div>

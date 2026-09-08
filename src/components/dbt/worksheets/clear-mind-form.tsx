@@ -79,6 +79,7 @@ export function ClearMindForm({ entry, onChange }: Props) {
         <TextAreaField
           label="My slip plan (harm reduction if I slip)"
           value={data.slipPlan ?? ""}
+          onChange={(v) => update("slipPlan", v)}
           hint="Have this written BEFORE a slip — during the slip is too late. A slip is not failure — apply harm reduction immediately."
           placeholder="If I slip: 1. 2. 3."
           rows={3}

@@ -21,6 +21,31 @@ export interface GoalSkillLink {
   reason?: string;
 }
 
+/**
+ * Normalize the "how can my group / therapist support me" field.
+ *
+ * History: this used to be one free-text string; it is now a list of
+ * individual bullet entries (one support request per entry). Older saves and
+ * imported backups may still carry a plain string — split it into entries on
+ * newlines and strip the bullet/dash prefixes people naturally type.
+ */
+export function normalizeGroupSupport(value: unknown): string[] {
+  const toEntries = (raw: string): string[] =>
+    raw
+      .split(/\r?\n|\u2022|\u00b7/) // newlines or literal bullet characters
+      .map((line) => line.replace(/^\s*[-*•·]\s*/, "").trim())
+      .filter((line) => line.length > 0);
+
+  if (typeof value === "string") return toEntries(value);
+  if (Array.isArray(value)) {
+    // Arrays may contain plain strings; be lenient and flatten any nesting.
+    return value.flatMap((v) =>
+      typeof v === "string" ? toEntries(v) : []
+    );
+  }
+  return [];
+}
+
 /** Result of a breakdown (AI-generated or the offline template). */
 export interface GoalGuidance {
   source: "ai" | "offline";
@@ -37,8 +62,8 @@ export interface Goal {
   title: string;
   description: string;
   targetDate: string;
-  /** "How my group / therapist can support me" — free text. */
-  groupSupport: string;
+  /** "How my group / therapist can support me" — one entry per bullet. */
+  groupSupport: string[];
   steps: GoalStep[];
   skills: GoalSkillLink[];
   guidance?: GoalGuidance;
@@ -57,7 +82,7 @@ export function emptyGoal(): Goal {
     title: "",
     description: "",
     targetDate: "",
-    groupSupport: "",
+    groupSupport: [],
     steps: [],
     skills: [],
     createdAt: now,
@@ -83,9 +108,16 @@ export function loadGoals(): Goal[] | null {
     const parsed = JSON.parse(raw);
     if (!parsed || !Array.isArray(parsed.goals)) return null;
     // Basic shape repair so older/partial entries never crash the UI.
+    // (groupSupport normalization migrates the old single-string field to
+    // the new per-bullet entries format in place.)
     return parsed.goals
       .slice(0, MAX_GOALS)
-      .map((g: Partial<Goal>) => ({ ...emptyGoal(), ...g, id: g.id || newId() }));
+      .map((g: Partial<Goal>) => ({
+        ...emptyGoal(),
+        ...g,
+        id: g.id || newId(),
+        groupSupport: normalizeGroupSupport(g.groupSupport),
+      }));
   } catch {
     return null;
   }
@@ -100,6 +132,42 @@ export interface SaveGoalsResult {
  *  (like the sidebar's goal counter) can react in real time without polling. */
 export const GOALS_CHANGED_EVENT = "dbt-skills:goals-changed";
 
+// ---------------------------------------------------------------------------
+// Deletion tombstones — mirror the worksheets pattern so a goal deleted on
+// Device A is not resurrected by Device B's stale local cache during sync
+// merge. Tombstones are `{ id, deletedAt }` pairs stored locally and synced
+// like any other key; the sync merge unions both sides and filters.
+// ---------------------------------------------------------------------------
+
+export const GOALS_TOMBSTONES_KEY = "dbt-skills:goal-tombstones";
+
+export interface GoalTombstone {
+  id: string;
+  deletedAt: string; // ISO timestamp
+}
+
+const MAX_TOMBSTONES = 200; // goals are capped at MAX_GOALS, so this is generous
+
+/** Record that the given goal ids were deleted, so sync won't resurrect them. */
+export function recordGoalTombstones(ids: string[]): void {
+  if (ids.length === 0) return;
+  try {
+    const raw = localStorage.getItem(GOALS_TOMBSTONES_KEY);
+    const existing: GoalTombstone[] = raw ? JSON.parse(raw) : [];
+    const known = new Set(existing.map((t) => t.id));
+    const now = new Date().toISOString();
+    for (const id of ids) {
+      if (!known.has(id)) existing.push({ id, deletedAt: now });
+    }
+    // Cap the list — oldest tombstones are the least likely to matter.
+    const trimmed = existing.slice(-MAX_TOMBSTONES);
+    localStorage.setItem(GOALS_TOMBSTONES_KEY, JSON.stringify(trimmed));
+  } catch {
+    // Best effort — without a tombstone a deleted goal may reappear after a
+    // sync merge, but nothing crashes.
+  }
+}
+
 /**
  * Persist goals to localStorage. Returns a result so callers can surface
  * failures (instead of silently swallowing them). Callers that ignore the
@@ -111,10 +179,18 @@ export function saveGoals(goals: Goal[]): SaveGoalsResult {
       GOALS_STORAGE_KEY,
       JSON.stringify({ goals, savedAt: new Date().toISOString() })
     );
-    // Broadcast a window event so other components (sidebar counter,
-    // dashboard, etc.) can refresh their derived state without polling.
     if (typeof window !== "undefined") {
+      // Broadcast so other components (sidebar counter, dashboard, etc.) can
+      // refresh their derived state without polling.
       window.dispatchEvent(new CustomEvent(GOALS_CHANGED_EVENT));
+      // IMPORTANT: also fire the sync layer's "local data changed" event.
+      // The auto-push watcher in sync.ts only listens for `dbt-local-changed`
+      // (and cross-tab `storage` events). Without this, goal edits never got
+      // pushed to the server for signed-in users — the server kept a stale
+      // goals snapshot, and the next pull/restore clobbered the newer local
+      // edits. This was the root cause of "goals don't save" for signed-in
+      // users even though the save itself succeeded.
+      window.dispatchEvent(new CustomEvent("dbt-local-changed"));
     }
     return { ok: true };
   } catch (e: unknown) {
@@ -158,7 +234,7 @@ interface MatchRule {
 
 const MATCH_RULES: MatchRule[] = [
   {
-    keywords: ["leave the house", "exposure", "going out", "go outside", "alone outside", "errands", "agoraphobia", "leave home", "leave alone", "step outside"],
+    keywords: ["leave the house", "leave my house", "leaving the house", "leaving home", "leaving home alone", "exposure", "going out", "go outside", "alone outside", "errands", "agoraphobia", "leave home", "leave alone", "step outside"],
     weight: 4,
     skillIds: ["opposite-action", "cope-ahead", "check-the-facts", "tipp", "self-soothing", "paired-muscle-relaxation", "wise-mind"],
     reason: "Gradual exposure works best when you plan coping ahead, act on opposite action, and rate anxiety before and after.",

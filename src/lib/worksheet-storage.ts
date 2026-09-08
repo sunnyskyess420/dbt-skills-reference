@@ -729,7 +729,7 @@ export function blankProsConsData(): Record<string, any> {
 
 export function blankDiaryCardData(): Record<string, any> {
   // 7 days, each with metrics
-  const days = [];
+  const days: Record<string, any>[] = [];
   for (let i = 0; i < 7; i++) {
     days.push({
       date: "",
