@@ -155,14 +155,19 @@ export function importGoalsFromJson(jsonString: string): GoalsImportResult {
     }
 
     if (imported > 0) {
-      try {
-        saveGoals(merged);
-      } catch {
+      const res = saveGoals(merged);
+      if (!res.ok) {
+        const reason =
+          res.error === "quota"
+            ? "localStorage is full — try deleting unused worksheets or exporting a backup first."
+            : res.error === "private-mode"
+            ? "browser storage is blocked (private mode or cookies disabled)."
+            : "localStorage could not be written.";
         return {
           success: false,
           imported: 0,
           skipped,
-          error: "Failed to save goals to localStorage (storage may be full).",
+          error: `Failed to save goals: ${reason}`,
         };
       }
     }

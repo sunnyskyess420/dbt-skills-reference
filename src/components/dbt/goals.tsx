@@ -29,6 +29,7 @@ import {
   FileDown,
   Download,
   Upload,
+  Check,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,14 @@ import {
   importGoalsFromJson,
   type GoalsImportResult,
 } from "@/lib/goals-export";
+import {
+  shouldShowGoalsReminder,
+  markGoalsReminderShown,
+  dismissGoalsReminder,
+  markGoalsExported,
+  getGoalsReminderInterval,
+} from "@/lib/goals-backup-reminder";
+import { toast } from "@/hooks/use-toast";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -80,18 +89,61 @@ export function Goals({ onViewSkill }: Props) {
   const [errorIds, setErrorIds] = React.useState<Record<string, string>>({});
   const [stepDrafts, setStepDrafts] = React.useState<Record<string, string>>({});
   const [importResult, setImportResult] = React.useState<GoalsImportResult | null>(null);
+  const [savedFlash, setSavedFlash] = React.useState(false);
+  const [showBackupReminder, setShowBackupReminder] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Load on first mount. The section starts empty — users add their own
   // goals. (loadGoals also wipes any leftover auto-seeded example data.)
   React.useEffect(() => {
-    setGoals(loadGoals() ?? []);
+    const loaded = loadGoals() ?? [];
+    setGoals(loaded);
     setLoaded(true);
+    // Re-evaluate the backup reminder whenever goals change between sessions.
+    if (shouldShowGoalsReminder(loaded.length)) {
+      setShowBackupReminder(true);
+    }
   }, []);
+
+  // Track the latest updatedAt across all goals — when it changes, flash "Saved ✓".
+  const lastSavedRef = React.useRef<string>("");
+  React.useEffect(() => {
+    if (goals.length === 0) return;
+    const latest = goals
+      .map((g) => g.updatedAt)
+      .sort()
+      .at(-1);
+    if (!latest) return;
+    if (latest !== lastSavedRef.current) {
+      const isFirstHydration = lastSavedRef.current === "";
+      lastSavedRef.current = latest;
+      // Don't flash on the very first hydration (it's just the load, not a save).
+      if (!isFirstHydration) {
+        setSavedFlash(true);
+        const t = setTimeout(() => setSavedFlash(false), 1200);
+        return () => clearTimeout(t);
+      }
+    }
+  }, [goals]);
 
   const commit = React.useCallback((next: Goal[]) => {
     setGoals(next);
-    saveGoals(next);
+    const res = saveGoals(next);
+    if (!res.ok) {
+      // Surface save failures so users know their data didn't persist —
+      // previously these were silently swallowed.
+      const reason =
+        res.error === "quota"
+          ? "Browser storage is full. Try deleting unused worksheets, or export a backup and clear old data."
+          : res.error === "private-mode"
+          ? "Browser storage is blocked (private mode or cookies disabled). Your goals won't persist."
+          : "Goals could not be saved — browser storage is unavailable.";
+      toast({
+        title: "Couldn't save your goals",
+        description: reason,
+        variant: "destructive",
+      });
+    }
   }, []);
 
   const updateGoal = React.useCallback(
@@ -107,7 +159,13 @@ export function Goals({ onViewSkill }: Props) {
 
   const addGoal = () => {
     if (goals.length >= MAX_GOALS) return;
-    commit([...goals, emptyGoal()]);
+    const next = [...goals, emptyGoal()];
+    commit(next);
+    // Check whether the new goal count should trigger a backup reminder.
+    if (shouldShowGoalsReminder(next.length)) {
+      setShowBackupReminder(true);
+      markGoalsReminderShown(next.length);
+    }
   };
 
   const deleteGoal = (id: string) => {
@@ -116,6 +174,10 @@ export function Goals({ onViewSkill }: Props) {
 
   const clearAll = () => {
     commit([]);
+    // Clearing all goals effectively resets the reminder counter — a user who
+    // wipes everything doesn't need to be nagged about backups for stale data.
+    markGoalsExported(0);
+    setShowBackupReminder(false);
   };
 
   // ----- print / pdf -------------------------------------------------------
@@ -140,6 +202,18 @@ export function Goals({ onViewSkill }: Props) {
 
   const handleExportJson = () => {
     downloadGoalsJsonBackup();
+    // A successful export resets the reminder counter (mirrors the worksheets pattern).
+    markGoalsExported(goals.length);
+    setShowBackupReminder(false);
+    toast({
+      title: "Backup downloaded",
+      description: `Exported ${goals.length} goal${goals.length === 1 ? "" : "s"} to dbt-goals-backup.json`,
+    });
+  };
+
+  const handleDismissReminder = () => {
+    dismissGoalsReminder(goals.length);
+    setShowBackupReminder(false);
   };
 
   const handleImportClick = () => {
@@ -154,7 +228,14 @@ export function Goals({ onViewSkill }: Props) {
     setImportResult(result);
     if (result.success && result.imported > 0) {
       // Refresh in-memory state from storage so the new goals appear.
-      setGoals(loadGoals() ?? []);
+      const refreshed = loadGoals() ?? [];
+      setGoals(refreshed);
+      // An import is functionally a backup restore — reset the reminder counter.
+      markGoalsExported(refreshed.length);
+      setShowBackupReminder(false);
+      // Reset the saved-flash baseline so we don't flash on this hydration.
+      const latest = refreshed.map((g) => g.updatedAt).sort().at(-1);
+      if (latest) lastSavedRef.current = latest;
     }
     // Reset input so the same file can be re-selected.
     e.target.value = "";
@@ -713,6 +794,12 @@ export function Goals({ onViewSkill }: Props) {
                 <span className="ml-1.5 text-muted-foreground font-normal">({goals.length})</span>
               )}
             </span>
+            {savedFlash && (
+              <span className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 shrink-0">
+                <Check className="h-3 w-3" />
+                Saved
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <Button
@@ -875,6 +962,44 @@ export function Goals({ onViewSkill }: Props) {
             >
               Dismiss
             </button>
+          </div>
+        )}
+
+        {/* Auto-backup reminder — fires every N new goals. Mirrors the
+            worksheets list's amber backup-reminder banner. */}
+        {showBackupReminder && goals.length > 0 && (
+          <div className="print:hidden rounded-md border border-amber-500/50 bg-amber-500/10 p-2.5 text-xs text-amber-800 dark:text-amber-200">
+            <div className="flex items-start gap-1.5">
+              <span className="text-base leading-none mt-0.5" aria-hidden>⚠</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold">Back up your goals</p>
+                <p className="mt-0.5">
+                  You now have {goals.length} goal{goals.length === 1 ? "" : "s"}. If your browser
+                  data is cleared, you&apos;ll lose them. Export a JSON backup now so you can
+                  restore them later.
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-[11px] px-2 border-amber-500/50 hover:bg-amber-500/20"
+                    onClick={handleExportJson}
+                  >
+                    <Download className="h-3 w-3 mr-1" />
+                    Backup now
+                  </Button>
+                  <button
+                    className="underline text-[11px]"
+                    onClick={handleDismissReminder}
+                  >
+                    Remind me later
+                  </button>
+                </div>
+                <p className="text-[10px] mt-1.5 opacity-70">
+                  Next reminder after {getGoalsReminderInterval()} more new goal{getGoalsReminderInterval() === 1 ? "" : "s"}.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 

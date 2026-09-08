@@ -91,14 +91,33 @@ export function loadGoals(): Goal[] | null {
   }
 }
 
-export function saveGoals(goals: Goal[]): void {
+export interface SaveGoalsResult {
+  ok: boolean;
+  error?: "quota" | "private-mode" | "unknown";
+}
+
+/**
+ * Persist goals to localStorage. Returns a result so callers can surface
+ * failures (instead of silently swallowing them). Callers that ignore the
+ * return value still work — the old `void` signature is preserved.
+ */
+export function saveGoals(goals: Goal[]): SaveGoalsResult {
   try {
     localStorage.setItem(
       GOALS_STORAGE_KEY,
       JSON.stringify({ goals, savedAt: new Date().toISOString() })
     );
-  } catch {
-    // ignore quota / privacy-mode errors
+    return { ok: true };
+  } catch (e: unknown) {
+    // QuotaExceededError or SecurityError (private mode / disabled storage)
+    const err = e as { name?: string; code?: number };
+    if (err?.name === "QuotaExceededError" || err?.code === 22) {
+      return { ok: false, error: "quota" };
+    }
+    if (err?.name === "SecurityError") {
+      return { ok: false, error: "private-mode" };
+    }
+    return { ok: false, error: "unknown" };
   }
 }
 
