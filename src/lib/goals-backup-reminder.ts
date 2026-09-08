@@ -95,5 +95,12 @@ export function dismissGoalsReminder(currentGoalCount: number) {
   markGoalsReminderShown(currentGoalCount);
 }
 
-/** Re-exported constant so the UI can show "next reminder after N more goals". */
-export { DEFAULT_GOALS_REMINDER_INTERVAL as getGoalsReminderInterval };
+/**
+ * Get the current reminder interval. Goals are scarcer than worksheets, so
+ * the interval is fixed at DEFAULT_GOALS_REMINDER_INTERVAL (2) — but we expose
+ * it as a function to mirror the worksheets' getReminderInterval() API and
+ * leave the door open for a future settings toggle.
+ */
+export function getGoalsReminderInterval(): number {
+  return DEFAULT_GOALS_REMINDER_INTERVAL;
+}

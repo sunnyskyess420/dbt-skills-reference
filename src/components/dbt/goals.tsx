@@ -109,10 +109,12 @@ export function Goals({ onViewSkill }: Props) {
   const lastSavedRef = React.useRef<string>("");
   React.useEffect(() => {
     if (goals.length === 0) return;
-    const latest = goals
-      .map((g) => g.updatedAt)
-      .sort()
-      .at(-1);
+    // Find the latest updatedAt without using Array.prototype.at(), which
+    // isn't supported on older browsers (Safari <15.4, some mobile webviews).
+    let latest = "";
+    for (const g of goals) {
+      if (g.updatedAt > latest) latest = g.updatedAt;
+    }
     if (!latest) return;
     if (latest !== lastSavedRef.current) {
       const isFirstHydration = lastSavedRef.current === "";
@@ -234,7 +236,10 @@ export function Goals({ onViewSkill }: Props) {
       markGoalsExported(refreshed.length);
       setShowBackupReminder(false);
       // Reset the saved-flash baseline so we don't flash on this hydration.
-      const latest = refreshed.map((g) => g.updatedAt).sort().at(-1);
+      let latest = "";
+      for (const g of refreshed) {
+        if (g.updatedAt > latest) latest = g.updatedAt;
+      }
       if (latest) lastSavedRef.current = latest;
     }
     // Reset input so the same file can be re-selected.
