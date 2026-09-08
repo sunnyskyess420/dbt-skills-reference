@@ -19,6 +19,7 @@ import {
   ListChecks,
   FileDown,
   GraduationCap,
+  MoreHorizontal,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -29,8 +30,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/relative-time";
 import { useSession } from "next-auth/react";
@@ -122,6 +128,10 @@ export function WorksheetDetail({
   const linkedSkillId = onViewSkill ? getSkillForWorksheet(entry.type) : undefined;
   const linkedSkill = linkedSkillId ? SKILLS.find((s) => s.id === linkedSkillId) : null;
   const [titleDraft, setTitleDraft] = React.useState(entry.title);
+  // Delete lives in an overflow menu now — it used to sit directly beside
+  // Export as PDF as small icon buttons, an easy mis-tap on a document
+  // someone filled out while distressed.
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
   // Persistent save indicator: always shows "Saved · just now / 2m ago / …",
   // flashing emerald briefly whenever the entry autosaves. Replaces the old
   // 1.2s flash that was easy to miss.
@@ -251,18 +261,23 @@ export function WorksheetDetail({
                 <TooltipContent>Download a formatted PDF</TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-muted-foreground hover:text-destructive"
-                  aria-label="Delete worksheet"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  <span className="ml-1 hidden sm:inline">Delete</span>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" aria-label="More actions">
+                  <MoreHorizontal className="h-4 w-4" />
                 </Button>
-              </AlertDialogTrigger>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive cursor-pointer"
+                  onClick={() => setConfirmDelete(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete worksheet
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Delete this worksheet?</AlertDialogTitle>

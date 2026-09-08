@@ -126,7 +126,7 @@ export default function Home() {
   }, []);
 
   // Worksheets
-  const { entries: worksheetEntries, createEntry, updateEntry, deleteEntry, findEntry, refresh: refreshWorksheets } = useWorksheets();
+  const { entries: worksheetEntries, loaded: worksheetsLoaded, createEntry, updateEntry, deleteEntry, findEntry, refresh: refreshWorksheets } = useWorksheets();
 
   // Derived from saved entries — placed after the worksheets hook because
   // it reads worksheetEntries.
@@ -409,6 +409,81 @@ export default function Home() {
     window.addEventListener("popstate", handler);
     return () => window.removeEventListener("popstate", handler);
   }, []);
+
+  // --- URL sync: deep links + refresh/lock survival ---------------------
+  // The current view is mirrored into ?v=<view>&id=<id> so a refresh or
+  // phone lock restores your place, and group leaders can paste a link to
+  // a specific skill or worksheet into chat. History state objects stay
+  // compatible with the popstate handler above.
+  const urlSyncedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (urlSyncedRef.current || !worksheetsLoaded) return;
+    urlSyncedRef.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get("v");
+    const id = params.get("id") ?? undefined;
+
+    if (v === "skill" && id) {
+      const skill = SKILLS.find((s) => s.id === id);
+      if (skill) {
+        setSelectedModule(skill.module);
+        setSelectedSkill(skill);
+        history.replaceState({ type: "skill", id }, "", buildViewUrl("skill", id));
+        return;
+      }
+    }
+    if (v === "worksheet" && id) {
+      const entry = findEntry(id);
+      if (entry) {
+        setSelectedModule("worksheets");
+        setSelectedWorksheetId(id);
+        history.replaceState({ type: "worksheet", id }, "", buildViewUrl("worksheet", id));
+        return;
+      }
+    }
+    const validViews = [
+      "bookmarks",
+      "worksheets",
+      "goals",
+      "dashboard",
+      "session-prep",
+      "crisis",
+      ...MODULES.map((m) => m.id),
+    ];
+    if (v && validViews.includes(v)) {
+      setSelectedModule(v as ViewMode);
+      history.replaceState({ type: "module", module: v as ViewMode }, "", buildViewUrl(v));
+      return;
+    }
+    // No (or invalid) view param — start at home with a clean URL
+    history.replaceState({ type: "module", module: "all" }, "", window.location.pathname);
+  }, [worksheetsLoaded, findEntry]);
+
+  // Keep the URL canonicalized to the current view after every change.
+  React.useEffect(() => {
+    if (!urlSyncedRef.current) return;
+    if (selectedSkill) {
+      history.replaceState(
+        { type: "skill", id: selectedSkill.id },
+        "",
+        buildViewUrl("skill", selectedSkill.id)
+      );
+    } else if (selectedWorksheetId) {
+      history.replaceState(
+        { type: "worksheet", id: selectedWorksheetId },
+        "",
+        buildViewUrl("worksheet", selectedWorksheetId)
+      );
+    } else if (selectedModule !== "all") {
+      history.replaceState(
+        { type: "module", module: selectedModule },
+        "",
+        buildViewUrl(selectedModule)
+      );
+    } else {
+      history.replaceState({ type: "module", module: "all" }, "", window.location.pathname);
+    }
+  }, [selectedModule, selectedSkill, selectedWorksheetId]);
 
   const isWorksheetsMode = selectedModule === "worksheets";
 
@@ -961,6 +1036,13 @@ function EmptyState({
       </div>
     </div>
   );
+}
+
+function buildViewUrl(view: string, id?: string): string {
+  const params = new URLSearchParams();
+  params.set("v", view);
+  if (id) params.set("id", id);
+  return `${window.location.pathname}?${params.toString()}`;
 }
 
 // Worksheet groups matching the dropdown order

@@ -146,3 +146,47 @@ npm run build      # production build (package.json's build script uses cp; on W
 
 - Moved directly under the hero on the home screen so it's visible
   without scrolling on phones.
+
+---
+
+# Round 3 — reader mode, touch safety, accessibility, deep links
+
+## A. Reader mode on skill pages
+
+- `src/components/dbt/skill-detail.tsx`: a persistent **"Aa"** button in
+  the skill header cycles the text scale (100% → 112% → 125% → back),
+  persisted in localStorage (`dbt-skills:reader-scale`). Handy when glancing between
+  the video call and the app.
+- The five skill sections (What it is / When to use it / How to do it /
+  Examples / Tips) are now **collapsible** — Steps and the first two
+  default open, Examples and Tips start collapsed. Collapsed sections
+  still print in full.
+
+## B. Touch ergonomics
+
+- `src/components/dbt/worksheets/worksheet-detail.tsx`: **Delete moved
+  into a "…" overflow menu**, away from Export as PDF, with the same
+  confirmation dialog. Mis-tapping delete on a worksheet filled out in
+  distress is much less likely now.
+- `kbd-shortcut.tsx` + `globals.css`: keyboard hint chips (Ctrl+K etc.)
+  are hidden on touch devices via `@media (pointer: coarse)`.
+- Rating buttons bumped to 40px tall for easier tapping.
+
+## C. Accessibility pass
+
+- `globals.css`: visible `:focus-visible` outlines for card-style buttons
+  and controls (module cards, worksheet cards, rating buttons, tabs,
+  search results) that previously only had hover styles.
+- `globals.css`: `prefers-reduced-motion` support — animations and
+  transitions are effectively disabled for users who ask for it.
+
+## D. URL deep links (refresh survives, links shareable)
+
+- `src/app/page.tsx`: the current view is mirrored into the URL as
+  `?v=<view>&id=<id>` (e.g. `?v=skill&id=wise-mind`,
+  `?v=worksheet&id=<entryId>`, `?v=crisis`). Three wins:
+  - Refreshing the page or locking your phone mid-worksheet no longer
+    dumps you back at the home screen.
+  - Group leaders can paste a direct link to a specific skill into chat.
+  - The browser Back button behavior is unchanged (history state objects
+    stay compatible with the existing popstate handler).

@@ -168,5 +168,41 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+  /* Collapsed reader sections still print in full */
+  .reader-section-content {
+    display: block !important;
+  }
+}
+
+/* Hide keyboard-hint chips on touch devices (no keyboard to press) */
+@media (pointer: coarse) {
+  .kbd-hint {
+    display: none !important;
+  }
+}
+
+/* Visible keyboard focus for card-style buttons and controls that rely on
+   hover styles — shadcn buttons have their own focus-visible ring, but the
+   plain <button> cards (modules, worksheets, skills, ratings) did not. */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="radio"]:focus-visible,
+[role="tab"]:focus-visible,
+[role="option"]:focus-visible {
+  outline: 2px solid var(--ring, #6366f1);
+  outline-offset: 2px;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

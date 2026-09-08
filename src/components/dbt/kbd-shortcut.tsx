@@ -38,7 +38,7 @@ export function KbdShortcut({
   return (
     <kbd
       className={cn(
-        "inline-flex items-center text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded border whitespace-nowrap",
+        "kbd-hint inline-flex items-center text-[10px] font-mono bg-muted px-1.5 py-0.5 rounded border whitespace-nowrap",
         className
       )}
     >
