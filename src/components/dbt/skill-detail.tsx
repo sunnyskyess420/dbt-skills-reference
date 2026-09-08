@@ -15,6 +15,10 @@ interface SkillDetailProps {
   onToggleBookmark: (skillId: string) => void;
   onSelectSkill: (skill: Skill) => void;
   onCreateWorksheet?: (type: WorksheetType) => void;
+  /** True when the user already has a worksheet of this skill's linked type. */
+  linkedWorksheetExists?: boolean;
+  /** Force-create a blank worksheet of the linked type. */
+  onStartBlankWorksheet?: (type: WorksheetType) => void;
 }
 
 export function SkillDetail({
@@ -24,6 +28,8 @@ export function SkillDetail({
   onToggleBookmark,
   onSelectSkill,
   onCreateWorksheet,
+  linkedWorksheetExists = false,
+  onStartBlankWorksheet,
 }: SkillDetailProps) {
   if (!skill) return null;
 
@@ -106,10 +112,32 @@ export function SkillDetail({
                 variant="outline"
               >
                 <FileText className="h-4 w-4 mr-2" />
-                Practice with Worksheet
+                {linkedWorksheetExists
+                  ? "Open your worksheet"
+                  : "Practice with Worksheet"}
               </Button>
               <p className="text-xs text-muted-foreground mt-1.5">
-                Opens a <span className="font-medium">{linkedWsMeta.shortName}</span> worksheet to practice this skill
+                {linkedWorksheetExists ? (
+                  <>
+                    Opens your most recent{" "}
+                    <span className="font-medium">{linkedWsMeta.shortName}</span> worksheet
+                    {onStartBlankWorksheet && (
+                      <>
+                        {" — or "}
+                        <button
+                          onClick={() => onStartBlankWorksheet(linkedWsType!)}
+                          className="underline hover:text-foreground"
+                        >
+                          start a blank copy
+                        </button>
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    Opens a <span className="font-medium">{linkedWsMeta.shortName}</span> worksheet to practice this skill
+                  </>
+                )}
               </p>
             </div>
           )}

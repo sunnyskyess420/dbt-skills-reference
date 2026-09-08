@@ -89,6 +89,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { downloadJsonBackup, importFromJson, type ImportResult } from "@/lib/worksheet-export";
+import { formatRelativeTime } from "@/lib/relative-time";
 import {
   shouldShowReminder,
   markExported,
@@ -562,7 +563,7 @@ export function WorksheetList({
                           <span>{meta.shortName}</span>
                           <span>·</span>
                           <Clock className="h-2.5 w-2.5" />
-                          <span>{formatRelative(entry.updatedAt)}</span>
+                          <span>{formatRelativeTime(entry.updatedAt)}</span>
                         </div>
                       </div>
                     </div>
@@ -592,18 +593,4 @@ export function WorksheetList({
       </div>
     </div>
   );
-}
-
-function formatRelative(iso: string): string {
-  const date = new Date(iso);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return `${diffMin}m ago`;
-  const diffHrs = Math.floor(diffMin / 60);
-  if (diffHrs < 24) return `${diffHrs}h ago`;
-  const diffDays = Math.floor(diffHrs / 24);
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }

@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -137,7 +136,11 @@ export function CheckboxGroup({
   );
 }
 
-// 0-5 slider with label
+// 0-5 rating with segmented tap buttons instead of a slider.
+// Tap targets are faster and more accurate than sliders on touch screens
+// (and keyboard/screen-reader friendly via radiogroup semantics). An
+// untouched field reads as 0 ("none"), which is a valid answer — the
+// selected 0 button makes that explicit instead of looking like an error.
 export function ScaleField({
   label,
   value,
@@ -153,18 +156,39 @@ export function ScaleField({
     <div className="space-y-1">
       <div className="flex items-center justify-between gap-2">
         <Label className="text-xs">{label}</Label>
-        <span className="text-xs font-mono font-semibold tabular-nums w-6 text-right">
+        <span
+          className="text-xs font-mono font-semibold tabular-nums w-6 text-right"
+          aria-hidden
+        >
           {value}
         </span>
       </div>
-      <Slider
-        value={[value]}
-        onValueChange={(v) => onChange(v[0])}
-        min={0}
-        max={5}
-        step={1}
-        className="py-1"
-      />
+      <div
+        role="radiogroup"
+        aria-label={`${label} (0 = none, 5 = extreme)`}
+        className="grid grid-cols-6 gap-1"
+      >
+        {[0, 1, 2, 3, 4, 5].map((n) => {
+          const selected = value === n;
+          return (
+            <button
+              key={n}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              onClick={() => onChange(n)}
+              className={cn(
+                "h-9 rounded-md border text-sm font-semibold transition-colors",
+                selected
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-muted-foreground border-border hover:bg-muted/60 hover:text-foreground"
+              )}
+            >
+              {n}
+            </button>
+          );
+        })}
+      </div>
       {help && <p className="text-[10px] text-muted-foreground">{help}</p>}
     </div>
   );
