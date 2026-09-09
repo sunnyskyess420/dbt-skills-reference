@@ -1,16 +1,28 @@
 "use client";
 
 import * as React from "react";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { SKILLS, MODULES, type Skill } from "@/data/skills";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { SKILLS, MODULES, type Skill, type Module } from "@/data/skills";
 import {
   WORKSHEET_TYPES,
   getWorksheetTypeMeta,
   type WorksheetEntry,
   type WorksheetType,
 } from "@/lib/worksheet-storage";
-import { Search, Bookmark, FileText, Plus } from "lucide-react";
+import { Search, Bookmark, FileText, Plus, BookOpen } from "lucide-react";
 import { formatRelativeTime } from "@/lib/relative-time";
 
 interface SearchPaletteProps {
@@ -29,9 +41,41 @@ interface SearchPaletteProps {
 // Item values are "kind:id|lowercased searchable text". The kind prefix
 // routes the selection to the right handler; cmdk lowercases values, so
 // entry-id lookups compare case-insensitively.
-function searchableValue(kind: "skill" | "wstype" | "wsentry", id: string, text: string[]) {
+function searchableValue(
+  kind: "skill" | "wstype" | "wsentry",
+  id: string,
+  text: string[]
+) {
   return `${kind}:${id}|${text.join(" ").toLowerCase()}`;
 }
+
+/**
+ * Compact a book reference by stripping the redundant module prefix
+ * (the group heading already names the module) and turning the " / "
+ * separator into a middot so it reads as a single tidy line.
+ *
+ *   "Distress Tolerance Handouts 11, 11a, 11b / Distress Tolerance Worksheets 9, 9a"
+ *    -> "Handouts 11, 11a, 11b · Worksheets 9, 9a"
+ */
+function shortReference(ref: string): string {
+  return ref
+    .replace(/\s*\/\s*/g, " · ")
+    .replace(
+      /(?:General|Mindfulness|Interpersonal Effectiveness|Emotion Regulation|Distress Tolerance)\s+(?=Handout|Worksheet)/g,
+      ""
+    )
+    .trim();
+}
+
+// A thin colored accent bar per module so the eye can scan groups quickly
+// even when the group heading scrolls out of view.
+const MODULE_ACCENT: Record<Module, string> = {
+  general: "bg-slate-400",
+  mindfulness: "bg-emerald-500",
+  interpersonal: "bg-amber-500",
+  "emotion-regulation": "bg-rose-500",
+  "distress-tolerance": "bg-sky-500",
+};
 
 export function SearchPalette({
   open,
@@ -112,14 +156,19 @@ export function SearchPalette({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 overflow-hidden max-w-2xl gap-0">
+      <DialogContent
+        className="p-0 overflow-hidden gap-0 max-w-3xl top-[12%] translate-y-0 rounded-xl"
+      >
         {/* Accessible title and description for screen readers (visually hidden) */}
-        <DialogTitle className="sr-only">Search DBT skills and worksheets</DialogTitle>
+        <DialogTitle className="sr-only">
+          Search DBT skills and worksheets
+        </DialogTitle>
         <DialogDescription className="sr-only">
-          Search skills, worksheet types, and your saved worksheets. Use arrow keys to navigate results and Enter to select.
+          Search skills, worksheet types, and your saved worksheets. Use arrow
+          keys to navigate results and Enter to select.
         </DialogDescription>
         <Command
-          className="rounded-lg"
+          className="rounded-xl"
           filter={(value, search) => {
             // value is kind:id|lowercased-searchable-text
             const [, text] = value.split("|", 2);
@@ -131,21 +180,29 @@ export function SearchPalette({
             return matchesAll ? 1 : 0;
           }}
         >
-          <div className="flex items-center border-b px-3">
-            <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+          {/* Search input row */}
+          <div className="flex items-center gap-3 border-b px-4">
+            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <CommandInput
               value={query}
               onValueChange={setQuery}
-              placeholder="Search skills, worksheets, or your saved entries (e.g. 'tipp', 'dear man', 'diary card')..."
+              placeholder="Search skills, worksheets, or your saved entries…  (try “tipp”, “dear man”, “diary card”)"
               className="h-12 border-0 focus-visible:ring-0 text-base"
             />
           </div>
-          <CommandList className="max-h-[60vh]">
-            <CommandEmpty>No matching skills or worksheets.</CommandEmpty>
+
+          <CommandList className="max-h-[62vh]">
+            <CommandEmpty className="py-10 text-center text-sm text-muted-foreground">
+              <Search className="h-5 w-5 mx-auto mb-2 opacity-40" />
+              No matching skills or worksheets.
+            </CommandEmpty>
 
             {/* Saved entries — quick "jump back in" + findable by search */}
             {recentEntries.length > 0 && (
-              <CommandGroup heading="Your worksheets" className="text-xs">
+              <CommandGroup
+                heading="Your worksheets"
+                className="text-xs"
+              >
                 {recentEntries.map((entry) => {
                   const meta = getWorksheetTypeMeta(entry.type);
                   return (
@@ -160,16 +217,21 @@ export function SearchPalette({
                       onSelect={handlePick}
                       className="py-2.5"
                     >
-                      <div className="flex items-start gap-2.5 w-full min-w-0">
-                        <FileText className={`h-4 w-4 mt-0.5 shrink-0 ${meta.color}`} />
+                      <div className="flex items-center gap-3 w-full min-w-0">
+                        <FileText
+                          className={`h-4 w-4 shrink-0 ${meta.color}`}
+                        />
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-sm truncate">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="font-medium text-sm truncate min-w-0">
                               {entry.title}
+                            </span>
+                            <span className="text-[10px] text-muted-foreground shrink-0 whitespace-nowrap">
+                              updated {formatRelativeTime(entry.updatedAt)}
                             </span>
                           </div>
                           <p className="text-xs text-muted-foreground truncate mt-0.5">
-                            {meta.shortName} · updated {formatRelativeTime(entry.updatedAt)}
+                            {meta.shortName}
                           </p>
                         </div>
                       </div>
@@ -182,7 +244,10 @@ export function SearchPalette({
             {/* Worksheet types — only once the user types, so the
                 empty-query view isn't flooded with 50+ rows */}
             {hasQuery && (
-              <CommandGroup heading="Start a new worksheet" className="text-xs">
+              <CommandGroup
+                heading="Start a new worksheet"
+                className="text-xs"
+              >
                 {WORKSHEET_TYPES.map((type) => (
                   <CommandItem
                     key={`type-${type.id}`}
@@ -194,12 +259,14 @@ export function SearchPalette({
                     onSelect={handlePick}
                     className="py-2.5"
                   >
-                    <div className="flex items-start gap-2.5 w-full min-w-0">
-                      <Plus className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
+                    <div className="flex items-center gap-3 w-full min-w-0">
+                      <Plus className="h-4 w-4 shrink-0 text-muted-foreground" />
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm">{type.name}</span>
-                          <span className="text-[10px] text-muted-foreground shrink-0 hidden sm:inline">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-medium text-sm truncate min-w-0">
+                            {type.name}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground shrink-0 whitespace-nowrap uppercase tracking-wider">
                             create new
                           </span>
                         </div>
@@ -216,7 +283,14 @@ export function SearchPalette({
             {grouped.map(({ module, skills }) => (
               <CommandGroup
                 key={module.id}
-                heading={module.name}
+                heading={
+                  <span className="flex items-center gap-1.5">
+                    <span
+                      className={`inline-block h-2 w-2 rounded-full ${MODULE_ACCENT[module.id]}`}
+                    />
+                    {module.name}
+                  </span>
+                }
                 className="text-xs"
               >
                 {skills.map((skill) => (
@@ -233,42 +307,71 @@ export function SearchPalette({
                     onSelect={handlePick}
                     className="py-2.5"
                   >
-                    <div className="flex items-start justify-between gap-3 w-full">
+                    <div className="flex items-center gap-3 w-full min-w-0">
+                      {/* Module color accent — survives scroll past heading */}
+                      <span
+                        className={`h-9 w-1 rounded-full shrink-0 ${MODULE_ACCENT[skill.module]}`}
+                      />
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm">{skill.name}</span>
+                        {/* Line 1: name + acronym + bookmark */}
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-medium text-sm truncate min-w-0">
+                            {skill.name}
+                          </span>
                           {skill.acronym && (
-                            <span className={`text-[10px] font-mono uppercase tracking-wider ${module.color}`}>
+                            <span
+                              className={`text-[10px] font-mono uppercase tracking-wider shrink-0 whitespace-nowrap px-1.5 py-0.5 rounded bg-muted ${module.color}`}
+                            >
                               {skill.acronym}
                             </span>
                           )}
                           {bookmarks.has(skill.id) && (
-                            <Bookmark className="h-3 w-3 fill-amber-500 text-amber-500" />
+                            <Bookmark className="h-3 w-3 fill-amber-500 text-amber-500 shrink-0" />
                           )}
                         </div>
-                        <p className="text-xs text-muted-foreground truncate mt-0.5">
-                          {skill.oneLiner}
-                        </p>
+                        {/* Line 2: one-liner (left) + compact reference (right) */}
+                        <div className="flex items-center gap-2 mt-0.5 min-w-0">
+                          <p className="text-xs text-muted-foreground truncate min-w-0 flex-1">
+                            {skill.oneLiner}
+                          </p>
+                          <span className="text-[10px] text-muted-foreground/70 shrink-0 whitespace-nowrap font-mono hidden sm:inline">
+                            {shortReference(skill.reference)}
+                          </span>
+                        </div>
                       </div>
-                      <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5 hidden sm:inline">
-                        {skill.reference}
-                      </span>
                     </div>
                   </CommandItem>
                 ))}
               </CommandGroup>
             ))}
           </CommandList>
-          <div className="border-t bg-muted/40 px-3 py-2 text-[11px] text-muted-foreground flex items-center justify-between">
-            <span>
-              <kbd className="px-1 py-0.5 rounded border bg-background font-mono">↑↓</kbd> navigate
-              {" · "}
-              <kbd className="px-1 py-0.5 rounded border bg-background font-mono">↵</kbd> select
-              {" · "}
-              <kbd className="px-1 py-0.5 rounded border bg-background font-mono">esc</kbd> close
+
+          {/* Footer — keyboard hints + index stats */}
+          <div className="border-t bg-muted/40 px-4 py-2 text-[11px] text-muted-foreground flex items-center justify-between gap-3">
+            <span className="flex items-center gap-3 min-w-0">
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded border bg-background font-mono text-[10px]">
+                  ↑↓
+                </kbd>
+                navigate
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded border bg-background font-mono text-[10px]">
+                  ↵
+                </kbd>
+                select
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded border bg-background font-mono text-[10px]">
+                  esc
+                </kbd>
+                close
+              </span>
             </span>
-            <span>
-              {SKILLS.length} skills · {WORKSHEET_TYPES.length} worksheet types indexed
+            <span className="flex items-center gap-1.5 shrink-0">
+              <BookOpen className="h-3 w-3" />
+              {SKILLS.length} skills · {WORKSHEET_TYPES.length} worksheet types
+              indexed
             </span>
           </div>
         </Command>
