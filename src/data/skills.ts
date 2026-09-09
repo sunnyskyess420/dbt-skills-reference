@@ -25,6 +25,7 @@ export interface Skill {
   examples?: string[];
   tags: string[];
   reference: string; // handout / worksheet number(s) in the printed book
+  pages?: string; // printed page number(s) in the 2nd edition
 }
 
 export const MODULES: {
@@ -99,6 +100,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["goals", "orientation", "life worth living", "acceptance and change", "overview"],
     reference: "General Handout 1 / General Worksheet 1",
+    pages: "p. 9",
   },
   {
     id: "options-for-solving-any-problem",
@@ -121,6 +123,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["problem solving", "options", "overview", "framework"],
     reference: "General Handout 1a",
+    pages: "p. 10",
   },
   {
     id: "biosocial-theory",
@@ -142,6 +145,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["biosocial", "theory", "invalidation", "emotional sensitivity", "framework"],
     reference: "General Handout 5",
+    pages: "p. 14",
   },
   {
     id: "chain-analysis",
@@ -173,6 +177,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["chain analysis", "behavior analysis", "worksheet", "problem behavior", "awareness"],
     reference: "General Handouts 7, 7a / General Worksheets 2, 2a",
+    pages: "pp. 20–21",
   },
   {
     id: "missing-links-analysis",
@@ -201,6 +206,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["missing links", "behavior analysis", "worksheet", "knowing vs doing"],
     reference: "General Handout 8 / General Worksheet 3",
+    pages: "p. 23",
   },
 
   // =================== MINDFULNESS SKILLS ===================
@@ -236,6 +242,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["wise mind", "states of mind", "reason mind", "emotion mind", "core mindfulness"],
     reference: "Mindfulness Handouts 3, 3a / Mindfulness Worksheet 3",
+    pages: "pp. 50–51",
   },
   {
     id: "what-skills",
@@ -266,6 +273,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["what skills", "observe", "describe", "participate", "core mindfulness", "present moment"],
     reference: "Mindfulness Handouts 4, 4a, 4b, 4c / Mindfulness Worksheets 4, 4a, 4b",
+    pages: "p. 53+",
   },
   {
     id: "how-skills",
@@ -294,6 +302,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["how skills", "nonjudgmentalness", "one-mindfulness", "effectiveness", "core mindfulness"],
     reference: "Mindfulness Handouts 5, 5a, 5b, 5c / Mindfulness Worksheets 5, 5a, 5b, 5c",
+    pages: "pp. 60–63",
   },
   {
     id: "loving-kindness",
@@ -326,6 +335,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["loving kindness", "metta", "compassion", "spiritual", "other perspectives"],
     reference: "Mindfulness Handout 8 / Mindfulness Worksheet 6",
+    pages: "p. 70",
   },
   {
     id: "balancing-doing-and-being-mind",
@@ -348,6 +358,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["doing mind", "being mind", "balance", "skillful means", "other perspectives"],
     reference: "Mindfulness Handouts 9, 9a / Mindfulness Worksheets 7, 7a",
+    pages: "pp. 71–72",
   },
   {
     id: "walking-the-middle-path",
@@ -371,6 +382,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["middle path", "dialectics", "synthesis", "opposites", "other perspectives"],
     reference: "Mindfulness Handout 10 / Mindfulness Worksheets 10, 10a, 10b",
+    pages: "p. 74",
   },
 
   // =================== INTERPERSONAL EFFECTIVENESS ===================
@@ -409,6 +421,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["dear man", "assertiveness", "asking", "saying no", "objectives", "interpersonal", "acronym"],
     reference: "Interpersonal Effectiveness Handouts 5, 5a / Interpersonal Effectiveness Worksheets 4, 5",
+    pages: "pp. 174–175",
   },
   {
     id: "give",
@@ -438,6 +451,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["give", "relationship", "validation", "gentle", "interpersonal", "acronym"],
     reference: "Interpersonal Effectiveness Handouts 6, 6a / Interpersonal Effectiveness Worksheets 4, 5",
+    pages: "pp. 174–175",
   },
   {
     id: "fast",
@@ -467,6 +481,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["fast", "self-respect", "values", "interpersonal", "acronym"],
     reference: "Interpersonal Effectiveness Handout 7 / Interpersonal Effectiveness Worksheets 4, 5",
+    pages: "pp. 174–175",
   },
   {
     id: "dime-game",
@@ -493,6 +508,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["dime game", "decision", "intensity", "asking", "interpersonal"],
     reference: "Interpersonal Effectiveness Handout 8 / Interpersonal Effectiveness Worksheet 6",
+    pages: "p. 176",
   },
   {
     id: "troubleshooting-interpersonal",
@@ -515,6 +531,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["troubleshooting", "interpersonal", "problem solving", "review"],
     reference: "Interpersonal Effectiveness Handout 9 / Interpersonal Effectiveness Worksheet 7",
+    pages: "p. 178",
   },
   {
     id: "finding-people-to-like-you",
@@ -537,6 +554,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["relationships", "friendship", "loneliness", "social skills"],
     reference: "Interpersonal Effectiveness Handouts 11, 11a / Interpersonal Effectiveness Worksheet 8",
+    pages: "p. 183",
   },
   {
     id: "mindfulness-of-others",
@@ -559,6 +577,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["mindfulness of others", "attunement", "relationships", "presence"],
     reference: "Interpersonal Effectiveness Handouts 12, 12a / Interpersonal Effectiveness Worksheet 9",
+    pages: "p. 184",
   },
   {
     id: "ending-relationships",
@@ -581,6 +600,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["ending relationships", "breakups", "boundaries", "safety"],
     reference: "Interpersonal Effectiveness Handouts 13, 13a / Interpersonal Effectiveness Worksheet 10",
+    pages: "pp. 145–146",
   },
   {
     id: "dialectics",
@@ -603,6 +623,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["dialectics", "middle path", "synthesis", "both-and", "framework"],
     reference: "Interpersonal Effectiveness Handouts 15, 16, 16a, 16b, 16c / Interpersonal Effectiveness Worksheet 11",
+    pages: "pp. 150–154",
   },
   {
     id: "validation",
@@ -634,6 +655,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["validation", "levels of validation", "listening", "relationships", "self-validation"],
     reference: "Interpersonal Effectiveness Handouts 17, 18, 18a, 19, 19a / Interpersonal Effectiveness Worksheets 12, 13",
+    pages: "pp. 155–160",
   },
   {
     id: "behavior-change-strategies",
@@ -656,6 +678,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["behavior change", "reinforcement", "extinction", "punishment", "operant"],
     reference: "Interpersonal Effectiveness Handouts 20, 21, 22, 22a / Interpersonal Effectiveness Worksheets 14, 15",
+    pages: "pp. 161–164",
   },
 
   // =================== EMOTION REGULATION ===================
@@ -680,6 +703,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["functions of emotions", "understanding emotions", "naming emotions"],
     reference: "Emotion Regulation Handout 3 / Emotion Regulation Worksheets 2, 2a, 2b, 2c",
+    pages: "p. 210",
   },
   {
     id: "myths-about-emotions",
@@ -701,6 +725,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["myths", "emotions", "shoulds", "self-invalidation"],
     reference: "Emotion Regulation Handout 4a / Emotion Regulation Worksheet 3",
+    pages: "p. 212",
   },
   {
     id: "model-for-describing-emotions",
@@ -718,6 +743,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["emotion model", "components of emotion", "naming emotions"],
     reference: "Emotion Regulation Handouts 5, 6 / Emotion Regulation Worksheets 4, 4a",
+    pages: "pp. 213–214",
   },
   {
     id: "check-the-facts",
@@ -754,6 +780,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["check the facts", "cognitive", "interpretation", "intensity", "thinking"],
     reference: "Emotion Regulation Handouts 8, 8a / Emotion Regulation Worksheet 5",
+    pages: "pp. 228–229",
   },
   {
     id: "opposite-action",
@@ -789,6 +816,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["opposite action", "exposure", "changing emotions", "action urge", "behavior"],
     reference: "Emotion Regulation Handouts 9, 10, 11, 13 / Emotion Regulation Worksheets 6, 7",
+    pages: "p. 230+",
   },
   {
     id: "problem-solving",
@@ -819,6 +847,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["problem solving", "changing situation", "decision"],
     reference: "Emotion Regulation Handout 12 / Emotion Regulation Worksheet 8",
+    pages: "p. 241",
   },
   {
     id: "accumulate-positive-emotions-short-term",
@@ -846,6 +875,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["positive emotions", "pleasant events", "short term", "build mastery", "vulnerability"],
     reference: "Emotion Regulation Handouts 15, 16 / Emotion Regulation Worksheets 9, 10, 13",
+    pages: "pp. 248–249",
   },
   {
     id: "accumulate-positive-emotions-long-term",
@@ -875,6 +905,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["positive emotions", "long term", "values", "goals", "life worth living"],
     reference: "Emotion Regulation Handouts 17, 18 / Emotion Regulation Worksheets 11, 11a, 11b",
+    pages: "pp. 252–253",
   },
   {
     id: "build-mastery",
@@ -897,6 +928,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["build mastery", "competence", "self-respect", "vulnerability", "daily practice"],
     reference: "Emotion Regulation Handout 19 / Emotion Regulation Worksheets 12, 13",
+    pages: "p. 256",
   },
   {
     id: "cope-ahead",
@@ -925,6 +957,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["cope ahead", "rehearsal", "anticipatory", "preparation"],
     reference: "Emotion Regulation Handout 19 / Emotion Regulation Worksheets 12, 13",
+    pages: "p. 256",
   },
   {
     id: "please",
@@ -955,6 +988,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["please", "body", "sleep", "food", "exercise", "physical", "vulnerability", "acronym"],
     reference: "Emotion Regulation Handout 20 / Emotion Regulation Worksheet 14",
+    pages: "p. 257",
   },
   {
     id: "nightmare-protocol",
@@ -977,6 +1011,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["nightmares", "sleep", "ptsd", "image rehearsal", "dreams"],
     reference: "Emotion Regulation Handout 20a / Emotion Regulation Worksheet 14a",
+    pages: "p. 258",
   },
   {
     id: "sleep-hygiene",
@@ -998,6 +1033,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["sleep", "hygiene", "vulnerability", "self-care"],
     reference: "Emotion Regulation Handout 20b / Emotion Regulation Worksheet 14b",
+    pages: "p. 259",
   },
   {
     id: "mindfulness-of-current-emotions",
@@ -1028,6 +1064,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["mindfulness of emotions", "letting go", "suffering", "wave", "observing"],
     reference: "Emotion Regulation Handout 22 / Emotion Regulation Worksheet 15",
+    pages: "p. 264",
   },
   {
     id: "managing-extreme-emotions",
@@ -1049,6 +1086,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["extreme emotions", "crisis", "distress tolerance", "intensity"],
     reference: "Emotion Regulation Handout 23",
+    pages: "p. 265",
   },
 
   // =================== DISTRESS TOLERANCE ===================
@@ -1073,6 +1111,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["crisis survival", "when to use", "framework", "distress tolerance"],
     reference: "Distress Tolerance Handout 3",
+    pages: "p. 326",
   },
   {
     id: "stop",
@@ -1102,6 +1141,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["stop", "crisis", "pause", "interrupt", "distress tolerance", "acronym"],
     reference: "Distress Tolerance Handout 4 / Distress Tolerance Worksheets 2, 2a",
+    pages: "p. 327",
   },
   {
     id: "pros-and-cons",
@@ -1132,6 +1172,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["pros and cons", "decision", "crisis", "urge surfing", "distress tolerance"],
     reference: "Distress Tolerance Handout 5 / Distress Tolerance Worksheets 3, 3a",
+    pages: "p. 328",
   },
   {
     id: "tipp",
@@ -1167,6 +1208,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["tipp", "body chemistry", "cold water", "intense exercise", "paced breathing", "muscle relaxation", "physiology", "crisis", "acronym"],
     reference: "Distress Tolerance Handouts 6, 6a, 6b, 6c / Distress Tolerance Worksheets 4, 4a, 4b",
+    pages: "pp. 329–332",
   },
   {
     id: "using-cold-water",
@@ -1197,6 +1239,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["cold water", "dive reflex", "tipp", "physiology", "crisis"],
     reference: "Distress Tolerance Handout 6a / Distress Tolerance Worksheet 4",
+    pages: "p. 330",
   },
   {
     id: "paired-muscle-relaxation",
@@ -1231,6 +1274,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["muscle relaxation", "tipp", "body", "breath", "physiology"],
     reference: "Distress Tolerance Handout 6b / Distress Tolerance Worksheet 4a",
+    pages: "p. 331",
   },
   {
     id: "distracting-accepts",
@@ -1262,6 +1306,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["accepts", "distract", "crisis", "distress tolerance", "acronym"],
     reference: "Distress Tolerance Handout 7 / Distress Tolerance Worksheets 5, 5a, 5b",
+    pages: "p. 333",
   },
   {
     id: "self-soothing",
@@ -1291,6 +1336,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["self-soothe", "five senses", "comfort", "crisis", "distress tolerance"],
     reference: "Distress Tolerance Handout 8 / Distress Tolerance Worksheets 6, 6a, 6b",
+    pages: "p. 334",
   },
   {
     id: "improve-the-moment",
@@ -1323,6 +1369,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["improve", "crisis", "distress tolerance", "imagery", "meaning", "acronym"],
     reference: "Distress Tolerance Handout 9 / Distress Tolerance Worksheets 7, 7a, 7b",
+    pages: "p. 336",
   },
   {
     id: "radical-acceptance",
@@ -1360,6 +1407,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["radical acceptance", "acceptance", "reality", "suffering", "distress tolerance"],
     reference: "Distress Tolerance Handouts 11, 11a, 11b / Distress Tolerance Worksheets 9, 9a",
+    pages: "pp. 342–344",
   },
   {
     id: "turning-the-mind",
@@ -1389,6 +1437,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["turning the mind", "acceptance", "commitment", "repeated choice"],
     reference: "Distress Tolerance Handout 12 / Distress Tolerance Worksheets 8, 8a, 10",
+    pages: "p. 345",
   },
   {
     id: "willingness",
@@ -1411,6 +1460,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["willingness", "willfulness", "acceptance", "action", "distress tolerance"],
     reference: "Distress Tolerance Handout 13 / Distress Tolerance Worksheets 8, 8a, 10",
+    pages: "p. 346",
   },
   {
     id: "half-smiling-willing-hands",
@@ -1440,6 +1490,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["half-smile", "willing hands", "body", "somatic", "acceptance"],
     reference: "Distress Tolerance Handouts 14, 14a / Distress Tolerance Worksheets 11, 11a",
+    pages: "pp. 347–348",
   },
   {
     id: "mindfulness-of-current-thoughts",
@@ -1470,6 +1521,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["mindfulness of thoughts", "defusion", "observing thoughts", "acceptance"],
     reference: "Distress Tolerance Handouts 15, 15a / Distress Tolerance Worksheets 12, 12a",
+    pages: "pp. 350–351",
   },
   {
     id: "dialectical-abstinence",
@@ -1491,6 +1543,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["addiction", "abstinence", "harm reduction", "dialectics", "crisis"],
     reference: "Distress Tolerance Handouts 17, 17a / Distress Tolerance Worksheet 14",
+    pages: "pp. 357–358",
   },
   {
     id: "clear-mind",
@@ -1508,6 +1561,7 @@ export const SKILLS: Skill[] = [
     ],
     tags: ["addiction", "clear mind", "addict mind", "clean mind", "recovery"],
     reference: "Distress Tolerance Handouts 18, 18a / Distress Tolerance Worksheet 15",
+    pages: "pp. 359–360",
   },
 ];
 
