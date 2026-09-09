@@ -104,7 +104,7 @@ export function SkillList({
                         <div className="flex items-start gap-2">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-1.5">
-                              <span className="text-sm font-medium truncate">{skill.name}</span>
+                              <span className="text-sm font-medium">{skill.name}</span>
                               {skill.acronym && (
                                 <span className="text-[10px] font-mono uppercase text-muted-foreground shrink-0">
                                   {skill.acronym}

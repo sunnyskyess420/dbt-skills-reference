@@ -142,10 +142,10 @@ export function Sidebar({
                               )}
                             >
                               {bookmarks.has(skill.id) && (
-                                <Bookmark className="h-3 w-3 fill-amber-500 text-amber-500 shrink-0" />
+                                <Bookmark className="h-3 w-3 fill-amber-500 text-amber-500 shrink-0 mt-0.5" />
                               )}
-                              <span className="flex-1 truncate">{skill.name}</span>
-                              <ChevronRight className="h-3 w-3 shrink-0 opacity-50" />
+                              <span className="flex-1 text-left leading-tight line-clamp-2">{skill.name}</span>
+                              <ChevronRight className="h-3 w-3 shrink-0 opacity-50 mt-0.5" />
                             </button>
                           </li>
                         ))}
