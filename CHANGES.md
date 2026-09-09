@@ -190,3 +190,22 @@ npm run build      # production build (package.json's build script uses cp; on W
   - Group leaders can paste a direct link to a specific skill into chat.
   - The browser Back button behavior is unchanged (history state objects
     stay compatible with the existing popstate handler).
+
+---
+
+# Round 4 — performance: code-split worksheet forms
+
+- `src/components/dbt/worksheets/form-registry.tsx` (new): a typed
+  registry that loads every worksheet form on demand via `next/dynamic`.
+  `Record<WorksheetType, ComponentType<WorksheetFormProps>>` makes the
+  compiler enforce that every worksheet type has a form.
+- `worksheet-detail.tsx`: replaced 52 static form imports and ~50
+  conditional render blocks with a single registry lookup. The diary
+  card summary (heatmap + stats) loads lazily too.
+- Measured (production build, uncompressed):
+  - Initial JS for the home screen: **1.79 MB → 1.62 MB (−9%)**.
+  - Each worksheet form is now its own 2–8 KB chunk, fetched only when
+    that worksheet is opened, instead of all of them shipping inside a
+    1.1 MB main chunk.
+- No visual or behavior changes — forms render identically, with a brief
+  "Loading worksheet..." placeholder the first time a type is opened.
