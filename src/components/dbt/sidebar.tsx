@@ -135,7 +135,7 @@ export function Sidebar({
                             <button
                               onClick={() => onSelectSkill(skill)}
                               className={cn(
-                                "w-full flex items-center gap-1.5 px-2 py-1.5 rounded text-left text-xs transition-colors",
+                                "w-full flex items-start gap-1.5 px-2 py-1.5 rounded text-left text-xs transition-colors",
                                 selectedSkillId === skill.id
                                   ? "bg-background text-foreground font-medium shadow-sm"
                                   : "text-muted-foreground hover:text-foreground hover:bg-background/50"
@@ -144,7 +144,7 @@ export function Sidebar({
                               {bookmarks.has(skill.id) && (
                                 <Bookmark className="h-3 w-3 fill-amber-500 text-amber-500 shrink-0 mt-0.5" />
                               )}
-                              <span className="flex-1 text-left leading-tight" style={{display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden"}}>{skill.name}</span>
+                              <span className="flex-1 text-left leading-tight break-words">{skill.name}</span>
                               <ChevronRight className="h-3 w-3 shrink-0 opacity-50 mt-0.5" />
                             </button>
                           </li>
