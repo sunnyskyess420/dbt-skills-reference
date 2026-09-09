@@ -40,59 +40,14 @@ import {
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/relative-time";
 import { useSession } from "next-auth/react";
-import { ChainAnalysisForm } from "./chain-analysis-form";
-import { ProsConsForm } from "./pros-cons-form";
-import { DiaryCardForm } from "./diary-card-form";
-import { WalkingMiddlePathForm } from "./walking-middle-path-form";
-import { MissingLinksForm } from "./missing-links-form";
-import { DearManScriptForm } from "./dear-man-script-form";
-import { CheckTheFactsForm } from "./check-the-facts-form";
-import { OppositeActionForm } from "./opposite-action-form";
-import { RadicalAcceptanceForm } from "./radical-acceptance-form";
-import { CrisisSurvivalTrackerForm } from "./crisis-survival-tracker-form";
-import { ValuesToActionsForm } from "./values-to-actions-form";
-import { PleasantEventsDiaryForm } from "./pleasant-events-diary-form";
-import { EmotionDiaryForm } from "./emotion-diary-form";
-import { DialecticsPracticeForm } from "./dialectics-practice-form";
-import { SelfValidationForm } from "./self-validation-form";
-import { DimeGameForm } from "./dime-game-form";
-import { CopeAheadForm } from "./cope-ahead-form";
-import { BuildMasteryForm } from "./build-mastery-form";
-import { PleaseTrackerForm } from "./please-tracker-form";
-import { NightmareProtocolForm } from "./nightmare-protocol-form";
-import { MindfulnessEmotionsForm } from "./mindfulness-emotions-form";
-import { MindfulnessThoughtsForm } from "./mindfulness-thoughts-form";
-import { TurningMindWillingnessForm } from "./turning-mind-willingness-form";
-import { ClarifyingPrioritiesForm } from "./clarifying-priorities-form";
-import { TroubleshootingIeForm } from "./troubleshooting-ie-form";
-import { ValidatingOthersForm } from "./validating-others-form";
-import { MythsEmotionsForm } from "./myths-emotions-form";
-import { BeingEffectiveForm } from "./being-effective-form";
-import { WiseMindForm } from "./wise-mind-form";
-import { WhatSkillsForm } from "./what-skills-form";
-import { HowSkillsForm } from "./how-skills-form";
-import { LovingKindnessForm } from "./loving-kindness-form";
-import { BalancingDoingBeingForm } from "./balancing-doing-being-form";
-import { StopSkillForm } from "./stop-skill-form";
-import { TippForm } from "./tipp-form";
-import { AcceptsForm } from "./accepts-form";
-import { SelfSoothingForm } from "./self-soothing-form";
-import { ImproveForm } from "./improve-form";
-import { HalfSmilingForm } from "./half-smiling-form";
-import { EmotionModelForm } from "./emotion-model-form";
-import { ProblemSolvingForm } from "./problem-solving-form";
-import { PositivesShortForm } from "./positives-short-form";
-import { PositivesLongForm } from "./positives-long-form";
-import { SleepHygieneForm } from "./sleep-hygiene-form";
-import { ExtremeEmotionsForm } from "./extreme-emotions-form";
-import { ClearMindForm } from "./clear-mind-form";
-import { FindingPeopleForm } from "./finding-people-form";
-import { MindfulnessOthersForm } from "./mindfulness-others-form";
-import { EndingRelationshipsForm } from "./ending-relationships-form";
-import { OptionsProblemsForm } from "./options-problems-form";
-import { DialecticalAbstinenceForm } from "./dialectical-abstinence-form";
-import { BehaviorChangeForm } from "./behavior-change-form";
-import { DiaryCardSummary } from "./diary-card-summary";
+import { WORKSHEET_FORMS, WorksheetFormLoading } from "./form-registry";
+import dynamic from "next/dynamic";
+
+// The diary card summary (heatmap + stats) is also loaded on demand.
+const DiaryCardSummary = dynamic(
+  () => import("./diary-card-summary").then((m) => m.DiaryCardSummary),
+  { loading: WorksheetFormLoading, ssr: false }
+);
 import { exportToPdf } from "@/lib/worksheet-pdf";
 import {
   Tooltip,
@@ -119,6 +74,8 @@ export function WorksheetDetail({
   onViewSkill,
 }: Props) {
   const meta = getWorksheetTypeMeta(entry.type);
+  // The form component is loaded on demand from the code-split registry.
+  const FormComponent = WORKSHEET_FORMS[entry.type];
 
   // Sync-aware footer copy: signed-in users see cloud wording, guests see
   // device wording.
@@ -349,164 +306,12 @@ export function WorksheetDetail({
             </p>
           </div>
 
-          {entry.type === "chain-analysis" && (
-            <ChainAnalysisForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "pros-cons" && (
-            <ProsConsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "diary-card" &&
-            (view === "form" ? (
-              <DiaryCardForm entry={entry} onChange={onChangeData} />
-            ) : (
-              <DiaryCardSummary entry={entry} />
-            ))}
-          {entry.type === "walking-middle-path" && (
-            <WalkingMiddlePathForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "missing-links" && (
-            <MissingLinksForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "dear-man-script" && (
-            <DearManScriptForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "check-the-facts" && (
-            <CheckTheFactsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "opposite-action" && (
-            <OppositeActionForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "radical-acceptance" && (
-            <RadicalAcceptanceForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "crisis-survival-tracker" && (
-            <CrisisSurvivalTrackerForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "values-to-actions" && (
-            <ValuesToActionsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "pleasant-events-diary" && (
-            <PleasantEventsDiaryForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "emotion-diary" && (
-            <EmotionDiaryForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "dialectics-practice" && (
-            <DialecticsPracticeForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "self-validation" && (
-            <SelfValidationForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "dime-game" && (
-            <DimeGameForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "cope-ahead" && (
-            <CopeAheadForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "build-mastery" && (
-            <BuildMasteryForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "please-tracker" && (
-            <PleaseTrackerForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "nightmare-protocol" && (
-            <NightmareProtocolForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "mindfulness-emotions" && (
-            <MindfulnessEmotionsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "mindfulness-thoughts" && (
-            <MindfulnessThoughtsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "turning-mind-willingness" && (
-            <TurningMindWillingnessForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "clarifying-priorities" && (
-            <ClarifyingPrioritiesForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "troubleshooting-ie" && (
-            <TroubleshootingIeForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "validating-others" && (
-            <ValidatingOthersForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "myths-emotions" && (
-            <MythsEmotionsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "being-effective" && (
-            <BeingEffectiveForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "wise-mind" && (
-            <WiseMindForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "what-skills" && (
-            <WhatSkillsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "how-skills" && (
-            <HowSkillsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "loving-kindness" && (
-            <LovingKindnessForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "balancing-doing-being" && (
-            <BalancingDoingBeingForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "stop-skill" && (
-            <StopSkillForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "tipp" && (
-            <TippForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "accepts" && (
-            <AcceptsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "self-soothing" && (
-            <SelfSoothingForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "improve" && (
-            <ImproveForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "half-smiling" && (
-            <HalfSmilingForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "emotion-model" && (
-            <EmotionModelForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "problem-solving" && (
-            <ProblemSolvingForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "positives-short" && (
-            <PositivesShortForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "positives-long" && (
-            <PositivesLongForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "sleep-hygiene" && (
-            <SleepHygieneForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "extreme-emotions" && (
-            <ExtremeEmotionsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "clear-mind" && (
-            <ClearMindForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "finding-people" && (
-            <FindingPeopleForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "mindfulness-others" && (
-            <MindfulnessOthersForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "ending-relationships" && (
-            <EndingRelationshipsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "options-problems" && (
-            <OptionsProblemsForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "dialectical-abstinence" && (
-            <DialecticalAbstinenceForm entry={entry} onChange={onChangeData} />
-          )}
-          {entry.type === "behavior-change" && (
-            <BehaviorChangeForm entry={entry} onChange={onChangeData} />
+          {entry.type === "diary-card" && view === "summary" ? (
+            <DiaryCardSummary entry={entry} />
+          ) : FormComponent ? (
+            <FormComponent entry={entry} onChange={onChangeData} />
+          ) : (
+            <p className="text-sm text-muted-foreground">Unknown worksheet type: {entry.type}</p>
           )}
 
           <div className="mt-12 pt-6 border-t text-xs text-muted-foreground print:mt-6">
