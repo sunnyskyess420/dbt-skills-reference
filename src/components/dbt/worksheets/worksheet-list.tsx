@@ -471,10 +471,13 @@ export function WorksheetList({
                         className="cursor-pointer py-2"
                       >
                         <Icon className={cn("h-4 w-4 mr-2 shrink-0", type.color)} />
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="text-xs font-medium">{type.shortName}</div>
-                          <div className="text-[10px] text-muted-foreground truncate">
-                            {type.description.slice(0, 50)}...
+                          <div className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
+                            <span className="truncate">{type.description.slice(0, 50)}...</span>
+                            {type.pages && (
+                              <span className="font-mono shrink-0">{type.pages}</span>
+                            )}
                           </div>
                         </div>
                       </DropdownMenuItem>
@@ -564,6 +567,12 @@ export function WorksheetList({
                           <span>·</span>
                           <Clock className="h-2.5 w-2.5" />
                           <span>{formatRelativeTime(entry.updatedAt)}</span>
+                          {meta.pages && (
+                            <>
+                              <span>·</span>
+                              <span className="font-mono">{meta.pages}</span>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>

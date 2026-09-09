@@ -278,6 +278,12 @@ export function WorksheetDetail({
             <BookOpen className="h-3 w-3 mt-0.5 shrink-0" />
             <span>
               <span className="font-medium">Book reference:</span> {meta.reference}
+              {meta.pages && (
+                <>
+                  {" · "}
+                  <span className="font-mono">{meta.pages}</span>
+                </>
+              )}
             </span>
           </div>
           {linkedSkill && onViewSkill && (
@@ -299,7 +305,10 @@ export function WorksheetDetail({
           <div className="hidden print:block mb-6 pb-3 border-b">
             <h1 className="text-xl font-bold">{entry.title}</h1>
             <p className="text-sm text-muted-foreground">{meta.name}</p>
-            <p className="text-xs text-muted-foreground mt-1">{meta.reference}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {meta.reference}
+              {meta.pages && <> · {meta.pages}</>}
+            </p>
             <p className="text-xs mt-1">
               Created: {new Date(entry.createdAt).toLocaleString()} · Last updated:{" "}
               {new Date(entry.updatedAt).toLocaleString()}

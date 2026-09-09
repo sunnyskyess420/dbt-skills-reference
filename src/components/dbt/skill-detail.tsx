@@ -164,6 +164,12 @@ export function SkillDetail({
             <BookOpen className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
               <span className="font-medium">Book reference:</span> {skill.reference}
+              {skill.pages && (
+                <>
+                  {" · "}
+                  <span className="font-mono">{skill.pages}</span>
+                </>
+              )}
             </span>
           </div>
 
