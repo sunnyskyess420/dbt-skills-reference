@@ -117,6 +117,11 @@ export function SkillList({
                             <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                               {skill.oneLiner}
                             </p>
+                            {skill.pages && (
+                              <p className="text-[10px] text-muted-foreground/60 font-mono mt-0.5">
+                                {skill.pages}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </button>
