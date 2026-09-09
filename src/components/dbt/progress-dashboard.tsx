@@ -29,7 +29,7 @@ const SKILL_KEYS = [
   { key: "skillMindfulness", label: "Mindfulness" },
   { key: "skillDistressTolerance", label: "Distress Tolerance" },
   { key: "skillEmotionRegulation", label: "Emotion Regulation" },
-  { key: "skillInterpersonal", label: "Interpersonal" },
+  { key: "skillInterpersonal", label: "Interpersonal Effectiveness" },
 ];
 
 export function ProgressDashboard({ entries, onSelectWorksheet }: Props) {

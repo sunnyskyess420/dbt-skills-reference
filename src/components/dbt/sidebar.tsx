@@ -124,7 +124,7 @@ export function Sidebar({
                       )}
                     >
                       <Icon className={cn("h-4 w-4", isActive ? module.color : "")} />
-                      <span className="flex-1 text-left truncate">{module.short}</span>
+                      <span className="flex-1 text-left text-xs leading-tight">{module.short}</span>
                       <span className="text-[10px] text-muted-foreground">{skills.length}</span>
                     </button>
 

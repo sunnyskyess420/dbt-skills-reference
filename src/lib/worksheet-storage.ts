@@ -116,7 +116,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Identify two opposing positions, find what's true in each, and articulate a synthesis that integrates both. The core dialectical thinking skill.",
     icon: "GitMerge",
-    reference: "Mindfulness Worksheets 10, 10a, 10b / IE Worksheets 11–11b (Handouts 10, 15, 16)",
+    reference: "Mindfulness Worksheets 10, 10a, 10b / Interpersonal Effectiveness Worksheets 11–11b (Handouts 10, 15, 16)",
     color: "text-emerald-600 dark:text-emerald-400",
   },
   {
@@ -138,7 +138,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Write out a full interpersonal effectiveness script before a difficult conversation: Describe, Express, Assert, Reinforce, stay Mindful, Appear confident, Negotiate.",
     icon: "MessageSquareText",
-    reference: "IE Handout 5a / IE Worksheet 4",
+    reference: "Interpersonal Effectiveness Handout 5a / Interpersonal Effectiveness Worksheet 4",
     color: "text-amber-600 dark:text-amber-400",
   },
   {
@@ -149,7 +149,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Walk through whether your emotion and its intensity fit the situation: what happened, your interpretation, alternative interpretations, and whether the threat is real.",
     icon: "SearchCheck",
-    reference: "ER Handouts 8, 8a / ER Worksheet 5",
+    reference: "Emotion Regulation Handouts 8, 8a / Emotion Regulation Worksheet 5",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -160,7 +160,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Identify an emotion, its action urge, whether it fits the facts, and plan the opposite action step-by-step. The core skill for changing unwanted emotions.",
     icon: "FlipHorizontal",
-    reference: "ER Handouts 9-11 / ER Worksheet 7",
+    reference: "Emotion Regulation Handouts 9-11 / Emotion Regulation Worksheet 7",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -171,7 +171,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Guided steps for practicing radical acceptance of a specific situation: what you're accepting, what makes it hard, willingness, half-smile, turning the mind.",
     icon: "HeartHandshake",
-    reference: "DT Handouts 11, 11b / DT Worksheets 9, 9a",
+    reference: "Distress Tolerance Handouts 11, 11b / Distress Tolerance Worksheets 9, 9a",
     color: "text-sky-600 dark:text-sky-400",
   },
   {
@@ -182,7 +182,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "After a crisis, check off which survival skills you used (STOP, TIPP, Pros/Cons, Distract, Self-Soothe, IMPROVE) and what worked. Helps you learn what helps.",
     icon: "ShieldCheck",
-    reference: "DT Handouts 2-9a / DT Worksheet 1",
+    reference: "Distress Tolerance Handouts 2-9a / Distress Tolerance Worksheet 1",
     color: "text-sky-600 dark:text-sky-400",
   },
   {
@@ -193,7 +193,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Identify your top values, pick one, break it into concrete weekly action steps. Directly builds a life worth living.",
     icon: "Target",
-    reference: "ER Handouts 17-18 / ER Worksheets 11, 11a, 11b",
+    reference: "Emotion Regulation Handouts 17-18 / Emotion Regulation Worksheets 11, 11a, 11b",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -204,7 +204,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Track one pleasant activity per day and rate your emotion before and after. Builds the 'accumulate positive emotions' skill.",
     icon: "Smile",
-    reference: "ER Handout 15 / ER Worksheet 10",
+    reference: "Emotion Regulation Handout 15 / Emotion Regulation Worksheet 10",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -215,7 +215,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Track one specific emotion (e.g., anger, shame) across a week: triggers, intensity, what you did, what worked. More detailed than the diary card for a single emotion.",
     icon: "Activity",
-    reference: "ER Handout 3 / ER Worksheet 2b",
+    reference: "Emotion Regulation Handout 3 / Emotion Regulation Worksheet 2b",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -226,7 +226,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Practice finding the synthesis between two opposing positions in a specific relationship conflict. Similar to Walking the Middle Path but focused on one relationship.",
     icon: "GitMerge",
-    reference: "IE Handouts 15-16 / IE Worksheet 11",
+    reference: "Interpersonal Effectiveness Handouts 15-16 / Interpersonal Effectiveness Worksheet 11",
     color: "text-amber-600 dark:text-amber-400",
   },
   {
@@ -237,7 +237,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Practice the 6 levels of validation on yourself, for when you're being harsh with yourself about a feeling you're having.",
     icon: "HeartPulse",
-    reference: "IE Handouts 17-19 / IE Worksheet 13",
+    reference: "Interpersonal Effectiveness Handouts 17-19 / Interpersonal Effectiveness Worksheet 13",
     color: "text-amber-600 dark:text-amber-400",
   },
   {
@@ -248,7 +248,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Interactive decision tool: answer 10 questions about your situation to figure out how intensely to ask for what you want or how firmly to say no. Live score calculation.",
     icon: "Coins",
-    reference: "IE Handout 8 / IE Worksheet 6",
+    reference: "Interpersonal Effectiveness Handout 8 / Interpersonal Effectiveness Worksheet 6",
     color: "text-amber-600 dark:text-amber-400",
   },
   {
@@ -259,7 +259,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Rehearse a difficult situation in detail — imagine it vividly, feel the emotions, and practice the skill you'll use. So it's ready when the situation arrives.",
     icon: "BrainCog",
-    reference: "ER Handout 19 / ER Worksheets 12, 13",
+    reference: "Emotion Regulation Handout 19 / Emotion Regulation Worksheets 12, 13",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -270,7 +270,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Daily competence tracker — do one thing each day that gives you a sense of accomplishment. Builds self-respect and resilience against despair.",
     icon: "TrendingUp",
-    reference: "ER Handout 19 / ER Worksheets 12, 13",
+    reference: "Emotion Regulation Handout 19 / Emotion Regulation Worksheets 12, 13",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -281,7 +281,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Weekly physical self-care checklist: treat Physical iLLness, balanced Eating, avoid mood-Altering drugs, balanced Sleep, get Exercise.",
     icon: "HeartPulse",
-    reference: "ER Handout 20 / ER Worksheet 14",
+    reference: "Emotion Regulation Handout 20 / Emotion Regulation Worksheet 14",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -292,7 +292,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Rewrite a recurring nightmare with a different, mastery-ending. Rehearse the new version before sleep to reduce nightmare frequency.",
     icon: "Moon",
-    reference: "ER Handout 20a / ER Worksheet 14a",
+    reference: "Emotion Regulation Handout 20a / Emotion Regulation Worksheet 14a",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -303,7 +303,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Observe an emotion as a wave — notice where you feel it in your body, name it, let it crest and pass without acting on it or suppressing it.",
     icon: "Waves",
-    reference: "ER Handout 22 / ER Worksheet 15",
+    reference: "Emotion Regulation Handout 22 / Emotion Regulation Worksheet 15",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -314,7 +314,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Observe thoughts as passing mental events — like leaves on a stream or clouds in the sky. Not as truth, not as you. Let them come and go.",
     icon: "Cloud",
-    reference: "DT Handouts 15, 15a / DT Worksheets 12, 12a",
+    reference: "Distress Tolerance Handouts 15, 15a / Distress Tolerance Worksheets 12, 12a",
     color: "text-sky-600 dark:text-sky-400",
   },
   {
@@ -325,7 +325,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Practice turning back to acceptance each time you slip, and choosing willingness (doing what's needed) over willfulness (refusing reality).",
     icon: "RefreshCw",
-    reference: "DT Handouts 12, 13 / DT Worksheets 8, 8a, 10",
+    reference: "Distress Tolerance Handouts 12, 13 / Distress Tolerance Worksheets 8, 8a, 10",
     color: "text-sky-600 dark:text-sky-400",
   },
   {
@@ -336,7 +336,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Figure out whether your priority is objectives (get what you want), relationship (keep the connection), or self-respect in a specific situation.",
     icon: "ListChecks",
-    reference: "IE Handout 4 / IE Worksheet 3",
+    reference: "Interpersonal Effectiveness Handout 4 / Interpersonal Effectiveness Worksheet 3",
     color: "text-amber-600 dark:text-amber-400",
   },
   {
@@ -347,7 +347,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "When DEAR MAN, GIVE, or FAST didn't work — diagnose what got in the way and what to try differently next time.",
     icon: "Wrench",
-    reference: "IE Handout 9 / IE Worksheet 7",
+    reference: "Interpersonal Effectiveness Handout 9 / Interpersonal Effectiveness Worksheet 7",
     color: "text-amber-600 dark:text-amber-400",
   },
   {
@@ -358,7 +358,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Practice the 6 levels of validation on another person. Communicate that their experience makes sense — without necessarily agreeing with it.",
     icon: "Users",
-    reference: "IE Handouts 17-18 / IE Worksheet 12",
+    reference: "Interpersonal Effectiveness Handouts 17-18 / Interpersonal Effectiveness Worksheet 12",
     color: "text-amber-600 dark:text-amber-400",
   },
   {
@@ -369,7 +369,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Identify and challenge false beliefs about emotions — 'there's a right way to feel', 'negative emotions are bad', 'if I feel it I must act on it'.",
     icon: "Lightbulb",
-    reference: "ER Handout 4a / ER Worksheet 3",
+    reference: "Emotion Regulation Handout 4a / Emotion Regulation Worksheet 3",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -380,7 +380,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     description:
       "Plan and practice the FAST skill for self-respect effectiveness: Be Fair, no Apologies, Stick to values, Be Truthful. Write your script, rehearse it, and reflect.",
     icon: "ShieldCheck",
-    reference: "IE Handout 7 / IE Worksheet 5",
+    reference: "Interpersonal Effectiveness Handout 7 / Interpersonal Effectiveness Worksheet 5",
     color: "text-amber-600 dark:text-amber-400",
   },
   {
