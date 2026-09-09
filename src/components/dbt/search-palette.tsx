@@ -319,6 +319,11 @@ export function SearchPalette({
                           <span className="text-[10px] text-muted-foreground shrink-0 whitespace-nowrap uppercase tracking-wider">
                             create new
                           </span>
+                          {type.pages && (
+                            <span className="text-[10px] text-muted-foreground/70 shrink-0 whitespace-nowrap font-mono hidden sm:inline">
+                              {type.pages}
+                            </span>
+                          )}
                         </div>
                         <p className="text-xs text-muted-foreground truncate mt-0.5">
                           {type.description}
@@ -387,6 +392,7 @@ export function SearchPalette({
                             </p>
                             <span className="text-[10px] text-muted-foreground/70 shrink-0 whitespace-nowrap font-mono hidden sm:inline">
                               {shortReference(skill.reference)}
+                              {skill.pages && <> · {skill.pages}</>}
                             </span>
                           </div>
                         </div>

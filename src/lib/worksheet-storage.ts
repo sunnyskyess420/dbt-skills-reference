@@ -69,6 +69,7 @@ export interface WorksheetTypeMeta {
   name: string;
   shortName: string;
   description: string;
+  pages?: string; // printed page number in the 2nd edition
   icon: string; // lucide icon name (we map in component)
   reference: string; // book cross-reference
   color: string; // tailwind class
@@ -79,6 +80,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "chain-analysis",
     name: "Chain Analysis",
     shortName: "Chain Analysis",
+    pages: "p. 31",
     description:
       "Map a specific problem behavior link-by-link: prompting event → vulnerabilities → thoughts/feelings/sensations/actions → behavior → consequences. Find the links where a different DBT skill could have changed the chain.",
     icon: "Link2",
@@ -89,6 +91,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "pros-cons",
     name: "Pros and Cons of Acting on Crisis Urges",
     shortName: "Pros & Cons",
+    pages: "p. 374",
     description:
       "Before acting on a crisis urge, weigh the pros and cons of BOTH acting on it AND resisting it — short-term AND long-term. The point is the structured weighing, especially of long-term consequences.",
     icon: "Scale",
@@ -109,6 +112,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "walking-middle-path",
     name: "Walking the Middle Path (Dialectics)",
     shortName: "Middle Path",
+    pages: "p. 105",
     description:
       "Identify two opposing positions, find what's true in each, and articulate a synthesis that integrates both. The core dialectical thinking skill.",
     icon: "GitMerge",
@@ -119,6 +123,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "missing-links",
     name: "Missing-Links Analysis (Behavior Analysis)",
     shortName: "Missing-Links",
+    pages: "p. 23",
     description:
       "When you knew a skill that would have helped but didn't use it: find the precise gap between knowing and doing, and plan a strategy to close it.",
     icon: "Unplug",
@@ -129,6 +134,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "dear-man-script",
     name: "DEAR MAN Script",
     shortName: "DEAR MAN",
+    pages: "p. 174",
     description:
       "Write out a full interpersonal effectiveness script before a difficult conversation: Describe, Express, Assert, Reinforce, stay Mindful, Appear confident, Negotiate.",
     icon: "MessageSquareText",
@@ -139,6 +145,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "check-the-facts",
     name: "Check the Facts",
     shortName: "Check the Facts",
+    pages: "p. 230",
     description:
       "Walk through whether your emotion and its intensity fit the situation: what happened, your interpretation, alternative interpretations, and whether the threat is real.",
     icon: "SearchCheck",
@@ -149,6 +156,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "opposite-action",
     name: "Opposite Action",
     shortName: "Opposite Action",
+    pages: "p. 231",
     description:
       "Identify an emotion, its action urge, whether it fits the facts, and plan the opposite action step-by-step. The core skill for changing unwanted emotions.",
     icon: "FlipHorizontal",
@@ -159,6 +167,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "radical-acceptance",
     name: "Radical Acceptance Practice",
     shortName: "Radical Acceptance",
+    pages: "p. 394",
     description:
       "Guided steps for practicing radical acceptance of a specific situation: what you're accepting, what makes it hard, willingness, half-smile, turning the mind.",
     icon: "HeartHandshake",
@@ -169,6 +178,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "crisis-survival-tracker",
     name: "Crisis Survival Skills Tracker",
     shortName: "Crisis Tracker",
+    pages: "p. 369",
     description:
       "After a crisis, check off which survival skills you used (STOP, TIPP, Pros/Cons, Distract, Self-Soothe, IMPROVE) and what worked. Helps you learn what helps.",
     icon: "ShieldCheck",
@@ -179,6 +189,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "values-to-actions",
     name: "Values to Action Steps",
     shortName: "Values to Actions",
+    pages: "p. 296",
     description:
       "Identify your top values, pick one, break it into concrete weekly action steps. Directly builds a life worth living.",
     icon: "Target",
@@ -189,6 +200,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "pleasant-events-diary",
     name: "Pleasant Events Diary",
     shortName: "Pleasant Events",
+    pages: "p. 295",
     description:
       "Track one pleasant activity per day and rate your emotion before and after. Builds the 'accumulate positive emotions' skill.",
     icon: "Smile",
@@ -199,6 +211,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "emotion-diary",
     name: "Emotion Diary (Single Emotion)",
     shortName: "Emotion Diary",
+    pages: "p. 295",
     description:
       "Track one specific emotion (e.g., anger, shame) across a week: triggers, intensity, what you did, what worked. More detailed than the diary card for a single emotion.",
     icon: "Activity",
@@ -209,6 +222,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "dialectics-practice",
     name: "Dialectics Practice",
     shortName: "Dialectics",
+    pages: "p. 189",
     description:
       "Practice finding the synthesis between two opposing positions in a specific relationship conflict. Similar to Walking the Middle Path but focused on one relationship.",
     icon: "GitMerge",
@@ -219,6 +233,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "self-validation",
     name: "Self-Validation Practice",
     shortName: "Self-Validation",
+    pages: "p. 241",
     description:
       "Practice the 6 levels of validation on yourself, for when you're being harsh with yourself about a feeling you're having.",
     icon: "HeartPulse",
@@ -229,6 +244,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "dime-game",
     name: "The Dime Game (Intensity of Asking or Saying No)",
     shortName: "Dime Game",
+    pages: "p. 175",
     description:
       "Interactive decision tool: answer 10 questions about your situation to figure out how intensely to ask for what you want or how firmly to say no. Live score calculation.",
     icon: "Coins",
@@ -239,6 +255,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "cope-ahead",
     name: "Cope Ahead",
     shortName: "Cope Ahead",
+    pages: "p. 293",
     description:
       "Rehearse a difficult situation in detail — imagine it vividly, feel the emotions, and practice the skill you'll use. So it's ready when the situation arrives.",
     icon: "BrainCog",
@@ -249,6 +266,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "build-mastery",
     name: "Build Mastery",
     shortName: "Build Mastery",
+    pages: "p. 301",
     description:
       "Daily competence tracker — do one thing each day that gives you a sense of accomplishment. Builds self-respect and resilience against despair.",
     icon: "TrendingUp",
@@ -259,6 +277,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "please-tracker",
     name: "PLEASE Skills Tracker",
     shortName: "PLEASE Tracker",
+    pages: "p. 302",
     description:
       "Weekly physical self-care checklist: treat Physical iLLness, balanced Eating, avoid mood-Altering drugs, balanced Sleep, get Exercise.",
     icon: "HeartPulse",
@@ -269,6 +288,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "nightmare-protocol",
     name: "Nightmare Protocol",
     shortName: "Nightmare Protocol",
+    pages: "p. 258",
     description:
       "Rewrite a recurring nightmare with a different, mastery-ending. Rehearse the new version before sleep to reduce nightmare frequency.",
     icon: "Moon",
@@ -279,6 +299,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "mindfulness-emotions",
     name: "Mindfulness of Current Emotions",
     shortName: "Mindfulness of Emotions",
+    pages: "p. 101",
     description:
       "Observe an emotion as a wave — notice where you feel it in your body, name it, let it crest and pass without acting on it or suppressing it.",
     icon: "Waves",
@@ -289,6 +310,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "mindfulness-thoughts",
     name: "Mindfulness of Current Thoughts",
     shortName: "Mindfulness of Thoughts",
+    pages: "p. 103",
     description:
       "Observe thoughts as passing mental events — like leaves on a stream or clouds in the sky. Not as truth, not as you. Let them come and go.",
     icon: "Cloud",
@@ -299,6 +321,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "turning-mind-willingness",
     name: "Turning the Mind & Willingness",
     shortName: "Turning & Willingness",
+    pages: "p. 348",
     description:
       "Practice turning back to acceptance each time you slip, and choosing willingness (doing what's needed) over willfulness (refusing reality).",
     icon: "RefreshCw",
@@ -309,6 +332,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "clarifying-priorities",
     name: "Clarifying Priorities",
     shortName: "Clarifying Priorities",
+    pages: "p. 156",
     description:
       "Figure out whether your priority is objectives (get what you want), relationship (keep the connection), or self-respect in a specific situation.",
     icon: "ListChecks",
@@ -319,6 +343,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "troubleshooting-ie",
     name: "Troubleshooting Interpersonal Effectiveness",
     shortName: "Troubleshooting IE",
+    pages: "p. 158",
     description:
       "When DEAR MAN, GIVE, or FAST didn't work — diagnose what got in the way and what to try differently next time.",
     icon: "Wrench",
@@ -329,6 +354,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "validating-others",
     name: "Validating Others",
     shortName: "Validating Others",
+    pages: "p. 194",
     description:
       "Practice the 6 levels of validation on another person. Communicate that their experience makes sense — without necessarily agreeing with it.",
     icon: "Users",
@@ -339,6 +365,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "myths-emotions",
     name: "Myths About Emotions",
     shortName: "Myths About Emotions",
+    pages: "p. 212",
     description:
       "Identify and challenge false beliefs about emotions — 'there's a right way to feel', 'negative emotions are bad', 'if I feel it I must act on it'.",
     icon: "Lightbulb",
@@ -349,6 +376,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "being-effective",
     name: "Being Effective (FAST Skill)",
     shortName: "Being Effective",
+    pages: "p. 88",
     description:
       "Plan and practice the FAST skill for self-respect effectiveness: Be Fair, no Apologies, Stick to values, Be Truthful. Write your script, rehearse it, and reflect.",
     icon: "ShieldCheck",
@@ -359,6 +387,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "wise-mind",
     name: "Wise Mind Practice",
     shortName: "Wise Mind",
+    pages: "p. 50",
     description:
       "Distinguish reasonable mind vs. emotion mind, and find Wise Mind — the quiet synthesis that includes both feeling and reason.",
     icon: "Sparkles",
@@ -369,6 +398,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "what-skills",
     name: "What Skills: Observe, Describe, Participate",
     shortName: "What Skills",
+    pages: "p. 84",
     description:
       "Practice the three What skills — notice experience, put words on it nonjudgmentally, or enter fully into an activity.",
     icon: "Eye",
@@ -379,6 +409,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "how-skills",
     name: "How Skills: Nonjudgmental, One-Mindful, Effective",
     shortName: "How Skills",
+    pages: "p. 88",
     description:
       "Practice the quality you bring to mindfulness — nonjudgmentalness, one-mindfulness, and effectiveness.",
     icon: "Compass",
@@ -389,6 +420,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "loving-kindness",
     name: "Loving Kindness Practice",
     shortName: "Loving-Kindness",
+    pages: "p. 70",
     description:
       "Silently repeat phrases of well-wishing, starting with yourself and extending outward — even to difficult people.",
     icon: "Heart",
@@ -399,6 +431,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "balancing-doing-being",
     name: "Balancing Doing Mind and Being Mind",
     shortName: "Doing & Being Mind",
+    pages: "p. 98",
     description:
       "Recognize whether you're in doing mind (goal-focused) or being mind (present-moment) and shift toward balance.",
     icon: "RefreshCw",
@@ -409,6 +442,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "stop-skill",
     name: "STOP Skill Practice",
     shortName: "STOP Skill",
+    pages: "p. 372",
     description:
       "Stop, Take a step back, Observe, Proceed mindfully. The first crisis survival skill — interrupts the autopilot of emotional reaction.",
     icon: "Octagon",
@@ -419,6 +453,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "tipp",
     name: "TIPP Skills Log",
     shortName: "TIPP",
+    pages: "p. 329",
     description:
       "Use Temperature, Intense exercise, Paced breathing, and Paired muscle relaxation to rapidly reduce extreme emotional arousal.",
     icon: "Zap",
@@ -429,6 +464,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "accepts",
     name: "Distracting with ACCEPTS",
     shortName: "ACCEPTS",
+    pages: "p. 379",
     description:
       "Seven distraction strategies — Activities, Contributing, Comparisons, Emotions, Pushing away, Thoughts, Sensations.",
     icon: "Shuffle",
@@ -439,6 +475,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "self-soothing",
     name: "Self-Soothing with the Five Senses",
     shortName: "Self-Soothing",
+    pages: "p. 6",
     description:
       "Comfort yourself through the five senses — vision, hearing, smell, taste, touch. Calms the nervous system directly.",
     icon: "Flower2",
@@ -449,6 +486,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "improve",
     name: "IMPROVE the Moment",
     shortName: "IMPROVE",
+    pages: "p. 386",
     description:
       "Imagery, Meaning, Prayer, Relaxation, One thing, Vacation, Encouragement — reshape how you relate to a difficult moment.",
     icon: "Sparkle",
@@ -459,6 +497,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "half-smiling",
     name: "Half-Smiling and Willing Hands",
     shortName: "Half-Smiling",
+    pages: "p. 397",
     description:
       "Body-based cues that support radical acceptance — a slight smile and open palms communicate safety to your nervous system.",
     icon: "SmilePlus",
@@ -469,6 +508,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "emotion-model",
     name: "Model for Describing Emotions",
     shortName: "Emotion Model",
+    pages: "p. 212",
     description:
       "Break down an emotion into its components — prompting event, interpretation, biology, expressions, aftereffects — to find where to intervene.",
     icon: "Puzzle",
@@ -479,6 +519,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "problem-solving",
     name: "Problem Solving",
     shortName: "Problem Solving",
+    pages: "p. 241",
     description:
       "When the emotion fits the facts, solve the problem: define it, brainstorm, evaluate, choose, plan, do it, evaluate the result.",
     icon: "Lightbulb",
@@ -489,6 +530,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "positives-short",
     name: "Accumulate Positive Emotions — Short Term",
     shortName: "Positives Short-Term",
+    pages: "p. 295",
     description:
       "Plan and track one small pleasant activity per day for a week. Motivation follows action — don't wait until you feel like it.",
     icon: "Sun",
@@ -499,6 +541,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "positives-long",
     name: "Accumulating Positive Emotions — Long Term",
     shortName: "Positives Long-Term",
+    pages: "p. 295",
     description:
       "Identify values, set goals connected to them, and take small daily actions toward building a life worth living.",
     icon: "Mountain",
@@ -509,6 +552,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "sleep-hygiene",
     name: "Sleep Hygiene Tracker",
     shortName: "Sleep Hygiene",
+    pages: "p. 259",
     description:
       "Daily sleep log with hygiene checklist. Good sleep is foundational to emotion regulation — without it, no other skill fully works.",
     icon: "BedDouble",
@@ -519,6 +563,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "extreme-emotions",
     name: "Managing Extreme Emotions Plan",
     shortName: "Extreme Emotions",
+    pages: "p. 266",
     description:
       "Create a crisis plan for when emotions reach 8/10+: distress tolerance first, then emotion regulation when intensity drops.",
     icon: "Siren",
@@ -529,6 +574,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "clear-mind",
     name: "Clear Mind (Addiction Recovery)",
     shortName: "Clear Mind",
+    pages: "p. 359",
     description:
       "The synthesis of addiction recovery: abstinent AND aware of the vulnerability, prepared, and engaged in ongoing recovery.",
     icon: "CircleDot",
@@ -539,6 +585,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "finding-people",
     name: "Finding and Getting People to Like You",
     shortName: "Finding People",
+    pages: "p. 183",
     description:
       "Plan where to meet people who share your interests, how to start conversations, and how to be someone others enjoy being around.",
     icon: "UserPlus",
@@ -549,6 +596,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "mindfulness-others",
     name: "Mindfulness of Others",
     shortName: "Mindfulness of Others",
+    pages: "p. 184",
     description:
       "Practice being present with another person — noticing their mood, body language, and what they might need. The foundation of attunement.",
     icon: "ScanEye",
@@ -559,6 +607,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "ending-relationships",
     name: "Ending Relationships",
     shortName: "Ending Relationships",
+    pages: "p. 145",
     description:
       "Guided reflection for ending a relationship skillfully — be clear, preserve the learning, and maintain self-respect.",
     icon: "UserMinus",
@@ -569,6 +618,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "options-problems",
     name: "Options for Solving Any Problem",
     shortName: "Options for Problems",
+    pages: "p. 10",
     description:
       "Four options for any problem: solve it, feel better about it, radically accept it, or stay miserable. Map your situation to the right skill family.",
     icon: "GitFork",
@@ -579,6 +629,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "dialectical-abstinence",
     name: "Dialectical Abstinence",
     shortName: "Dialectical Abstinence",
+    pages: "p. 357",
     description:
       "Aim for absolute abstinence AND have a detailed harm reduction plan for slips. The synthesis of recovery.",
     icon: "ShieldHalf",
@@ -589,6 +640,7 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     id: "behavior-change",
     name: "Behavior Change Strategies",
     shortName: "Behavior Change",
+    pages: "p. 162",
     description:
       "To increase a behavior, reinforce it immediately. To decrease a behavior, stop reinforcing it. Be deliberate, consistent, aware.",
     icon: "Repeat",
