@@ -244,7 +244,7 @@ function DayForm({
             { key: "skillMindfulness", label: "Mindfulness" },
             { key: "skillDistressTolerance", label: "Distress Tolerance" },
             { key: "skillEmotionRegulation", label: "Emotion Regulation" },
-            { key: "skillInterpersonal", label: "Interpersonal" },
+            { key: "skillInterpersonal", label: "Interpersonal Effectiveness" },
           ].map((opt) => (
             <div key={opt.key} className="flex items-center space-x-2">
               <Checkbox

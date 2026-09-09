@@ -54,7 +54,7 @@ export const MODULES: {
   {
     id: "interpersonal",
     name: "Interpersonal Effectiveness Skills",
-    short: "Interpersonal",
+    short: "Interpersonal Effectiveness",
     color: "text-amber-600 dark:text-amber-400",
     description:
       "Skills for asking for what you need, saying no, keeping relationships, maintaining self-respect, navigating conflict, and walking the middle path.",
@@ -62,7 +62,7 @@ export const MODULES: {
   {
     id: "emotion-regulation",
     name: "Emotion Regulation Skills",
-    short: "Emotion",
+    short: "Emotion Regulation",
     color: "text-rose-600 dark:text-rose-400",
     description:
       "Skills for understanding and naming emotions, changing unwanted emotional responses, reducing vulnerability to emotion mind, and managing really difficult emotions.",
@@ -70,7 +70,7 @@ export const MODULES: {
   {
     id: "distress-tolerance",
     name: "Distress Tolerance Skills",
-    short: "Distress",
+    short: "Distress Tolerance",
     color: "text-sky-600 dark:text-sky-400",
     description:
       "Crisis survival skills for tolerating painful events and urges without making things worse, plus reality acceptance skills for reducing suffering.",

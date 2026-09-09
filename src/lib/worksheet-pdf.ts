@@ -294,7 +294,7 @@ function generateDiaryCard(doc: jsPDF, entry: WorksheetEntry) {
   writeRow("Mindfulness", days.map((d) => (d?.skillMindfulness ? "Y" : "")));
   writeRow("Distress Tolerance", days.map((d) => (d?.skillDistressTolerance ? "Y" : "")));
   writeRow("Emotion Regulation", days.map((d) => (d?.skillEmotionRegulation ? "Y" : "")));
-  writeRow("Interpersonal", days.map((d) => (d?.skillInterpersonal ? "Y" : "")));
+  writeRow("Interpersonal Effectiveness", days.map((d) => (d?.skillInterpersonal ? "Y" : "")));
 
   writeSectionTitle(doc, undefined, "Daily notes");
   days.forEach((d, idx) => {
@@ -1126,7 +1126,7 @@ const COMPARE_SKILL_KEYS = [
   { key: "skillMindfulness", label: "Mindfulness" },
   { key: "skillDistressTolerance", label: "Distress Tolerance" },
   { key: "skillEmotionRegulation", label: "Emotion Regulation" },
-  { key: "skillInterpersonal", label: "Interpersonal" },
+  { key: "skillInterpersonal", label: "Interpersonal Effectiveness" },
 ];
 
 interface WeekStats {

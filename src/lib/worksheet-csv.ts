@@ -47,7 +47,7 @@ function diaryCardsToCSV(entries: WorksheetEntry[]): string {
     "Skill: Mindfulness",
     "Skill: Distress Tolerance",
     "Skill: Emotion Regulation",
-    "Skill: Interpersonal",
+    "Skill: Interpersonal Effectiveness",
     "Notes",
   ];
 

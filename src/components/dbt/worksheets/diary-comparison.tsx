@@ -327,7 +327,7 @@ function ComparisonTable({
                 { key: "skillMindfulness", label: "Mindfulness" },
                 { key: "skillDistressTolerance", label: "Distress Tolerance" },
                 { key: "skillEmotionRegulation", label: "Emotion Regulation" },
-                { key: "skillInterpersonal", label: "Interpersonal" },
+                { key: "skillInterpersonal", label: "Interpersonal Effectiveness" },
               ].map((sk) => {
                 const leftCount = leftStats.days.filter((d) => d?.[sk.key]).length;
                 const rightCount = rightStats.days.filter((d) => d?.[sk.key]).length;
