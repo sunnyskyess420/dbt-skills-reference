@@ -1,6 +1,6 @@
 # DBT Skills Reference
 
-A comprehensive DBT (Dialectical Behavior Therapy) skills reference app with **27 interactive fillable worksheets**, **progress dashboard**, **crisis resources**, **therapy session prep**, and **PWA install** — built for use during virtual group therapy sessions.
+A comprehensive DBT (Dialectical Behavior Therapy) skills reference app with **52 interactive fillable worksheets**, **progress dashboard**, **crisis resources**, **therapy session prep**, and **PWA install** — built for use during virtual group therapy sessions.
 
 **Live demo:** Deploy your own for free on Vercel (see below).
 
@@ -65,7 +65,7 @@ A comprehensive DBT (Dialectical Behavior Therapy) skills reference app with **2
 - **Recently viewed** — quick access to last 5 skills
 - Each skill card includes: one-liner, full description, when to use, numbered steps, examples, tips & common pitfalls, tags, and **book cross-reference** (e.g., "Distress Tolerance Handout 6 / Worksheets 4, 4a, 4b")
 
-### 📝 27 Interactive Worksheets
+### 📝 52 Interactive Worksheets
 
 All worksheets **autosave to your browser** (localStorage) — no login, no server. Each has **PDF export**, **print support**, **pin/unpin**, and **sort** (Recent, Created, Type, Name A-Z).
 
@@ -280,10 +280,10 @@ src/
 │   ├── use-worksheets.ts       # Worksheet CRUD hook
 │   └── use-platform.ts         # Mac/Windows detection
 └── lib/
-    ├── worksheet-storage.ts    # Worksheet types, schemas, localStorage CRUD (27 types)
+    ├── worksheet-storage.ts    # Worksheet types, schemas, localStorage CRUD (52 types)
     ├── worksheet-export.ts     # JSON backup/restore
     ├── worksheet-csv.ts        # CSV export (diary cards + worksheet summaries)
-    ├── worksheet-pdf.ts        # PDF generation (all 27 types + comparison)
+    ├── worksheet-pdf.ts        # PDF generation (all 52 types + comparison)
     ├── diary-suggestions.ts    # Skill suggestions engine
     ├── backup-reminder.ts      # Auto-backup reminder logic
     ├── settings.ts             # App settings storage
