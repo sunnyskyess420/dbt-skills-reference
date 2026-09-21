@@ -4,6 +4,20 @@ Three user-friendliness upgrades for the DBT virtual therapy group context.
 **No DBT content, worksheet fields, or skill text was changed** — these are
 navigation and flow changes only.
 
+## 0. Search by page number (latest)
+
+The search palette now accepts a **printed book page number**. Type `174` and it
+lists everything on page 174 (DEAR MAN, FAST, GIVE, and the DEAR MAN Script
+worksheet); press Enter to open the first hit. Also accepts `p. 174`,
+`pp. 20-21`, and handout/worksheet references like `worksheet 9a` / `handout 5`,
+and adds a browsable **Book pages** tab (104 entries, pp. 6–397). Unindexed
+pages fall back to the nearest indexed pages instead of a dead end.
+
+**New:** `src/lib/page-index.ts` (index + query parsing), `docs/verification/verify-page-index.ts`,
+`docs/verification/verify-worksheet-store.ts`, `docs/page-number-search.md`.
+**Changed:** `src/components/dbt/search-palette.tsx`, `src/components/dbt/help-dialog.tsx`,
+`tsconfig.json`. No DBT content changed.
+
 ## 1. Guest-first first-run experience
 
 **Problem:** New members were greeted with a sign-in dialog that led with

@@ -32,6 +32,16 @@ const SHORTCUT_GROUPS: { title: string; shortcuts: Shortcut[] }[] = [
         icon: Search,
       },
       {
+        keys: ["174"],
+        description: "Type a page number in the palette to jump to that printed book page",
+        icon: Search,
+      },
+      {
+        keys: ["worksheet", "9a"],
+        description: "Type a handout/worksheet number to find its book page",
+        icon: Search,
+      },
+      {
         keys: ["/"],
         description: "Open search (alternative shortcut)",
         icon: Search,
