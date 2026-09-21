@@ -17,7 +17,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowRight, TrendingUp, TrendingDown, Minus, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { exportComparisonToPdf } from "@/lib/worksheet-pdf";
 
 interface Props {
   open: boolean;
@@ -131,7 +130,11 @@ export function DiaryComparison({ open, onOpenChange, diaryCards }: Props) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => exportComparisonToPdf(left, right)}
+                onClick={async () => {
+                  // Loaded on demand so the PDF library stays out of the initial bundle.
+                  const { exportComparisonToPdf } = await import("@/lib/worksheet-pdf");
+                  exportComparisonToPdf(left, right);
+                }}
                 className="shrink-0"
               >
                 <FileDown className="h-3.5 w-3.5 mr-1" />

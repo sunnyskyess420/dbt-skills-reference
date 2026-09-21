@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Bookmark, ChevronRight, ChevronDown, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy, Target, X } from "lucide-react";
 import { UserMenu } from "@/components/dbt/user-menu";
 import type { SyncState } from "@/lib/sync";
+import Link from "next/link";
 
 interface SidebarProps {
   selectedModule: Module | "all" | "bookmarks" | "worksheets" | "goals" | "dashboard" | "session-prep" | "crisis";
@@ -227,8 +228,13 @@ export function Sidebar({
         )}
         <UserMenu onOpenAuth={onOpenAuth} sync={sync} onSyncNow={onSyncNow} />
         <p className="px-1 text-[11px] text-muted-foreground">
-          Based on{" "}
-          <span className="italic">Linehan (2014)</span>
+          Based on <span className="italic">Linehan (2014)</span> ·{" "}
+          <Link
+            href="/about"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            About &amp; sources
+          </Link>
         </p>
       </div>
     </nav>

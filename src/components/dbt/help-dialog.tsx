@@ -9,6 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Keyboard, Search, FileText, Settings, Moon, Bookmark } from "lucide-react";
+import Link from "next/link";
 import { InstallAppButton } from "@/components/dbt/install-button";
 
 interface Props {
@@ -156,6 +157,15 @@ export function HelpDialog({ open, onOpenChange }: Props) {
           <p>
             <strong>Tip:</strong> Press <kbd className="font-mono bg-muted px-1 rounded">?</kbd> from
             anywhere in the app to reopen this dialog.
+          </p>
+          <p>
+            <Link
+              href="/about"
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              About &amp; sources
+            </Link>{" "}
+            — where the content comes from, and what this tool is not.
           </p>
           <div className="flex items-start gap-2">
             <div className="flex-1">

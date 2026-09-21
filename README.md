@@ -344,3 +344,7 @@ node scripts/generate-pwa-icons.mjs
 MIT — see [LICENSE](LICENSE).
 
 The DBT skills content in `src/data/skills.ts` is paraphrased from copyrighted material (Guilford Press, 2014) for educational reference. Do not redistribute the content commercially.
+
+**Attribution and non-affiliation.** This is an independent, unaffiliated project: it is not produced, sponsored, reviewed, or endorsed by Marsha M. Linehan, Behavioral Tech, or Guilford Press. Handout/worksheet numbers and printed page numbers are pointers into *DBT Skills Training Handouts and Worksheets, Second Edition* (Guilford Press, 2014); the verbatim text of the handouts and worksheets is not reproduced. See [NOTICE.md](NOTICE.md) for the full provenance statement and the in-app **About & sources** page (`/about`). It is an educational tool, not medical advice.
+
+**Removal requests.** If you hold rights in any referenced material, open an issue at <https://github.com/sunnyskyess420/dbt-skills-reference/issues> and it will be reviewed and corrected or removed promptly.

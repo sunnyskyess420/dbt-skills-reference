@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ClipboardList, Printer, FileDown, CheckCircle2 } from "lucide-react";
-import { exportToPdf } from "@/lib/worksheet-pdf";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 

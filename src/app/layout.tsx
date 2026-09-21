@@ -36,6 +36,7 @@ const sourceSans = Source_Sans_3({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://dbt-skills-reference.vercel.app"),
   title: "DBT Skills Reference",
   description:
     "Fast, search-first DBT skills reference for use during virtual group therapy. Covers all five DBT modules: General, Mindfulness, Interpersonal Effectiveness, Emotion Regulation, Distress Tolerance.",
@@ -70,11 +71,22 @@ export const metadata: Metadata = {
     title: "DBT Skills Reference",
     description: "Fast, search-first DBT skills reference for virtual group therapy.",
     type: "website",
+    url: "/",
+    siteName: "DBT Skills Reference",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "DBT Skills Reference — a searchable DBT skills library: 53 skills, 52 fillable worksheets, 5 modules",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "DBT Skills Reference",
     description: "Fast, search-first DBT skills reference for virtual group therapy.",
+    images: ["/og-image.png"],
   },
 };
 
@@ -123,6 +135,13 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${poppins.variable} ${lora.variable} ${nunito.variable} ${sourceSans.variable} font-sans antialiased bg-background text-foreground`}
       >
+        {/* Skip link: keyboard users can jump past the header/nav straight to the page content. */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:border focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring"
+        >
+          Skip to content
+        </a>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

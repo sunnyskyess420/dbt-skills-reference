@@ -48,7 +48,6 @@ const DiaryCardSummary = dynamic(
   () => import("./diary-card-summary").then((m) => m.DiaryCardSummary),
   { loading: WorksheetFormLoading, ssr: false }
 );
-import { exportToPdf } from "@/lib/worksheet-pdf";
 import {
   Tooltip,
   TooltipContent,
@@ -208,7 +207,11 @@ export function WorksheetDetail({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => exportToPdf(entry)}
+                    onClick={async () => {
+                  // Loaded on demand so the PDF library stays out of the initial bundle.
+                  const { exportToPdf } = await import("@/lib/worksheet-pdf");
+                  exportToPdf(entry);
+                }}
                     aria-label="Export as PDF"
                   >
                     <FileDown className="h-4 w-4" />

@@ -688,7 +688,7 @@ export default function Home() {
         )}
 
         {/* Right pane */}
-        <main className="flex-1 min-w-0 overflow-y-auto">
+        <main id="main-content" className="flex-1 min-w-0 overflow-y-auto">
           {selectedWorksheet ? (
             <WorksheetDetail
               entry={selectedWorksheet}

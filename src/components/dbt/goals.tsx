@@ -36,7 +36,6 @@ import {
   recordGoalTombstones,
   MAX_GOALS,
 } from "@/lib/goals-storage";
-import { exportGoalToPdf, exportAllGoalsToPdf } from "@/lib/goals-pdf";
 import {
   downloadGoalsJsonBackup,
   importGoalsFromJson,
@@ -217,15 +216,18 @@ export function Goals({ onViewSkill }: Props) {
     window.print();
   };
 
-  const handleExportAllPdf = () => {
+  const handleExportAllPdf = async () => {
     const usable = goals.filter(
       (g) => g.title.trim() || g.description.trim() || g.steps.length > 0
     );
     if (usable.length === 0) return;
+    // Loaded on demand so the (large) PDF library stays out of the initial bundle.
+    const { exportAllGoalsToPdf } = await import("@/lib/goals-pdf");
     exportAllGoalsToPdf(usable);
   };
 
-  const handleExportGoalPdf = (goal: Goal) => {
+  const handleExportGoalPdf = async (goal: Goal) => {
+    const { exportGoalToPdf } = await import("@/lib/goals-pdf");
     exportGoalToPdf(goal);
   };
 
