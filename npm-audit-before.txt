@@ -1,0 +1,41 @@
+# npm audit report
+
+@babel/core  <=7.29.0
+@babel/core: Arbitrary File Read via sourceMappingURL Comment - https://github.com/advisories/GHSA-4x5r-pxfx-6jf8
+fix available via `npm audit fix`
+node_modules/@babel/core
+
+@humanfs/node  <0.16.8
+Severity: moderate
+humanfs: Recursive copy follows symlinked files and copies data from outside the source tree - https://github.com/advisories/GHSA-p498-v437-472g
+fix available via `npm audit fix`
+node_modules/@humanfs/node
+
+ajv  <6.14.0
+Severity: moderate
+ajv has ReDoS when using `$data` option - https://github.com/advisories/GHSA-2g4f-4pwh-qvx6
+fix available via `npm audit fix`
+node_modules/ajv
+
+baseline-browser-mapping  >=2.0.0 <2.11.0
+Severity: moderate
+baseline-browser-mapping process termination on invalid input causes denial of service - https://github.com/advisories/GHSA-w5vr-8v7q-w6rv
+fix available via `npm audit fix`
+node_modules/baseline-browser-mapping
+
+brace-expansion  <=1.1.20 || 2.0.0 - 2.1.6
+Severity: high
+brace-expansion: Zero-step sequence causes process hang and memory exhaustion - https://github.com/advisories/GHSA-f886-m6hf-6m8v
+brace-expansion: Zero-step sequence causes process hang and memory exhaustion - https://github.com/advisories/GHSA-f886-m6hf-6m8v
+brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups - https://github.com/advisories/GHSA-3jxr-9vmj-r5cp
+brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups - https://github.com/advisories/GHSA-3jxr-9vmj-r5cp
+brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash - https://github.com/advisories/GHSA-mh99-v99m-4gvg
+brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash - https://github.com/advisories/GHSA-mh99-v99m-4gvg
+brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation - https://github.com/advisories/GHSA-rgw5-rvv9-x895
+brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation - https://github.com/advisories/GHSA-rgw5-rvv9-x895
+fix available via `npm audit fix`
+node_modules/brace-expansion
+
+... (full output in shell output)
+
+33 vulnerabilities (2 low, 9 moderate, 19 high, 3 critical)
