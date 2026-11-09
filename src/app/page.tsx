@@ -42,6 +42,16 @@ const GUEST_NUDGE_DISMISSED_KEY = "dbt-skills:sync-nudge-dismissed";
 
 type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "goals" | "smart-goals" | "cheat-sheet" | "dashboard" | "session-prep" | "crisis";
 
+// Labels for the "back to …" control on a skill opened from a section.
+const SKILL_RETURN_LABELS: Partial<Record<ViewMode, string>> = {
+  goals: "My Goals",
+  "smart-goals": "SMART Goals",
+  "cheat-sheet": "Cheat Sheet",
+  dashboard: "Dashboard",
+  "session-prep": "Session Prep",
+  crisis: "Crisis Resources",
+};
+
 export default function Home() {
   const [selectedModule, setSelectedModule] = React.useState<ViewMode>("all");
   const [selectedSkill, setSelectedSkill] = React.useState<Skill | null>(null);
@@ -91,6 +101,11 @@ export default function Home() {
       window.removeEventListener("dbt-sync-restored", refresh);
     };
   }, []);
+
+  // Where a skill page should return when the user came from a full-width
+  // section (My Goals, SMART Goals, cheat sheet). Without this, Back only
+  // cleared the skill and dropped the user into that skill's module list.
+  const [skillReturnView, setSkillReturnView] = React.useState<ViewMode | null>(null);
 
   // Auth + sync wiring.
   // `status` flips to "authenticated" once NextAuth resolves the JWT cookie.
@@ -231,6 +246,8 @@ export default function Home() {
   const handleSelectSkill = React.useCallback((skill: Skill) => {
     setSelectedSkill(skill);
     setSelectedWorksheetId(null); // skills and worksheets are mutually exclusive
+    // Opening a skill from a list is a fresh navigation — drop any return view.
+    setSkillReturnView(null);
     setRecent((prev) => {
       const next = [skill.id, ...prev.filter((id) => id !== skill.id)].slice(0, 10);
       try {
@@ -316,20 +333,27 @@ export default function Home() {
     [handleSelectSkill]
   );
 
-  // View a skill from the My Goals section — switches to that skill's module
+  // View a skill from a full-width section (My Goals / SMART Goals / cheat
+  // sheet). Remembers the section so Back can return there — otherwise the
+  // section was only reachable again from the sidebar.
   const handleViewSkillFromGoal = React.useCallback(
     (skillId: string) => {
       const skill = SKILLS.find((s) => s.id === skillId);
       if (!skill) return;
+      const origin = selectedModule;
       setSelectedModule(skill.module);
-      handleSelectSkill(skill);
+      handleSelectSkill(skill); // clears the return view…
+      if (origin !== "all") { // …so set it after
+        setSkillReturnView(origin);
+      }
     },
-    [handleSelectSkill]
+    [handleSelectSkill, selectedModule]
   );
 
   // When selecting a non-worksheets mode, clear worksheet selection
   const handleSelectModule = React.useCallback((m: ViewMode) => {
     setSelectedModule(m);
+    setSkillReturnView(null);
     if (m === "worksheets") {
       setSelectedSkill(null);
     } else {
@@ -508,6 +532,14 @@ export default function Home() {
       history.replaceState({ type: "module", module: "all" }, "", window.location.pathname);
     }
   }, [selectedModule, selectedSkill, selectedWorksheetId]);
+
+  // Leave a skill page and, when it was opened from a section, go back there.
+  const handleBackFromSkill = React.useCallback(() => {
+    const target = skillReturnView;
+    setSelectedSkill(null);
+    setSkillReturnView(null);
+    if (target) setSelectedModule(target);
+  }, [skillReturnView]);
 
   const isWorksheetsMode = selectedModule === "worksheets";
 
@@ -745,7 +777,8 @@ export default function Home() {
           ) : selectedSkill ? (
             <SkillDetail
               skill={selectedSkill}
-              onBack={() => setSelectedSkill(null)}
+              onBack={handleBackFromSkill}
+              backLabel={skillReturnView ? SKILL_RETURN_LABELS[skillReturnView] : undefined}
               isBookmarked={bookmarks.has(selectedSkill.id)}
               onToggleBookmark={toggleBookmark}
               onSelectSkill={handleSelectSkill}

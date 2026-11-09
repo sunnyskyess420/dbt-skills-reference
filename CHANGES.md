@@ -4,7 +4,18 @@ Three user-friendliness upgrades for the DBT virtual therapy group context.
 **No DBT content, worksheet fields, or skill text was changed** — these are
 navigation and flow changes only.
 
-## Cheat Sheet view (latest)
+## Skill pages return to where you came from
+
+Opening a skill from My Goals, SMART Goals or the Cheat Sheet used to strand
+the user in that skill's module list: the back control only cleared the skill,
+and it was hidden entirely on desktop widths. Back now names its destination
+("Back to SMART Goals") on every screen size and returns to the section you
+opened the skill from.
+
+**Changed:** `src/app/page.tsx` (return-view state), `src/components/dbt/skill-detail.tsx`
+(optional `backLabel`). No DBT content changed.
+
+## Cheat Sheet view
 
 A single dense page with the whole toolkit — `?v=cheat-sheet`, reachable from
 the sidebar and from a top-bar button on any screen. Sections: Wise Mind

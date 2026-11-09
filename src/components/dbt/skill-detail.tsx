@@ -16,6 +16,8 @@ const READER_SCALES: number[] = [1, 1.12, 1.25];
 interface SkillDetailProps {
   skill: Skill | null;
   onBack?: () => void;
+  /** When set, the back control is always visible and names its destination. */
+  backLabel?: string;
   isBookmarked: boolean;
   onToggleBookmark: (skillId: string) => void;
   onSelectSkill: (skill: Skill) => void;
@@ -29,6 +31,7 @@ interface SkillDetailProps {
 export function SkillDetail({
   skill,
   onBack,
+  backLabel,
   isBookmarked,
   onToggleBookmark,
   onSelectSkill,
@@ -96,10 +99,14 @@ export function SkillDetail({
                 variant="ghost"
                 size="sm"
                 onClick={onBack}
-                className="lg:hidden shrink-0"
-                aria-label="Back to list"
+                className={cn("shrink-0", backLabel ? "h-7 px-2" : "lg:hidden")}
+                aria-label={backLabel ? `Back to ${backLabel}` : "Back to list"}
+                title={backLabel ? `Back to ${backLabel}` : undefined}
               >
                 <ArrowLeft className="h-4 w-4" />
+                {backLabel && (
+                  <span className="ml-1 text-xs font-medium">{backLabel}</span>
+                )}
               </Button>
             )}
             <span className={cn("text-xs font-semibold uppercase tracking-wider", moduleInfo.color)}>
