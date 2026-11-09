@@ -4,7 +4,38 @@ Three user-friendliness upgrades for the DBT virtual therapy group context.
 **No DBT content, worksheet fields, or skill text was changed** — these are
 navigation and flow changes only.
 
-## 0. Search by page number (latest)
+## Cheat Sheet view (latest)
+
+A single dense page with the whole toolkit — `?v=cheat-sheet`, reachable from
+the sidebar and from a top-bar button on any screen. Sections: Wise Mind
+figure, Mindfulness (WHAT/HOW), Emotion Regulation, Distress Tolerance,
+Interpersonal Effectiveness. Every row is derived from the existing skill
+entries (trimmed to the letter/keyword plus its first clause); tapping a block
+opens the full skill. A "One-liners" switch adds the short description to each
+block. No new DBT text and no third-party handout is bundled — see
+`docs/cheat-sheet.md`.
+
+**New:** `src/lib/cheat-sheet.ts`, `src/components/dbt/cheat-sheet.tsx`,
+`docs/cheat-sheet.md`.
+**Changed:** `src/app/page.tsx` (view mode, top-bar button, render branch),
+`src/components/dbt/sidebar.tsx` (nav entry). No DBT content changed.
+
+## SMART Goals section
+
+A separate **SMART Goals** section (`?v=smart-goals`, sidebar entry beside My
+Goals) for goals written so they can be worked and reviewed: specific,
+measurable, achievable, relevant and time-bound — plus a plan of small steps,
+dated check-ins, and a completed archive that keeps the record. My Goals is
+untouched; the two sections store and export separately.
+
+**New:** `src/lib/smart-goals-storage.ts`, `src/lib/smart-goals-export.ts`,
+`src/lib/smart-goals-pdf.ts`, `src/components/dbt/smart-goals.tsx`,
+`docs/smart-goals.md`.
+**Changed:** `src/app/page.tsx` (view mode, sidebar badge, render branch),
+`src/components/dbt/sidebar.tsx`, `src/lib/sync.ts` (per-goal merge plus
+tombstones for the new key). No DBT content changed.
+
+## 0. Search by page number
 
 The search palette now accepts a **printed book page number**. Type `174` and it
 lists everything on page 174 (DEAR MAN, FAST, GIVE, and the DEAR MAN Script

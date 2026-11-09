@@ -18,6 +18,11 @@ import {
   GOALS_TOMBSTONES_KEY,
   type GoalTombstone,
 } from "./goals-storage";
+import {
+  SMART_GOALS_STORAGE_KEY,
+  SMART_GOALS_TOMBSTONES_KEY,
+  type SmartGoalTombstone,
+} from "./smart-goals-storage";
 
 // All client-side localStorage keys for the DBT app start with this prefix.
 // We sync any key that matches, which keeps the sync logic future-proof as
@@ -142,6 +147,21 @@ export function mergePayloads(
   }
   const goalTombstoneIds = new Set(goalTombstoneTs.keys());
 
+  // Same again for the SMART-goals tombstone set.
+  const smartGoalTombstoneTs = new Map<string, number>();
+  for (const side of [local, server]) {
+    const arr = side[SMART_GOALS_TOMBSTONES_KEY];
+    if (!Array.isArray(arr)) continue;
+    for (const t of arr as SmartGoalTombstone[]) {
+      if (!t || typeof t.id !== "string") continue;
+      const ts = new Date(t.deletedAt ?? 0).getTime();
+      if (Number.isNaN(ts)) continue;
+      const prev = smartGoalTombstoneTs.get(t.id) ?? 0;
+      if (ts > prev) smartGoalTombstoneTs.set(t.id, ts);
+    }
+  }
+  const smartGoalTombstoneIds = new Set(smartGoalTombstoneTs.keys());
+
   // Step 2: standard per-key merge.
   const merged: Record<string, unknown> = { ...local };
 
@@ -162,6 +182,15 @@ export function mergePayloads(
     );
   } else {
     delete merged[GOALS_TOMBSTONES_KEY];
+  }
+
+  // Same for SMART-goal tombstones.
+  if (smartGoalTombstoneTs.size > 0) {
+    merged[SMART_GOALS_TOMBSTONES_KEY] = Array.from(smartGoalTombstoneTs.entries()).map(
+      ([id, ts]) => ({ id, deletedAt: new Date(ts).toISOString() })
+    );
+  } else {
+    delete merged[SMART_GOALS_TOMBSTONES_KEY];
   }
 
   for (const [key, serverValue] of Object.entries(server)) {
@@ -189,6 +218,14 @@ export function mergePayloads(
       merged[key] = mergeGoalsPayload(local[key], serverValue, goalTombstoneIds);
       continue;
     }
+    // SMART goals: same per-goal newest-updatedAt-wins merge. Without this
+    // they would fall into the "server wins" bucket below and a stale
+    // server copy would wipe edits made on this device (the exact bug
+    // documented above for My Goals).
+    if (key === SMART_GOALS_STORAGE_KEY) {
+      merged[key] = mergeGoalsPayload(local[key], serverValue, smartGoalTombstoneIds);
+      continue;
+    }
     // For everything else (bookmarks, recent, settings, ...), server wins.
     merged[key] = serverValue;
   }
@@ -209,6 +246,15 @@ export function mergePayloads(
   const goalsVal = merged["dbt-skills:goals"];
   if (goalsVal && goalTombstoneIds.size > 0) {
     merged["dbt-skills:goals"] = applyGoalTombstones(goalsVal, goalTombstoneIds);
+  }
+
+  // Same defensive sweep for SMART goals.
+  const smartGoalsVal = merged[SMART_GOALS_STORAGE_KEY];
+  if (smartGoalsVal && smartGoalTombstoneIds.size > 0) {
+    merged[SMART_GOALS_STORAGE_KEY] = applyGoalTombstones(
+      smartGoalsVal,
+      smartGoalTombstoneIds
+    );
   }
 
   return merged;

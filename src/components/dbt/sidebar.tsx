@@ -4,14 +4,14 @@ import * as React from "react";
 import { MODULES, SKILLS, type Module, type Skill } from "@/data/skills";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Bookmark, ChevronRight, ChevronDown, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy, Target, X } from "lucide-react";
+import { Bookmark, ChevronRight, ChevronDown, Brain, Heart, Users, Flame, BookOpen, FileText, BarChart3, ClipboardList, LifeBuoy, Target, Crosshair, LayoutGrid, X } from "lucide-react";
 import { UserMenu } from "@/components/dbt/user-menu";
 import type { SyncState } from "@/lib/sync";
 import Link from "next/link";
 
 interface SidebarProps {
-  selectedModule: Module | "all" | "bookmarks" | "worksheets" | "goals" | "dashboard" | "session-prep" | "crisis";
-  onSelectModule: (m: Module | "all" | "bookmarks" | "worksheets" | "goals" | "dashboard" | "session-prep" | "crisis") => void;
+  selectedModule: Module | "all" | "bookmarks" | "worksheets" | "goals" | "smart-goals" | "cheat-sheet" | "dashboard" | "session-prep" | "crisis";
+  onSelectModule: (m: Module | "all" | "bookmarks" | "worksheets" | "goals" | "smart-goals" | "cheat-sheet" | "dashboard" | "session-prep" | "crisis") => void;
   selectedSkillId: string | null;
   onSelectSkill: (skill: Skill) => void;
   bookmarks: Set<string>;
@@ -19,6 +19,8 @@ interface SidebarProps {
   /** Number of goals with actual content (title, description, or steps).
    *  Empty slots don't count — only goals the user has actually filled in. */
   goalCount: number;
+  /** Goals still in progress in the SMART Goals section (completed ones are archived). */
+  smartGoalCount: number;
   // Auth/sync wiring
   onOpenAuth: () => void;
   sync: SyncState;
@@ -46,6 +48,7 @@ export function Sidebar({
   bookmarks,
   worksheetCount,
   goalCount,
+  smartGoalCount,
   onOpenAuth,
   sync,
   onSyncNow,
@@ -180,6 +183,20 @@ export function Sidebar({
             label="My Goals"
             count={goalCount}
             highlight={goalCount > 0}
+          />
+          <NavButton
+            active={selectedModule === "smart-goals"}
+            onClick={() => onSelectModule("smart-goals")}
+            icon={<Crosshair className="h-4 w-4" />}
+            label="SMART Goals"
+            count={smartGoalCount}
+            highlight={smartGoalCount > 0}
+          />
+          <NavButton
+            active={selectedModule === "cheat-sheet"}
+            onClick={() => onSelectModule("cheat-sheet")}
+            icon={<LayoutGrid className="h-4 w-4" />}
+            label="Cheat Sheet"
           />
           <NavButton
             active={selectedModule === "dashboard"}

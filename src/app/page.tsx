@@ -17,6 +17,8 @@ import { KbdShortcut } from "@/components/dbt/kbd-shortcut";
 import { ProgressDashboard } from "@/components/dbt/progress-dashboard";
 import { SessionPrep } from "@/components/dbt/session-prep";
 import { Goals } from "@/components/dbt/goals";
+import { SmartGoals } from "@/components/dbt/smart-goals";
+import { CheatSheet } from "@/components/dbt/cheat-sheet";
 import { SkillOfDay } from "@/components/dbt/skill-of-day";
 import { CrisisResources } from "@/components/dbt/crisis-resources";
 import { AuthDialog } from "@/components/dbt/auth-dialog";
@@ -25,8 +27,12 @@ import { useWorksheets } from "@/hooks/use-worksheets";
 import { useSync, useAutoPush } from "@/lib/sync";
 import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta, getWorksheetForSkill } from "@/lib/worksheet-storage";
 import { getFilledGoalCount, GOALS_CHANGED_EVENT } from "@/lib/goals-storage";
+import {
+  getActiveSmartGoalCount,
+  SMART_GOALS_CHANGED_EVENT,
+} from "@/lib/smart-goals-storage";
 import { Button } from "@/components/ui/button";
-import { Search, Menu, X, FileText, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight, LifeBuoy } from "lucide-react";
+import { Search, Menu, X, FileText, LayoutGrid, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight, LifeBuoy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
@@ -34,7 +40,7 @@ const STORAGE_KEY_RECENT = "dbt-skills:recent";
 // One-time dismissal flag for the guest "sign in to back up" nudge.
 const GUEST_NUDGE_DISMISSED_KEY = "dbt-skills:sync-nudge-dismissed";
 
-type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "goals" | "dashboard" | "session-prep" | "crisis";
+type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "goals" | "smart-goals" | "cheat-sheet" | "dashboard" | "session-prep" | "crisis";
 
 export default function Home() {
   const [selectedModule, setSelectedModule] = React.useState<ViewMode>("all");
@@ -65,6 +71,22 @@ export default function Home() {
     window.addEventListener("dbt-sync-restored", refresh);
     return () => {
       window.removeEventListener(GOALS_CHANGED_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("dbt-sync-restored", refresh);
+    };
+  }, []);
+
+  // SMART-goal badge — same live-update pattern as the My Goals counter, but
+  // it only counts goals still in progress (completed ones live in the record).
+  const [smartGoalCount, setSmartGoalCount] = React.useState(0);
+  React.useEffect(() => {
+    const refresh = () => setSmartGoalCount(getActiveSmartGoalCount());
+    refresh();
+    window.addEventListener(SMART_GOALS_CHANGED_EVENT, refresh);
+    window.addEventListener("storage", refresh);
+    window.addEventListener("dbt-sync-restored", refresh);
+    return () => {
+      window.removeEventListener(SMART_GOALS_CHANGED_EVENT, refresh);
       window.removeEventListener("storage", refresh);
       window.removeEventListener("dbt-sync-restored", refresh);
     };
@@ -445,6 +467,8 @@ export default function Home() {
       "bookmarks",
       "worksheets",
       "goals",
+      "smart-goals",
+      "cheat-sheet",
       "dashboard",
       "session-prep",
       "crisis",
@@ -510,6 +534,10 @@ export default function Home() {
                   "Worksheets"
                 ) : selectedModule === "goals" ? (
                   "My Goals"
+                ) : selectedModule === "smart-goals" ? (
+                  "SMART Goals"
+                ) : selectedModule === "cheat-sheet" ? (
+                  "Cheat Sheet"
                 ) : selectedModule === "dashboard" ? (
                   "Dashboard"
                 ) : selectedModule === "session-prep" ? (
@@ -546,6 +574,17 @@ export default function Home() {
               title="Crisis Resources"
             >
               <LifeBuoy className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleSelectModule("cheat-sheet")}
+              className="hidden sm:flex"
+              title="DBT cheat sheet"
+              aria-label="Open the DBT cheat sheet"
+            >
+              <LayoutGrid className="h-4 w-4 md:mr-1.5" />
+              <span className="hidden md:inline">Cheat sheet</span>
             </Button>
             <Button
               variant="ghost"
@@ -601,6 +640,7 @@ export default function Home() {
             bookmarks={bookmarks}
             worksheetCount={worksheetEntries.length}
             goalCount={goalCount}
+            smartGoalCount={smartGoalCount}
             onOpenAuth={() => setAuthOpen(true)}
             sync={syncState}
             onSyncNow={() => void syncNow()}
@@ -641,6 +681,7 @@ export default function Home() {
                 bookmarks={bookmarks}
                 worksheetCount={worksheetEntries.length}
                 goalCount={goalCount}
+                smartGoalCount={smartGoalCount}
                 onOpenAuth={() => {
                   setSidebarOpen(false);
                   setAuthOpen(true);
@@ -656,7 +697,7 @@ export default function Home() {
         )}
 
         {/* Middle pane — hidden for full-width views (goals, dashboard, session-prep, crisis) */}
-        {(selectedModule !== "goals" && selectedModule !== "dashboard" && selectedModule !== "session-prep" && selectedModule !== "crisis") && (
+        {(selectedModule !== "goals" && selectedModule !== "smart-goals" && selectedModule !== "cheat-sheet" && selectedModule !== "dashboard" && selectedModule !== "session-prep" && selectedModule !== "crisis") && (
         <section
           className={cn(
             "shrink-0 border-r w-full sm:w-80 lg:w-80 xl:w-96 print:hidden",
@@ -722,6 +763,10 @@ export default function Home() {
             <WorksheetsEmptyState onCreate={handleCreateWorksheet} />
           ) : selectedModule === "goals" ? (
             <Goals onViewSkill={handleViewSkillFromGoal} />
+          ) : selectedModule === "smart-goals" ? (
+            <SmartGoals onViewSkill={handleViewSkillFromGoal} />
+          ) : selectedModule === "cheat-sheet" ? (
+            <CheatSheet onViewSkill={handleViewSkillFromGoal} />
           ) : selectedModule === "dashboard" ? (
             <ProgressDashboard
               entries={worksheetEntries}
