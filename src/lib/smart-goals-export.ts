@@ -97,7 +97,10 @@ export function importSmartGoalsFromJson(jsonString: string): SmartGoalsImportRe
     let skipped = 0;
 
     for (const raw of incoming) {
-      if (merged.length >= MAX_SMART_GOALS) {
+      // Only active goals occupy the limited slots — an imported archive
+      // should not be rejected because the completed list is long.
+      const activeCount = merged.filter((g) => g.status !== "done").length;
+      if (activeCount >= MAX_SMART_GOALS) {
         skipped++;
         continue;
       }

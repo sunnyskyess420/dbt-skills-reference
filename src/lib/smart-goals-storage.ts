@@ -272,7 +272,11 @@ export function loadSmartGoals(): SmartGoal[] | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { goals?: unknown };
     if (!parsed || !Array.isArray(parsed.goals)) return null;
-    return (parsed.goals as unknown[]).map(normalizeSmartGoal).slice(0, MAX_SMART_GOALS);
+    // Do NOT cap the list here. The cap is on *active* slots, and completed
+    // goals are kept as an archive that does not count against it — slicing
+    // on load silently dropped the archive, and the next save persisted the
+    // loss (5 active + 1 done → the done goal vanished on any edit).
+    return (parsed.goals as unknown[]).map(normalizeSmartGoal);
   } catch {
     return null;
   }
