@@ -3,7 +3,7 @@
 // This is intentionally simple — the app is fully client-side and works offline
 // once the assets are cached.
 
-const CACHE_NAME = "dbt-skills-v5";
+const CACHE_NAME = "dbt-skills-v6";
 const PRECACHE_URLS = [
   "/",
   "/manifest.json",
@@ -48,6 +48,12 @@ self.addEventListener("fetch", (event) => {
   // GETs were similarly frozen at whatever the first response was. API
   // responses must always come from the network.
   if (url.pathname.startsWith("/api/")) return;
+
+  // Build output must never be served from the SW cache. Next emits new chunks
+  // on every build (and stable-looking ones in dev), so cache-first here
+  // pinned stale JS: a feature would look missing until the cache was cleared
+  // by hand. Let the network (and the browser's HTTP cache) own these.
+  if (url.pathname.startsWith("/_next/")) return;
 
   // Navigation requests: network-first, fall back to cached root
   if (request.mode === "navigate") {

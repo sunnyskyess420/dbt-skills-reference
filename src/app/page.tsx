@@ -50,6 +50,7 @@ type ViewMode = Module | "all" | "bookmarks" | "worksheets" | "goals" | "smart-g
 
 // Labels for the "back to …" control on a skill opened from a section.
 const SKILL_RETURN_LABELS: Partial<Record<ViewMode, string>> = {
+  worksheets: "Worksheet",
   goals: "My Goals",
   "smart-goals": "SMART Goals",
   "cheat-sheet": "Cheat Sheet",
@@ -130,6 +131,10 @@ export default function Home() {
   // section (My Goals, SMART Goals, cheat sheet). Without this, Back only
   // cleared the skill and dropped the user into that skill's module list.
   const [skillReturnView, setSkillReturnView] = React.useState<ViewMode | null>(null);
+  // …and which worksheet, when the skill was opened from one.
+  const [skillReturnWorksheetId, setSkillReturnWorksheetId] = React.useState<
+    string | null
+  >(null);
 
   // Auth + sync wiring.
   // `status` flips to "authenticated" once NextAuth resolves the JWT cookie.
@@ -346,15 +351,22 @@ export default function Home() {
   );
 
   // View a skill from a worksheet page — switches out of worksheets mode
+  // Opening a skill from a worksheet remembers the worksheet, so Back
+  // returns to that filled-in sheet rather than the worksheets list.
   const handleViewSkillFromWorksheet = React.useCallback(
     (skillId: string) => {
       const skill = SKILLS.find((s) => s.id === skillId);
       if (!skill) return;
+      const originWorksheetId = selectedWorksheetId;
       setSelectedWorksheetId(null);
       setSelectedModule(skill.module);
-      handleSelectSkill(skill);
+      handleSelectSkill(skill); // clears the return view…
+      if (originWorksheetId) { // …so set it after
+        setSkillReturnView("worksheets");
+        setSkillReturnWorksheetId(originWorksheetId);
+      }
     },
-    [handleSelectSkill]
+    [handleSelectSkill, selectedWorksheetId]
   );
 
   // View a skill from a full-width section (My Goals / SMART Goals / cheat
@@ -378,6 +390,7 @@ export default function Home() {
   const handleSelectModule = React.useCallback((m: ViewMode) => {
     setSelectedModule(m);
     setSkillReturnView(null);
+    setSkillReturnWorksheetId(null);
     if (m === "worksheets") {
       setSelectedSkill(null);
     } else {
@@ -560,10 +573,27 @@ export default function Home() {
   // Leave a skill page and, when it was opened from a section, go back there.
   const handleBackFromSkill = React.useCallback(() => {
     const target = skillReturnView;
+    const backToWorksheet = skillReturnWorksheetId;
     setSelectedSkill(null);
     setSkillReturnView(null);
+    setSkillReturnWorksheetId(null);
+    if (target === "worksheets" && backToWorksheet) {
+      setSelectedModule("worksheets");
+      setSelectedWorksheetId(backToWorksheet);
+      return;
+    }
     if (target) setSelectedModule(target);
-  }, [skillReturnView]);
+  }, [skillReturnView, skillReturnWorksheetId]);
+
+  // Even a skill opened from a plain list gets a visible Back control
+  // (it used to be mobile-only); the label names where it returns to.
+  const skillBackLabel =
+    (skillReturnView ? SKILL_RETURN_LABELS[skillReturnView] : undefined) ??
+    (selectedModule === "all"
+      ? "All skills"
+      : selectedModule === "bookmarks"
+      ? "Bookmarks"
+      : MODULES.find((m) => m.id === selectedModule)?.short);
 
   const isWorksheetsMode = selectedModule === "worksheets";
 
@@ -810,7 +840,7 @@ export default function Home() {
             <SkillDetail
               skill={selectedSkill}
               onBack={handleBackFromSkill}
-              backLabel={skillReturnView ? SKILL_RETURN_LABELS[skillReturnView] : undefined}
+              backLabel={skillBackLabel}
               isBookmarked={bookmarks.has(selectedSkill.id)}
               onToggleBookmark={toggleBookmark}
               onSelectSkill={handleSelectSkill}

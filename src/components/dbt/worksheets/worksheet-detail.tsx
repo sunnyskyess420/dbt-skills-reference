@@ -146,10 +146,12 @@ export function WorksheetDetail({
               variant="ghost"
               size="sm"
               onClick={onBack}
-              className="lg:hidden shrink-0"
-              aria-label="Back to list"
+              className="h-7 px-2 shrink-0"
+              aria-label="Back to worksheets"
+              title="Back to worksheets"
             >
               <ArrowLeft className="h-4 w-4" />
+              <span className="ml-1 text-xs font-medium">Worksheets</span>
             </Button>
             <span className={cn("text-xs font-semibold uppercase tracking-wider", meta.color)}>
               {meta.shortName}

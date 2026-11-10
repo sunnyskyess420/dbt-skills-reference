@@ -67,7 +67,7 @@ export function SkillDetail({
                 variant="ghost"
                 size="sm"
                 onClick={onBack}
-                className={cn("shrink-0", backLabel ? "h-7 px-2" : "lg:hidden")}
+                className={cn("shrink-0", backLabel ? "h-7 px-2" : "h-7 w-7")}
                 aria-label={backLabel ? `Back to ${backLabel}` : "Back to list"}
                 title={backLabel ? `Back to ${backLabel}` : undefined}
               >
