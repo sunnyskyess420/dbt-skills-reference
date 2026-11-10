@@ -4,6 +4,21 @@ Three user-friendliness upgrades for the DBT virtual therapy group context.
 **No DBT content, worksheet fields, or skill text was changed** — these are
 navigation and flow changes only.
 
+## End-to-end sync test (SQLite)
+
+The last uncovered path — sign-in and cloud sync — now has a real test:
+
+1. `scripts/sync-e2e.mjs` builds a throwaway SQLite database from
+   `prisma/schema.test.prisma` (identical models; the payload is a `String`, so
+   nothing is Postgres-specific) and generates a SQLite Prisma client.
+2. `tests/sync-e2e.spec.ts` signs up through the real dialog, creates a SMART
+   goal, polls `GET /api/sync` until the server holds it, clears localStorage,
+   reloads, and asserts the goal comes back in both the UI and storage.
+3. The runner **always** re-generates the default Postgres client afterwards
+   and deletes the database, so the repo is never left on SQLite.
+
+`npm run test:sync`. Total suite: 13 fast + 52 forms + 1 sync.
+
 ## Smoke suite: forms, PDF/print, sync guard
 
 The suite grew from 8 to 65 checks:

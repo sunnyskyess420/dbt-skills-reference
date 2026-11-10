@@ -9,7 +9,8 @@ npx playwright install chromium   # first time only
 
 npm run test:smoke   # 13 tests, ~1 min  — views, navigation, persistence, PDF, print, sync guard
 npm run test:forms   # 52 tests, ~4 min  — every worksheet type
-npm run test:all     # everything
+npm run test:sync    # 1 test,  ~1 min  — real sign-up → push → wipe → pull (SQLite)
+npm run test:all     # everything except the SQLite sync test
 ```
 
 Each run starts its own dev server on port 3210 (`SMOKE_PORT` overrides it)
@@ -65,24 +66,29 @@ Every bug that reached a user in this round was a state bug, invisible to `tsc`:
 - The worksheet catalog is read from `src/lib/worksheet-storage.ts` at test
   time, so a new worksheet type is covered without touching the spec.
 
+## Signed-in sync, end to end
+
+`npm run test:sync` runs the only test that needs a database and a session:
+
+1. `scripts/sync-e2e.mjs` builds a throwaway SQLite database from
+   `prisma/schema.test.prisma` (same models, SQLite provider — the payload is a
+   plain `String`, so nothing is Postgres-specific).
+2. It generates a SQLite Prisma client, runs `tests/sync-e2e.spec.ts`, then
+   **always** re-generates the default Postgres client in a `finally` block and
+   deletes the database file.
+3. The test signs up through the real dialog, creates a SMART goal, polls
+   `GET /api/sync` until the server actually holds it, clears `localStorage`,
+   reloads, and asserts the goal comes back — first in the UI, then in storage.
+
+Why the client dance: Prisma generates a provider-specific client, so testing
+against SQLite needs its own generate pass. The restore step is what keeps the
+repo from being left pointed at SQLite.
+
 ## Known limits
 
-- **Signed-in sync is only covered at the boundary.** A real end-to-end sync
-  test needs a database and a session; see below.
+- `test:all` skips the sync test; run `test:sync` separately (it rewrites the
+  generated Prisma client while it runs, so it shouldn't run in parallel with
+  anything else).
 - Print assertions are structural (chrome hidden, content present), not visual.
 - Forms are checked for render + title persistence, not per-field behaviour —
   52 bespoke layouts would need per-form fixtures.
-
-## Adding end-to-end sync
-
-The app uses NextAuth credentials + Prisma. To test a real push/pull you need:
-
-1. a SQLite schema (`prisma/schema.test.prisma`, provider `sqlite`) and
-   `DATABASE_URL=file:./smoke.db`;
-2. `prisma db push` + `prisma generate --schema` against that file before the
-   run (this rewrites the generated client, so re-run the default generate
-   afterwards);
-3. a sign-up through the credentials provider, then create a goal, wait for the
-   debounced push, clear localStorage, reload, and assert the goal comes back.
-
-That is a separate project/script rather than part of the default suite.

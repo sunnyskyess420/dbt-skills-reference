@@ -1,0 +1,33 @@
+// SQLite copy of the Prisma schema, used only by the end-to-end sync test.
+//
+// The payload column is a plain String, so nothing here is Postgres-specific —
+// the models are identical. `scripts/sync-e2e.mjs` pushes this schema into a
+// throwaway prisma/smoke.db, generates a SQLite client, runs the test, then
+// re-generates the default (Postgres) client afterwards.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userData     UserData?
+}
+
+model UserData {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payload   String
+  updatedAt DateTime @updatedAt
+}

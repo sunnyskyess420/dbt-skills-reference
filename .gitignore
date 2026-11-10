@@ -81,3 +81,6 @@ public/*.zip
 /test-results/
 /playwright-report/
 /blob-report/
+
+# Sync e2e database
+/prisma/smoke.db*

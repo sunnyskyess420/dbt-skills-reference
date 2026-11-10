@@ -30,6 +30,7 @@ export default defineConfig({
     env: {
       // Dummy values: the smoke suite never signs in, but the auth/sync routes
       // import Prisma at module scope, so the build needs them present.
+      // `npm run test:sync` passes a file: URL to a throwaway SQLite db.
       DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://smoke:smoke@localhost:5432/smoke",
       NEXTAUTH_SECRET: "smoke-test-secret",
       NEXTAUTH_URL: `http://localhost:${PORT}`,
