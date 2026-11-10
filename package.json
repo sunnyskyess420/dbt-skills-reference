@@ -11,7 +11,9 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
-    "test:smoke": "playwright test"
+    "test:smoke": "playwright test --grep-invert @forms",
+    "test:forms": "playwright test --grep @forms",
+    "test:all": "playwright test"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

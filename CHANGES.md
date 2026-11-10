@@ -4,6 +4,23 @@ Three user-friendliness upgrades for the DBT virtual therapy group context.
 **No DBT content, worksheet fields, or skill text was changed** — these are
 navigation and flow changes only.
 
+## Smoke suite: forms, PDF/print, sync guard
+
+The suite grew from 8 to 65 checks:
+
+- **`npm run test:forms`** — one test per worksheet type (52). Each opens the
+  form through the real dropdown, fills the title, asserts no `pageerror`, and
+  reloads to prove it persisted. ~4 min.
+- **`tests/pdf-print.spec.ts`** — both PDF generators download a real `%PDF-`
+  file over 2 KB; print media hides the sidebar and action bar but keeps the
+  content.
+- **`tests/sync-guard.spec.ts`** — `GET`/`POST /api/sync` return 401 without a
+  session and echo no state; guest data stays local across a reload.
+
+`npm run test:smoke` stays fast (13 tests, ~1 min) by excluding `@forms`;
+`npm run test:all` runs everything. `docs/smoke-tests.md` documents the layout
+and the steps needed for a true end-to-end sync test.
+
 ## Smoke test suite
 
 `npm run test:smoke` runs a Playwright suite against a real browser: all eight
