@@ -8,6 +8,7 @@ import { SkillList } from "@/components/dbt/skill-list";
 import { SkillDetail } from "@/components/dbt/skill-detail";
 import { SearchPalette } from "@/components/dbt/search-palette";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ReaderScaleControl } from "@/components/dbt/reader-scale-control";
 import { WorksheetList } from "@/components/dbt/worksheets/worksheet-list";
 import { WorksheetDetail } from "@/components/dbt/worksheets/worksheet-detail";
 import { DiaryComparison } from "@/components/dbt/worksheets/diary-comparison";
@@ -34,6 +35,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Search, Menu, X, FileText, LayoutGrid, Link2, Scale, CalendarRange, GitMerge, Unplug, Settings as SettingsIcon, Keyboard, MessageSquareText, SearchCheck, FlipHorizontal, HeartHandshake, ShieldCheck, Target, Smile, Activity, HeartPulse, Coins, BrainCog, TrendingUp, Moon, Waves, Cloud, RefreshCw, ListChecks, Wrench, Users, Lightbulb, Sparkles, Eye, Compass, Heart, Octagon, Zap, Shuffle, Flower2, Sparkle, SmilePlus, Puzzle, Sun, Mountain, BedDouble, Siren, CircleDot, UserPlus, ScanEye, UserMinus, GitFork, ShieldHalf, Repeat, BookOpen, Brain, Flame, ChevronRight, LifeBuoy } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  loadReaderScale,
+  saveReaderScale,
+  READER_SCALE_CHANGED_EVENT,
+} from "@/lib/reader-scale";
 
 const STORAGE_KEY_BOOKMARKS = "dbt-skills:bookmarks";
 const STORAGE_KEY_RECENT = "dbt-skills:recent";
@@ -62,6 +68,24 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = React.useState(false); // settings modal
   const [helpOpen, setHelpOpen] = React.useState(false); // keyboard shortcut help modal
   const [authOpen, setAuthOpen] = React.useState(false); // sign-in / sign-up dialog
+
+  // Global text size ("zoom"). It lived on the skill page only; now one
+  // value drives the whole content pane and every view inherits it.
+  const [readerScale, setReaderScale] = React.useState(1);
+  React.useEffect(() => {
+    const sync = () => setReaderScale(loadReaderScale());
+    sync();
+    window.addEventListener(READER_SCALE_CHANGED_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(READER_SCALE_CHANGED_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+  const changeReaderScale = React.useCallback((next: number) => {
+    setReaderScale(next);
+    saveReaderScale(next);
+  }, []);
 
   // Goal count for the sidebar badge. Listens to the GOALS_CHANGED_EVENT
   // that goals-storage.saveGoals() dispatches on every successful write, so
@@ -544,7 +568,14 @@ export default function Home() {
   const isWorksheetsMode = selectedModule === "worksheets";
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
+    <div
+      className="app-shell flex flex-col overflow-hidden bg-background"
+      style={{
+        zoom: readerScale,
+        width: `${100 / readerScale}vw`,
+        height: `${100 / readerScale}vh`,
+      }}
+    >
       {/* Top bar — hidden on print */}
       <header className="shrink-0 border-b bg-background/95 backdrop-blur z-30 print:hidden">
         <div className="flex items-center justify-between gap-2 px-3 sm:px-4 h-12">
@@ -646,6 +677,7 @@ export default function Home() {
             >
               <Keyboard className="h-4 w-4" />
             </Button>
+            <ReaderScaleControl value={readerScale} onChange={changeReaderScale} />
             <ThemeToggle />
             <Button
               variant="ghost"

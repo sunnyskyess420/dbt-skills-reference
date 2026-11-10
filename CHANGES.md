@@ -4,6 +4,18 @@ Three user-friendliness upgrades for the DBT virtual therapy group context.
 **No DBT content, worksheet fields, or skill text was changed** — these are
 navigation and flow changes only.
 
+## Global text size (zoom)
+
+The skill page's "Aa" zoom is now a global control in the top bar — 100 / 112 /
+125%, persisted under the same `dbt-skills:reader-scale` key so existing choices
+carry over. It scales the whole app shell, so skills, worksheets, My Goals,
+SMART Goals, the cheat sheet and the dashboard zoom together instead of only
+the skill text. Printing stays at 100%.
+
+**New:** `src/lib/reader-scale.ts`, `src/components/dbt/reader-scale-control.tsx`.
+**Changed:** `src/app/page.tsx` (control + shell scale), `src/components/dbt/skill-detail.tsx`
+(dropped its local zoom, now inherited), `src/app/globals.css` (print reset).
+
 ## Skill pages return to where you came from
 
 Opening a skill from My Goals, SMART Goals or the Cheat Sheet used to strand

@@ -206,3 +206,12 @@ a:focus-visible,
   }
 }
 
+/* The reader-scale control zooms the whole shell on screen. Printing should
+   follow the app's own print styles at 100%, not the on-screen zoom. */
+@media print {
+  .app-shell {
+    zoom: 1 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+}

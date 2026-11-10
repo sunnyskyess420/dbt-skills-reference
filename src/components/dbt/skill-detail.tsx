@@ -8,11 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkCheck, ArrowLeft, BookOpen, Lightbulb, Footprints, CircleHelp, Quote, Clock, FileText, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Reader-mode text scale steps (1x → 1.12x → 1.25x → back). Persisted so
-// the chosen size survives reloads — handy mid-session on a small screen.
-const READER_SCALE_KEY = "dbt-skills:reader-scale";
-const READER_SCALES: number[] = [1, 1.12, 1.25];
-
 interface SkillDetailProps {
   skill: Skill | null;
   onBack?: () => void;
@@ -39,39 +34,12 @@ export function SkillDetail({
   linkedWorksheetExists = false,
   onStartBlankWorksheet,
 }: SkillDetailProps) {
-  // Reader mode: persisted text scale, cycled with the "Aa" button.
-  const [readerScale, setReaderScale] = React.useState(1);
   // Collapsible skill sections — resets to defaults when the skill changes.
   const [openSections, setOpenSections] = React.useState<Record<string, boolean>>({});
 
   React.useEffect(() => {
-    try {
-      const raw = localStorage.getItem(READER_SCALE_KEY);
-      if (raw) {
-        const n = Number(raw);
-        if (READER_SCALES.includes(n)) setReaderScale(n);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  React.useEffect(() => {
     setOpenSections({});
   }, [skill?.id]);
-
-  const cycleReaderScale = React.useCallback(() => {
-    setReaderScale((prev) => {
-      const idx = READER_SCALES.indexOf(prev);
-      const next = READER_SCALES[(idx + 1) % READER_SCALES.length];
-      try {
-        localStorage.setItem(READER_SCALE_KEY, String(next));
-      } catch {
-        // ignore
-      }
-      return next;
-    });
-  }, []);
 
   const toggleSection = React.useCallback((key: string, def: boolean) => {
     setOpenSections((prev) => ({ ...prev, [key]: !(prev[key] ?? def) }));
@@ -119,19 +87,6 @@ export function SkillDetail({
             <Button
               variant="ghost"
               size="sm"
-              onClick={cycleReaderScale}
-              className="px-2"
-              title={`Text size ${Math.round(readerScale * 100)}% — click to change`}
-              aria-label={`Text size ${Math.round(readerScale * 100)} percent. Click to change`}
-            >
-              <span className="font-semibold">Aa</span>
-              <span className="text-[10px] text-muted-foreground ml-1 hidden sm:inline">
-                {Math.round(readerScale * 100)}%
-              </span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
               onClick={() => onToggleBookmark(skill.id)}
               className="shrink-0"
               aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
@@ -154,7 +109,7 @@ export function SkillDetail({
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6">
-        <div className="max-w-3xl mx-auto" style={{ zoom: readerScale }}>
+        <div className="max-w-3xl mx-auto">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             {skill.name}
           </h1>
