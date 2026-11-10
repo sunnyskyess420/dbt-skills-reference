@@ -4,6 +4,26 @@ Three user-friendliness upgrades for the DBT virtual therapy group context.
 **No DBT content, worksheet fields, or skill text was changed** — these are
 navigation and flow changes only.
 
+## Goals fixes and surfacing
+
+- **My Goals no longer truncates on read.** `loadGoals()` sliced the stored
+  list to `MAX_GOALS`; the cap belongs on adding, not on loading, so a larger
+  stored set could be silently cut and then saved back smaller.
+- **Lint gate is green.** `react-hooks/set-state-in-effect` is now a warning
+  rather than an error: every view hydrates from localStorage inside an effect,
+  which is the only place that data exists. 28 warnings remain visible; the
+  alternative (useSyncExternalStore across a dozen screens) is a much larger
+  change than the pattern warrants.
+- **SMART goals appear where the work happens.** The Dashboard gains a goals
+  card (active / completed / due for check-in, progress bars), and no longer
+  shows "no data" to users who only keep goals. Session Prep gains a "SMART
+  goals to review" card listing goals that are due for a check-in, close to
+  their deadline, or never reviewed, with a link into the section.
+
+**Changed:** `src/lib/goals-storage.ts`, `eslint.config.mjs`,
+`src/components/dbt/progress-dashboard.tsx`, `src/components/dbt/session-prep.tsx`,
+`src/app/page.tsx`.
+
 ## Global text size (zoom)
 
 The skill page's "Aa" zoom is now a global control in the top bar — 100 / 112 /

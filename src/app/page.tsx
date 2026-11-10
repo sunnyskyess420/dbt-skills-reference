@@ -869,6 +869,7 @@ export default function Home() {
                 setSelectedModule("worksheets");
                 handleSelectWorksheet(entry);
               }}
+              onOpenSmartGoals={() => handleSelectModule("smart-goals")}
             />
           ) : selectedModule === "session-prep" ? (
             <SessionPrep
@@ -877,6 +878,7 @@ export default function Home() {
                 setSelectedModule("worksheets");
                 handleSelectWorksheet(entry);
               }}
+              onOpenSmartGoals={() => handleSelectModule("smart-goals")}
             />
           ) : selectedModule === "crisis" ? (
             <CrisisResources />

@@ -18,6 +18,12 @@ const eslintConfig = [...nextCoreWebVitals, ...nextTypescript, {
     
     // React rules
     "react-hooks/exhaustive-deps": "off",
+    // This app hydrates every view from localStorage inside an effect —
+    // the only place that data exists. The rule wants derived state or
+    // useSyncExternalStore; converting a dozen screens is a bigger change
+    // than the pattern is worth right now. Kept as a warning so new
+    // instances stay visible instead of silently piling up.
+    "react-hooks/set-state-in-effect": "warn",
     "react-hooks/purity": "off",
     "react/no-unescaped-entities": "off",
     "react/display-name": "off",

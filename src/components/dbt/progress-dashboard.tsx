@@ -3,12 +3,21 @@
 import * as React from "react";
 import type { WorksheetEntry } from "@/lib/worksheet-storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Minus, Calendar, Activity, Target, Award, BookOpen, LifeBuoy, X } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Calendar, Activity, Target, Award, BookOpen, LifeBuoy, X, Crosshair, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  loadSmartGoals,
+  progressFor,
+  reviewDueInDays,
+  SMART_GOALS_CHANGED_EVENT,
+  type SmartGoal,
+} from "@/lib/smart-goals-storage";
 import { cn } from "@/lib/utils";
 
 interface Props {
   entries: WorksheetEntry[];
   onSelectWorksheet?: (entry: WorksheetEntry) => void;
+  onOpenSmartGoals?: () => void;
 }
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -32,7 +41,7 @@ const SKILL_KEYS = [
   { key: "skillInterpersonal", label: "Interpersonal Effectiveness" },
 ];
 
-export function ProgressDashboard({ entries, onSelectWorksheet }: Props) {
+export function ProgressDashboard({ entries, onSelectWorksheet, onOpenSmartGoals }: Props) {
   // Get all diary cards, sorted by date
   const diaryCards = React.useMemo(() => {
     return entries
@@ -125,6 +134,24 @@ export function ProgressDashboard({ entries, onSelectWorksheet }: Props) {
       .slice(0, 5);
   }, [entries]);
 
+  // SMART goals summary — the same storage the goals section writes.
+  const [smartGoals, setSmartGoals] = React.useState<SmartGoal[]>([]);
+  React.useEffect(() => {
+    const sync = () => setSmartGoals(loadSmartGoals() ?? []);
+    sync();
+    window.addEventListener(SMART_GOALS_CHANGED_EVENT, sync);
+    window.addEventListener("storage", sync);
+    window.addEventListener("dbt-sync-restored", sync);
+    return () => {
+      window.removeEventListener(SMART_GOALS_CHANGED_EVENT, sync);
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("dbt-sync-restored", sync);
+    };
+  }, []);
+  const activeGoals = smartGoals.filter((g) => g.status !== "done");
+  const doneGoalCount = smartGoals.length - activeGoals.length;
+  const goalsDueCount = activeGoals.filter((g) => reviewDueInDays(g) > 0).length;
+
   // Detect high urges in recent diary cards for crisis resource banner
   const [showCrisisBanner, setShowCrisisBanner] = React.useState(false);
   React.useEffect(() => {
@@ -155,8 +182,9 @@ export function ProgressDashboard({ entries, onSelectWorksheet }: Props) {
     }
   };
 
-  // If no data, show empty state
-  if (entries.length === 0) {
+  // If there is nothing at all — no worksheets and no goals — show the
+  // empty state. Someone who only uses SMART goals still gets a dashboard.
+  if (entries.length === 0 && smartGoals.length === 0) {
     return (
       <div className="h-full flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center">
@@ -184,7 +212,9 @@ export function ProgressDashboard({ entries, onSelectWorksheet }: Props) {
             Progress Dashboard
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Trends across {stats.totalWorksheets} worksheet{stats.totalWorksheets === 1 ? "" : "s"} and {stats.totalDiaryCards} diary card{stats.totalDiaryCards === 1 ? "" : "s"}.
+            {entries.length > 0
+              ? `Trends across ${stats.totalWorksheets} worksheet${stats.totalWorksheets === 1 ? "" : "s"} and ${stats.totalDiaryCards} diary card${stats.totalDiaryCards === 1 ? "" : "s"}.`
+              : "No worksheets logged yet — here are your goals."}
           </p>
         </div>
 
@@ -249,6 +279,72 @@ export function ProgressDashboard({ entries, onSelectWorksheet }: Props) {
             tone={stats.totalActionDays === 0 ? "good" : "warning"}
           />
         </div>
+
+        {/* SMART goals summary */}
+        {smartGoals.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <Crosshair className="h-4 w-4" />
+                SMART goals
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                <span>
+                  <span className="font-semibold text-foreground">{activeGoals.length}</span> active
+                </span>
+                <span>
+                  <span className="font-semibold text-foreground">{doneGoalCount}</span> completed
+                </span>
+                <span
+                  className={
+                    goalsDueCount > 0
+                      ? "text-amber-600 dark:text-amber-400 font-medium"
+                      : undefined
+                  }
+                >
+                  <span className="font-semibold">{goalsDueCount}</span> due for check-in
+                </span>
+                {onOpenSmartGoals && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-[11px] ml-auto"
+                    onClick={onOpenSmartGoals}
+                  >
+                    Open <ChevronRight className="h-3 w-3 ml-0.5" />
+                  </Button>
+                )}
+              </div>
+              <div className="space-y-2.5">
+                {activeGoals.slice(0, 3).map((goal) => {
+                  const progress = progressFor(goal);
+                  const due = reviewDueInDays(goal) > 0;
+                  return (
+                    <div key={goal.id} className="space-y-1">
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="text-xs font-medium leading-snug truncate">
+                          {goal.title.trim() || "Untitled goal"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground shrink-0">
+                          {progress.mode === "none" ? "no measure" : progress.label}
+                          {due ? " · check-in due" : ""}
+                        </span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-primary"
+                          style={{ width: `${progress.pct}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Urge trends chart */}
         {trendData.length > 0 && (

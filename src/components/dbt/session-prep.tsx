@@ -8,13 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ClipboardList, Printer, FileDown, CheckCircle2 } from "lucide-react";
+import { ClipboardList, Printer, FileDown, CheckCircle2, Crosshair } from "lucide-react";
+import {
+  loadSmartGoals,
+  progressFor,
+  reviewDueInDays,
+  daysUntilDeadline,
+  SMART_GOALS_CHANGED_EVENT,
+  type SmartGoal,
+} from "@/lib/smart-goals-storage";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
 interface Props {
   entries: WorksheetEntry[];
   onSelectWorksheet?: (entry: WorksheetEntry) => void;
+  onOpenSmartGoals?: () => void;
 }
 
 interface SessionPrepState {
@@ -61,7 +70,40 @@ const CHECKLIST_ITEMS: { key: keyof SessionPrepState; label: string; description
   { key: "preparedQuestions", label: "Prepare questions for therapist", description: "What do you want to ask or get help with?" },
 ];
 
-export function SessionPrep({ entries, onSelectWorksheet }: Props) {
+export function SessionPrep({ entries, onSelectWorksheet, onOpenSmartGoals }: Props) {
+  // SMART goals worth raising in session — same storage the goals section writes.
+  const [smartGoals, setSmartGoals] = React.useState<SmartGoal[]>([]);
+  React.useEffect(() => {
+    const sync = () => setSmartGoals(loadSmartGoals() ?? []);
+    sync();
+    window.addEventListener(SMART_GOALS_CHANGED_EVENT, sync);
+    window.addEventListener("storage", sync);
+    window.addEventListener("dbt-sync-restored", sync);
+    return () => {
+      window.removeEventListener(SMART_GOALS_CHANGED_EVENT, sync);
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("dbt-sync-restored", sync);
+    };
+  }, []);
+
+  // Overdue for a check-in, close to its deadline, or never checked in.
+  const goalsToReview = React.useMemo(() => {
+    return smartGoals
+      .filter((g) => g.status !== "done")
+      .map((goal) => ({
+        goal,
+        dueIn: reviewDueInDays(goal),
+        daysLeft: daysUntilDeadline(goal),
+      }))
+      .filter(
+        (x) =>
+          x.dueIn > 0 ||
+          x.goal.checkIns.length === 0 ||
+          (x.daysLeft !== null && x.daysLeft <= 14)
+      )
+      .sort((a, b) => b.dueIn - a.dueIn)
+      .slice(0, 5);
+  }, [smartGoals]);
   const [state, setState] = React.useState<SessionPrepState>(defaultState);
 
   // Sync-aware badge copy: signed-in users see cloud wording, guests see
@@ -181,6 +223,65 @@ export function SessionPrep({ entries, onSelectWorksheet }: Props) {
             ))}
           </CardContent>
         </Card>
+
+        {/* SMART goals to review */}
+        {goalsToReview.length > 0 && (
+          <Card className="print:hidden">
+            <CardHeader>
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <Crosshair className="h-4 w-4" />
+                SMART goals to review ({goalsToReview.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {goalsToReview.map(({ goal, dueIn, daysLeft }) => {
+                const progress = progressFor(goal);
+                return (
+                  <div key={goal.id} className="rounded-md border px-2.5 py-2">
+                    <div className="text-sm font-medium leading-snug">
+                      {goal.title.trim() || "Untitled goal"}
+                    </div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
+                      {progress.mode !== "none" && (
+                        <span className="text-foreground/80">{progress.label}</span>
+                      )}
+                      {dueIn > 0 && (
+                        <span className="font-medium text-amber-600 dark:text-amber-400">
+                          check-in due
+                        </span>
+                      )}
+                      {daysLeft !== null && (
+                        <span
+                          className={
+                            daysLeft < 0
+                              ? "font-medium text-rose-600 dark:text-rose-400"
+                              : daysLeft <= 14
+                              ? "text-amber-600 dark:text-amber-400"
+                              : undefined
+                          }
+                        >
+                          {daysLeft < 0
+                            ? `deadline passed ${Math.abs(daysLeft)}d ago`
+                            : `${daysLeft}d to deadline`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              {onOpenSmartGoals && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={onOpenSmartGoals}
+                >
+                  Open SMART goals
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick reference: recent worksheets */}
         {(recentDiaryCards.length > 0 || recentChainAnalyses.length > 0) && (

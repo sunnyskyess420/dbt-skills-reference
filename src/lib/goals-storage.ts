@@ -99,8 +99,10 @@ export function loadGoals(): Goal[] | null {
     // (groupSupport normalization migrates the old single-string field to
     // the new per-bullet entries format in place; the removed breakdown
     // feature's `guidance` blob is stripped from older saves.)
+    // No slice here: the cap is on active slots and this list has no
+    // archive, so truncating on read only ever discarded real data that a
+    // later save then lost for good. Adding is capped in the UI instead.
     return parsed.goals
-      .slice(0, MAX_GOALS)
       // Older saves may still carry the removed breakdown feature's
       // `guidance` blob — accept and strip it so it doesn't ride along.
       .map((g: Partial<Goal> & { guidance?: unknown }) => {
