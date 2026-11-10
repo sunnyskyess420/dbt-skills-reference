@@ -4,6 +4,18 @@ Three user-friendliness upgrades for the DBT virtual therapy group context.
 **No DBT content, worksheet fields, or skill text was changed** — these are
 navigation and flow changes only.
 
+## Smoke test suite
+
+`npm run test:smoke` runs a Playwright suite against a real browser: all eight
+views render without page errors or sideways overflow, a skill's back button
+returns to the list, a worksheet and a SMART goal survive a reload (including a
+check-in), the completed-goals archive survives editing an active goal, and the
+reader zoom applies and persists. 8 tests, ~45s. Requires
+`npx playwright install chromium` once.
+
+**New:** `playwright.config.ts`, `tests/smoke.spec.ts`, `docs/smoke-tests.md`,
+`test:smoke` script, `@playwright/test` devDependency.
+
 ## Goals fixes and surfacing
 
 - **My Goals no longer truncates on read.** `loadGoals()` sliced the stored

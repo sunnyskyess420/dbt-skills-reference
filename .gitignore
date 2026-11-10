@@ -77,3 +77,7 @@ Caddyfile
 # Local-only sqlite variant for sandbox development
 prisma/schema.local.prisma
 public/*.zip
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
