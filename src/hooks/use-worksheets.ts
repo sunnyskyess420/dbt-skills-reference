@@ -7,6 +7,7 @@ import {
   listEntries,
   createEntry as createEntryStorage,
   updateEntry as updateEntryStorage,
+  debouncedUpdateEntry,
   deleteEntry as deleteEntryStorage,
   pruneTombstones,
 } from "@/lib/worksheet-storage";
@@ -46,19 +47,25 @@ export function useWorksheets() {
   const updateEntry = React.useCallback(
     (id: string, updates: Partial<Pick<WorksheetEntry, "title" | "data">>) => {
       const draft = draftsRef.current.get(id);
-      const updated = updateEntryStorage(id, updates, draft ?? undefined);
-      if (updated) {
-        // Once persisted, remove from drafts
-        draftsRef.current.delete(id);
-        setEntries((prev) => {
-          const exists = prev.some((e) => e.id === id);
-          const next = exists
-            ? prev.map((e) => (e.id === id ? updated : e))
-            : [updated, ...prev];
-          return [...next].sort(
-            (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-          );
-        });
+      try {
+        const updated = debouncedUpdateEntry(id, updates, draft ?? undefined, 300);
+        if (updated) {
+          // Once persisted, remove from drafts
+          draftsRef.current.delete(id);
+          setEntries((prev) => {
+            const exists = prev.some((e) => e.id === id);
+            const next = exists
+              ? prev.map((e) => (e.id === id ? updated : e))
+              : [updated, ...prev];
+            return [...next].sort(
+              (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+            );
+          });
+        }
+      } catch (e) {
+        // Surface quota/serialization errors to the UI
+        console.error("Failed to save worksheet:", e);
+        // The UI component should handle this by showing an error indicator
       }
     },
     []
