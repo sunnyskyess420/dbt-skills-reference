@@ -67,21 +67,21 @@ export function snapshotLocalState(): Record<string, unknown> {
   return out;
 }
 
-// Replace every dbt-skills:* key in localStorage with the values in `payload`.
-// Keys that exist locally but not in the payload are deleted, so the post-
-// restore state matches the source machine exactly (modulo EXCLUDE_KEYS).
+// Restore local state from a server payload.
+//
+// NON-DESTRUCTIVE: Only overwrites keys that are present in the payload.
+// Keys that exist locally but not in the payload are preserved.
+// This prevents data loss when the server returns a partial or older payload.
+//
+// For keys that exist in both, we overwrite with the incoming value.
+// This is safe for our use case because:
+// - Sign-in: server is the source of truth for initial restore
+// - Manual "Sync now": user explicitly requested the server state
+// - Window focus: we want to catch changes from other devices
+//
+// Explicit "Clear data" in Settings remains the only destructive action.
 export function restoreLocalState(payload: Record<string, unknown>): void {
-  // Wipe existing dbt-skills:* keys first so we don't leave stale data.
-  const toRemove: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith(DBT_PREFIX) && !EXCLUDE_KEYS.has(key)) {
-      toRemove.push(key);
-    }
-  }
-  toRemove.forEach((k) => localStorage.removeItem(k));
-
-  // Write the new values.
+  // Write the new values. Do NOT delete keys that aren't in the payload.
   for (const [key, value] of Object.entries(payload)) {
     if (!key.startsWith(DBT_PREFIX)) continue;
     if (EXCLUDE_KEYS.has(key)) continue;
@@ -456,14 +456,32 @@ export function useSync(enabled: boolean, userKey?: string) {
     error: null,
   });
 
+  // Track the last sync operation to prevent concurrency issues.
+  // If a new sync starts while one is in flight, we ignore the older one's result.
+  const syncRef = React.useRef<{ id: number; cancelled: boolean }>({
+    id: 0,
+    cancelled: false,
+  });
+
   // `syncNow` does a full pull-then-push cycle. Used by the manual "Sync now"
   // button so the user can recover from a missed pull (e.g. if they signed
   // in while the network was flaky).
   const syncNow = React.useCallback(async () => {
     if (!enabled) return null;
+
+    // Increment sync ID to invalidate any in-flight operations
+    const syncId = ++syncRef.current.id;
+    syncRef.current.cancelled = false;
+
     setState((s) => ({ ...s, status: "syncing", error: null }));
     try {
       const { payload, updatedAt } = await pullFromServer();
+
+      // If a newer sync started while we were pulling, ignore this result
+      if (syncRef.current.id !== syncId || syncRef.current.cancelled) {
+        return null;
+      }
+
       if (payload && Object.keys(payload).length > 0) {
         const local = snapshotLocalState();
         const hasLocal = Object.keys(local).length > 0;
@@ -478,6 +496,12 @@ export function useSync(enabled: boolean, userKey?: string) {
       if (Object.keys(postRestore).length > 0) {
         pushedAt = await pushToServer();
       }
+
+      // Check again before setting state
+      if (syncRef.current.id !== syncId || syncRef.current.cancelled) {
+        return null;
+      }
+
       setState({
         status: "synced",
         lastSyncedAt: pushedAt ?? updatedAt,
@@ -485,6 +509,11 @@ export function useSync(enabled: boolean, userKey?: string) {
       });
       return pushedAt ?? updatedAt;
     } catch (e) {
+      // If a newer sync started, ignore this error
+      if (syncRef.current.id !== syncId || syncRef.current.cancelled) {
+        return null;
+      }
+
       // Auth errors are expected during sign-in/out transitions — don't
       // surface them as "Sync failed" in the UI.
       if (e instanceof AuthError) {
@@ -512,12 +541,21 @@ export function useSync(enabled: boolean, userKey?: string) {
       });
       return;
     }
-    let cancelled = false;
+
+    // Mark this as the current sync operation
+    const syncId = ++syncRef.current.id;
+    syncRef.current.cancelled = false;
+
     setState((s) => ({ ...s, status: "syncing", error: null }));
     (async () => {
       try {
         const { payload, updatedAt } = await pullFromServer();
-        if (cancelled) return;
+
+        // If a newer sync started while we were pulling, ignore this result
+        if (syncRef.current.id !== syncId || syncRef.current.cancelled) {
+          return;
+        }
+
         if (payload && Object.keys(payload).length > 0) {
           const local = snapshotLocalState();
           const hasLocal = Object.keys(local).length > 0;
@@ -532,7 +570,12 @@ export function useSync(enabled: boolean, userKey?: string) {
         const postRestore = snapshotLocalState();
         if (Object.keys(postRestore).length > 0) {
           const pushedAt = await pushToServer();
-          if (cancelled) return;
+
+          // Check again before setting state
+          if (syncRef.current.id !== syncId || syncRef.current.cancelled) {
+            return;
+          }
+
           setState({
             status: "synced",
             lastSyncedAt: pushedAt ?? updatedAt,
@@ -546,7 +589,11 @@ export function useSync(enabled: boolean, userKey?: string) {
           });
         }
       } catch (e) {
-        if (cancelled) return;
+        // If a newer sync started, ignore this error
+        if (syncRef.current.id !== syncId || syncRef.current.cancelled) {
+          return;
+        }
+
         if (e instanceof AuthError) {
           // Session vanished mid-sync — just go idle, don't alarm the user.
           setState({ status: "idle", lastSyncedAt: null, error: null });
@@ -560,12 +607,105 @@ export function useSync(enabled: boolean, userKey?: string) {
       }
     })();
     return () => {
-      cancelled = true;
+      // Cancel this sync when the effect cleans up
+      if (syncRef.current.id === syncId) {
+        syncRef.current.cancelled = true;
+      }
     };
     // Re-run when enabled flips OR when the signed-in user changes.
   }, [enabled, userKey]);
 
+  // Pull on window focus (but not on initial mount) to catch changes
+  // from other devices. Debounced to avoid hammering the server on
+  // rapid tab switches.
+  React.useEffect(() => {
+    if (!enabled) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let focusSyncId: number | null = null;
+
+    const handleFocus = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(async () => {
+        // Mark this focus sync
+        focusSyncId = ++syncRef.current.id;
+
+        try {
+          const { payload, updatedAt } = await pullFromServer();
+
+          // If a newer sync started, ignore this result
+          if (syncRef.current.id !== focusSyncId || syncRef.current.cancelled) {
+            return;
+          }
+
+          if (payload && Object.keys(payload).length > 0) {
+            const local = snapshotLocalState();
+            const hasLocal = Object.keys(local).length > 0;
+            const merged = hasLocal ? mergePayloads(local, payload) : payload;
+            restoreLocalState(merged);
+            window.dispatchEvent(new CustomEvent("dbt-sync-restored"));
+          }
+
+          // Check again before setting state
+          if (syncRef.current.id !== focusSyncId || syncRef.current.cancelled) {
+            return;
+          }
+
+          setState((s) => ({
+            ...s,
+            status: "synced",
+            lastSyncedAt: updatedAt,
+            error: null,
+          }));
+        } catch (e) {
+          // If a newer sync started, ignore this error
+          if (syncRef.current.id !== focusSyncId || syncRef.current.cancelled) {
+            return;
+          }
+
+          if (e instanceof AuthError) {
+            // Session gone on focus — ignore
+            return;
+          }
+          setState((s) => ({
+            ...s,
+            status: "error",
+            error: e instanceof Error ? e.message : "Sync failed",
+          }));
+        }
+      }, 1000); // 1 second debounce
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      if (timer) clearTimeout(timer);
+    };
+  }, [enabled]);
+
   return { state, syncNow };
+}
+
+// Push-only function for autosave. Does NOT pull or restore local state.
+// This prevents mid-entry overwrites caused by the pull-merge-restore cycle.
+export async function pushNow(): Promise<Date | null> {
+  const payload = snapshotLocalState();
+  // If localStorage is empty, don't push — this would wipe the server's
+  // data. The empty state usually means the user cleared their browser
+  // data or is on a fresh install; the server data should be preserved
+  // until the user explicitly pulls it back down.
+  if (Object.keys(payload).length === 0) {
+    // Return a placeholder date so the caller doesn't fail.
+    return new Date();
+  }
+  try {
+    return await pushToServer();
+  } catch (e) {
+    // Auth errors are expected during sign-in/out transitions —
+    // surface them silently for autosave.
+    if (e instanceof AuthError) {
+      return null;
+    }
+    throw e;
+  }
 }
 
 // Convenience: watch localStorage writes and trigger a debounced push.
@@ -575,6 +715,10 @@ export function useSync(enabled: boolean, userKey?: string) {
 // (status === "authenticated"), not during the "loading" transition. This
 // prevents pushes from firing with a half-established session and getting
 // 401s that surface as "Sync failed" in the UI.
+//
+// IMPORTANT: This hook ONLY pushes to the server. It does NOT pull or restore.
+// Pull is reserved for sign-in, manual "Sync now", and window focus events.
+// This prevents mid-entry overwrites caused by the pull-merge-restore cycle.
 export function useAutoPush(enabled: boolean, push: () => Promise<Date | null>) {
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   React.useEffect(() => {
