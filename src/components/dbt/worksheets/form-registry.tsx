@@ -98,4 +98,12 @@ export const WORKSHEET_FORMS: Record<WorksheetType, ComponentType<WorksheetFormP
   "paired-muscle": loadForm(() => import("./paired-muscle-form").then((m) => m.PairedMuscleForm)),
   "body-scan": loadForm(() => import("./body-scan-form").then((m) => m.BodyScanForm)),
   "mindfulness-events": loadForm(() => import("./mindfulness-events-form").then((m) => m.MindfulnessEventsForm)),
+  "abc-diary": loadForm(() => import("./abc-diary-form").then((m) => m.AbcDiaryForm)),
+  "er-pros-cons": loadForm(() => import("./er-pros-cons-form").then((m) => m.ErProsConsForm)),
+  "ie-myths": loadForm(() => import("./ie-myths-form").then((m) => m.IeMythsForm)),
+  "mindfulness-pros-cons": loadForm(() => import("./mindfulness-pros-cons-form").then((m) => m.MindfulnessProsConsForm)),
+  "effective-rethinking": loadForm(() => import("./effective-rethinking-form").then((m) => m.EffectiveRethinkingForm)),
+  "reinforce-nonaddictive": loadForm(() => import("./reinforce-nonaddictive-form").then((m) => m.ReinforceNonaddictiveForm)),
+  "burning-bridges": loadForm(() => import("./burning-bridges-form").then((m) => m.BurningBridgesForm)),
+  "alternate-rebellion": loadForm(() => import("./alternate-rebellion-form").then((m) => m.AlternateRebellionForm)),
 };

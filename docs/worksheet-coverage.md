@@ -1,8 +1,8 @@
 # Worksheet coverage vs. the book
 
-> **Status note.** Re-synced after the second worksheet wave (65 catalog
-> entries). Eight families remain missing — see `devin-handoff-worksheets.md`
-> for their book pages and intended shapes.
+> **Status note.** All worksheet families in the book now have a form (73
+> catalog entries). The only non-`Covered` row left is Emotion Regulation
+> Worksheet 6, which is `Partial` (covered by `opposite-action`).
 
 Compare against *DBT Skills Training Handouts and Worksheets, Second Edition*
 (Linehan, Guilford 2015). Book page numbers below are the printed page numbers,
@@ -18,10 +18,10 @@ covers this exercise", not "one lettered variant is absent".
 | Module | Book worksheet families | Covered | Partial | Missing |
 | --- | --- | --- | --- | --- |
 | General | 3 | 3 | 0 | 0 |
-| Mindfulness | 11 | 10 | 0 | 1 |
-| Interpersonal Effectiveness | 14 | 13 | 0 | 1 |
-| Emotion Regulation | 16 | 14 | 1 | 1 |
-| Distress Tolerance | 18 | 14 | 1 | 3 |
+| Mindfulness | 11 | 11 | 0 | 0 |
+| Interpersonal Effectiveness | 14 | 14 | 0 | 0 |
+| Emotion Regulation | 16 | 15 | 1 | 0 |
+| Distress Tolerance | 18 | 15 | 1 | 0 |
 
 ## General
 
@@ -35,7 +35,7 @@ covers this exercise", not "one lettered variant is absent".
 
 | Book item | Page | Status | App type |
 | --- | --- | --- | --- |
-| Mindfulness Worksheet 1 — Pros and Cons of Practicing Mindfulness | 77 | **Missing** | — |
+| Mindfulness Worksheet 1 — Pros and Cons of Practicing Mindfulness | 77 | Covered | `mindfulness-pros-cons` |
 | Mindfulness Worksheets 2, 2a, 2b — Core Skills Practice | 78–80 | Covered | `mindfulness-core` |
 | Mindfulness Worksheet 2c — Core Skills Calendar | 81 | Covered | `mindfulness-core` |
 | Mindfulness Worksheet 3 — Wise Mind Practice | 83 | Covered | `wise-mind` |
@@ -52,7 +52,7 @@ covers this exercise", not "one lettered variant is absent".
 | Book item | Page | Status | App type |
 | --- | --- | --- | --- |
 | Interpersonal Effectiveness Worksheet 1 — Pros and Cons of Using IE Skills | 167 | Covered | `pros-cons-skills` (module picker) |
-| Interpersonal Effectiveness Worksheet 2 — Challenging Myths | 168 | **Missing** | (`myths-emotions` is Emotion Regulation W3) |
+| Interpersonal Effectiveness Worksheet 2 — Challenging Myths | 168 | Covered | `ie-myths` |
 | Interpersonal Effectiveness Worksheet 3 — Clarifying Priorities | 173 | Covered | `clarifying-priorities` |
 | Interpersonal Effectiveness Worksheet 4 — Writing Out IE Scripts | 174 | Covered | `dear-man-script` |
 | Interpersonal Effectiveness Worksheet 5 — Tracking IE Skills Use | 175 | Covered | `ie-skills-tracker` |
@@ -70,7 +70,7 @@ covers this exercise", not "one lettered variant is absent".
 
 | Book item | Page | Status | App type |
 | --- | --- | --- | --- |
-| Emotion Regulation Worksheet 1 — Pros and Cons of Changing Emotions | 271 | **Missing** | — |
+| Emotion Regulation Worksheet 1 — Pros and Cons of Changing Emotions | 271 | Covered | `er-pros-cons` |
 | Emotion Regulation Worksheet 2 — What My Emotions Are Doing for Me | 275 | Covered | `emotion-functions` |
 | Emotion Regulation Worksheet 2b — Emotion Diary | 277 | Covered | `emotion-diary` |
 | Emotion Regulation Worksheet 3 — Myths About Emotions | 279 | Covered | `myths-emotions` |
@@ -84,7 +84,7 @@ covers this exercise", not "one lettered variant is absent".
 | Emotion Regulation Worksheets 11, 11a — Values to Specific Action Steps | 296–299 | Covered | `values-to-actions` |
 | Emotion Regulation Worksheet 11b — Diary of Daily Actions on Values | 300 | Covered | `values-diary` |
 | Emotion Regulation Worksheet 12 — Build Mastery and Cope Ahead | 301 | Covered | `build-mastery`, `cope-ahead` |
-| Emotion Regulation Worksheet 13 — Putting ABC Skills Together Day by Day | 302 | **Missing** | — |
+| Emotion Regulation Worksheet 13 — Putting ABC Skills Together Day by Day | 302 | Covered | `abc-diary` |
 | Emotion Regulation Worksheet 14 — Practicing PLEASE Skills | 303 | Covered | `please-tracker` |
 | Emotion Regulation Worksheet 14a — Target Nightmare Experience Form | 304 | Covered | `nightmare-protocol` |
 | Emotion Regulation Worksheet 14b — Sleep Hygiene Practice Sheet | 307 | Covered | `sleep-hygiene` |
@@ -101,7 +101,7 @@ covers this exercise", not "one lettered variant is absent".
 | Distress Tolerance Worksheets 3, 3a — Pros and Cons of Acting on Crisis Urges | 374–375 | Covered | `pros-cons` |
 | Distress Tolerance Worksheet 4 — Changing Body Chemistry with TIP | 376 | Covered | `tipp` |
 | Distress Tolerance Worksheet 4a — Paired Muscle Relaxation | 377 | Covered | `paired-muscle` |
-| Distress Tolerance Worksheet 4b — Effective Rethinking | 378 | **Missing** | — |
+| Distress Tolerance Worksheet 4b — Effective Rethinking | 378 | Covered | `effective-rethinking` |
 | Distress Tolerance Worksheets 5, 5a, 5b — Distracting with ACCEPTS | 379–381 | Covered | `accepts` |
 | Distress Tolerance Worksheets 6, 6a, 6b — Self-Soothing | 382–384 | Covered | `self-soothing` |
 | Distress Tolerance Worksheet 6c — Body Scan Meditation | 385 | Covered | `body-scan` |
@@ -114,29 +114,14 @@ covers this exercise", not "one lettered variant is absent".
 | Distress Tolerance Worksheet 13 — Skills When the Crisis Is Addiction | 403 | Covered | `addiction-crisis` |
 | Distress Tolerance Worksheet 14 — Planning for Dialectical Abstinence | 404 | Covered | `dialectical-abstinence` |
 | Distress Tolerance Worksheet 15 — From Clean Mind to Clear Mind | 407 | Covered | `clear-mind` |
-| Distress Tolerance Worksheet 16 — Reinforcing Nonaddictive Behaviors | 408 | **Missing** | — |
-| Distress Tolerance Worksheet 17 — Burning Bridges and Building New Ones | 409 | **Missing** | — |
-| Distress Tolerance Worksheet 18 — Alternate Rebellion and Adaptive Denial | 410 | **Missing** | — |
+| Distress Tolerance Worksheet 16 — Reinforcing Nonaddictive Behaviors | 408 | Covered | `reinforce-nonaddictive` |
+| Distress Tolerance Worksheet 17 — Burning Bridges and Building New Ones | 409 | Covered | `burning-bridges` |
+| Distress Tolerance Worksheet 18 — Alternate Rebellion and Adaptive Denial | 410 | Covered | `alternate-rebellion` |
 
 ## Remaining gaps
 
-Eight worksheet families have no form yet, in suggested build order:
-
-1. Emotion Regulation Worksheet 13 — Putting ABC Skills Together Day by Day
-   (page 302): weekly grid ticking accumulate-a-positive / build-mastery /
-   cope-ahead per day.
-2. Emotion Regulation Worksheet 1 — Pros and Cons of Changing Emotions
-   (page 271): 2×2 grid, same shape as `pros-cons-skills`.
-3. Interpersonal Effectiveness Worksheet 2 — Challenging Myths (page 168):
-   myth → why it's a myth → challenge → replacement belief; `myths-emotions`
-   is the template.
-4. Mindfulness Worksheet 1 — Pros and Cons of Practicing Mindfulness
-   (page 77): same 2×2 as #2.
-5. Distress Tolerance Worksheet 4b — Effective Rethinking and Paired
-   Relaxation (page 378): thought record with relaxation logged before/after.
-6. Distress Tolerance Worksheet 16 — Reinforcing Nonaddictive Behaviors
-   (page 408).
-7. Distress Tolerance Worksheet 17 — Burning Bridges and Building New Ones
-   (page 409).
-8. Distress Tolerance Worksheet 18 — Practicing Alternate Rebellion and
-   Adaptive Denial (page 410) — completes the addiction block with #6 and #7.
+None. Every worksheet family in the book has a form. Emotion Regulation
+Worksheet 6 ("Figuring Out How to Change Emotions", p. 287) is the only
+`Partial`: `opposite-action` covers the how-to-change half, but the book's
+full decision flow (emotion → function → change vs. accept) is not a
+single dedicated form.

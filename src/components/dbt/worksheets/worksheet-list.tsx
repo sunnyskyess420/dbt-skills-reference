@@ -156,19 +156,19 @@ const WORKSHEET_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
   },
   {
     label: "Distress Tolerance",
-    types: WORKSHEET_TYPES.filter((t) => ["pros-cons", "radical-acceptance", "crisis-survival-tracker", "mindfulness-thoughts", "turning-mind-willingness", "stop-skill", "tipp", "accepts", "self-soothing", "improve", "half-smiling", "clear-mind", "dialectical-abstinence", "reality-acceptance", "addiction-crisis", "paired-muscle", "body-scan"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["pros-cons", "radical-acceptance", "crisis-survival-tracker", "mindfulness-thoughts", "turning-mind-willingness", "stop-skill", "tipp", "accepts", "self-soothing", "improve", "half-smiling", "clear-mind", "dialectical-abstinence", "reality-acceptance", "addiction-crisis", "paired-muscle", "body-scan", "effective-rethinking", "reinforce-nonaddictive", "burning-bridges", "alternate-rebellion"].includes(t.id)),
   },
   {
     label: "Emotion Regulation",
-    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "values-priorities", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions", "emotion-model", "problem-solving", "positives-short", "positives-long", "sleep-hygiene", "extreme-emotions", "reduce-vulnerability", "er-troubleshooting", "values-diary", "emotion-functions"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "values-priorities", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions", "emotion-model", "problem-solving", "positives-short", "positives-long", "sleep-hygiene", "extreme-emotions", "reduce-vulnerability", "er-troubleshooting", "values-diary", "emotion-functions", "abc-diary", "er-pros-cons"].includes(t.id)),
   },
   {
     label: "Interpersonal Effectiveness",
-    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others", "being-effective", "finding-people", "mindfulness-others", "ending-relationships", "behavior-change", "ie-skills-tracker"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["dear-man-script", "dialectics-practice", "self-validation", "dime-game", "clarifying-priorities", "troubleshooting-ie", "validating-others", "being-effective", "finding-people", "mindfulness-others", "ending-relationships", "behavior-change", "ie-skills-tracker", "ie-myths"].includes(t.id)),
   },
   {
     label: "Mindfulness",
-    types: WORKSHEET_TYPES.filter((t) => ["walking-middle-path", "wise-mind", "what-skills", "how-skills", "loving-kindness", "balancing-doing-being", "mindfulness-core", "mindfulness-events"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["walking-middle-path", "wise-mind", "what-skills", "how-skills", "loving-kindness", "balancing-doing-being", "mindfulness-core", "mindfulness-events", "mindfulness-pros-cons"].includes(t.id)),
   },
 ];
 

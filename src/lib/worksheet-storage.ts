@@ -66,7 +66,15 @@ export type WorksheetType =
   | "ending-relationships"
   | "options-problems"
   | "dialectical-abstinence"
-  | "behavior-change";
+  | "behavior-change"
+  | "abc-diary"
+  | "er-pros-cons"
+  | "ie-myths"
+  | "mindfulness-pros-cons"
+  | "effective-rethinking"
+  | "reinforce-nonaddictive"
+  | "burning-bridges"
+  | "alternate-rebellion";
 
 export interface WorksheetEntry {
   id: string;
@@ -736,7 +744,8 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     icon: "Wrench",
     reference: "Emotion Regulation Handout 24 / Emotion Regulation Worksheet 16",
     color: "text-rose-600 dark:text-rose-400",
-  },  {
+  },
+  {
     id: "values-diary",
     name: "Diary of Daily Actions on Values",
     shortName: "Values Diary",
@@ -802,6 +811,94 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     reference: "Mindfulness Handouts 9, 9a / Mindfulness Worksheets 8, 9",
     color: "text-indigo-600 dark:text-indigo-400",
   },
+  {
+    id: "abc-diary",
+    name: "Putting ABC Skills Together Day by Day",
+    shortName: "ABC Day-by-Day",
+    pages: "p. 302",
+    description:
+      "Plan accumulate-positive, build-mastery and cope-ahead for each day, then tick what actually happened. The daily companion to the weekly vulnerability review.",
+    icon: "ListChecks",
+    reference: "Emotion Regulation Handout 19 / Emotion Regulation Worksheet 13",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "er-pros-cons",
+    name: "Pros and Cons of Changing Emotions",
+    shortName: "ER Pros & Cons",
+    pages: "p. 271",
+    description:
+      "Four boxes for one stuck emotion: what changing it buys and costs, what staying in it buys and costs — then the Wise Mind check.",
+    icon: "Scale",
+    reference: "Emotion Regulation Handout 1 / Emotion Regulation Worksheet 1",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "ie-myths",
+    name: "Challenging Myths About Effectiveness",
+    shortName: "IE Myths",
+    pages: "p. 168",
+    description:
+      "Twenty-four beliefs that sabotage getting your objectives — write the challenge that actually makes sense to you for each one.",
+    icon: "Lightbulb",
+    reference: "Interpersonal Effectiveness Handout 2a / Interpersonal Effectiveness Worksheet 2",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "mindfulness-pros-cons",
+    name: "Pros and Cons of Practicing Mindfulness",
+    shortName: "Mindfulness P&C",
+    pages: "p. 77",
+    description:
+      "The module-opener sheet: what practicing mindfulness buys and costs versus staying mindless, with a willingness rating before and after.",
+    icon: "Eye",
+    reference: "Mindfulness Handouts 1, 7 / Mindfulness Worksheet 1",
+    color: "text-indigo-600 dark:text-indigo-400",
+  },
+  {
+    id: "effective-rethinking",
+    name: "Effective Rethinking and Paired Relaxation",
+    shortName: "Rethinking",
+    pages: "p. 378",
+    description:
+      "Catch the stress-producing thought, replace it with an effective one, and pair the rethinking with relaxation to see if the stress drops.",
+    icon: "BrainCog",
+    reference: "Distress Tolerance Handout 6c / Distress Tolerance Worksheet 4b",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "reinforce-nonaddictive",
+    name: "Reinforcing Nonaddictive Behaviors",
+    shortName: "Nonaddictive Rewards",
+    pages: "p. 408",
+    description:
+      "Swap addiction reinforcers for abstinence reinforcers: new people, new activities, committed days off — and what the positive events were.",
+    icon: "TrendingUp",
+    reference: "Distress Tolerance Handout 19 / Distress Tolerance Worksheet 16",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "burning-bridges",
+    name: "Burning Bridges and Building New Ones",
+    shortName: "Burning Bridges",
+    pages: "p. 409",
+    description:
+      "Rate the commitment, then remove what made addiction possible, cut tempting contact, and build what makes it impossible.",
+    icon: "Unplug",
+    reference: "Distress Tolerance Handout 20 / Distress Tolerance Worksheet 17",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "alternate-rebellion",
+    name: "Alternate Rebellion and Adaptive Denial",
+    shortName: "Alt Rebellion",
+    pages: "p. 410",
+    description:
+      "When the urge hits: do something else instead, and deny the urge only as much as this hour requires — reframing, putting off, short stretches.",
+    icon: "Zap",
+    reference: "Distress Tolerance Handout 21 / Distress Tolerance Worksheet 18",
+    color: "text-sky-600 dark:text-sky-400",
+  },
 ];
 
 export function getWorksheetTypeMeta(type: WorksheetType): WorksheetTypeMeta {
@@ -828,7 +925,8 @@ export const WORKSHEET_TO_SKILL: Partial<Record<WorksheetType, string>> = {
   "improve": "improve-the-moment",
   "half-smiling": "half-smiling-willing-hands",
   "clear-mind": "clear-mind",
-  "dialectical-abstinence": "dialectical-abstinence",
+  "paired-muscle": "paired-muscle-relaxation",
+  "effective-rethinking": "paired-muscle-relaxation",
   // Emotion Regulation
   "check-the-facts": "check-the-facts",
   "opposite-action": "opposite-action",
@@ -1467,6 +1565,115 @@ export function blankBodyScanData(): Record<string, any> {
 export function blankMindfulnessEventsData(): Record<string, any> {
   return { kind: "pleasant", weekStartDate: "", entries: Array.from({ length: 7 }, () => ({ date: "" })), reflection: "" };
 }
+export function blankAbcDiaryData(): Record<string, any> {
+  return {
+    weekStartDate: "",
+    entries: Array.from({ length: 7 }, () => ({
+      date: "",
+      moodStart: 0,
+      moodEnd: 0,
+      accPosPlan: "",
+      accPosDid: false,
+      masteryPlan: "",
+      masteryDid: false,
+      copePlan: "",
+      copeDid: false,
+    })),
+    reflection: "",
+  };
+}
+export function blankErProsConsData(): Record<string, any> {
+  return {
+    entryDate: "",
+    emotion: "",
+    intensityBefore: 0,
+    intensityAfter: 0,
+    changePros: "",
+    changeCons: "",
+    stayPros: "",
+    stayCons: "",
+    decision: "",
+    wiseMindCheck: "",
+    wiseThings: "",
+  };
+}
+export function blankIeMythsData(): Record<string, any> {
+  return {
+    weekStartDate: "",
+    challenges: {},
+    customMyths: [
+      { myth: "", challenge: "" },
+      { myth: "", challenge: "" },
+      { myth: "", challenge: "" },
+    ],
+    notes: "",
+  };
+}
+export function blankMindfulnessProsConsData(): Record<string, any> {
+  return {
+    weekStartDate: "",
+    willingnessBefore: 0,
+    willingnessAfter: 0,
+    practicePros: "",
+    practiceCons: "",
+    mindlessPros: "",
+    mindlessCons: "",
+    decision: "",
+    wiseMindCheck: "",
+    wiseThings: "",
+  };
+}
+export function blankEffectiveRethinkingData(): Record<string, any> {
+  return {
+    entryDate: "",
+    promptingEvent: "",
+    stressThoughts: "",
+    effectiveThoughts: "",
+    rethinkingPracticed: false,
+    fearReduction: 0,
+    thoughtsUsed: "",
+    relaxationBefore: 0,
+    relaxationAfter: 0,
+    rethinkingPlusRelaxation: false,
+    stressReduction: 0,
+    comments: "",
+  };
+}
+export function blankReinforceNonaddictiveData(): Record<string, any> {
+  return {
+    weekStartDate: "",
+    efforts: {},
+    findPeopleNotes: "",
+    enjoyableActivitiesNotes: "",
+    sampledGroupsNotes: "",
+    positiveEventsNotes: "",
+    daysAbstinent: "",
+    abstinencePlan: "",
+    positiveEvents: [],
+    reflection: "",
+  };
+}
+export function blankBurningBridgesData(): Record<string, any> {
+  const row = () => ({ item: "", done: false });
+  return {
+    commitment: 0,
+    wiseCommitment: 0,
+    enablers: [row()],
+    tempting: [row()],
+    barriers: [row()],
+    cravingImagery: "",
+    urgeStrategies: {},
+  };
+}
+export function blankAlternateRebellionData(): Record<string, any> {
+  return {
+    weekStartDate: "",
+    rebellionPlans: ["", "", ""],
+    actualDid: ["", "", ""],
+    rebellionEffectiveness: 0,
+    adaptiveDenial: {},
+  };
+}
 export function blankErTroubleshootingData(): Record<string, any> {
   return { entryDate: "", emotion: "", howItShows: "", tried: {}, reasons: {}, diagnosis: "", adjustment: "", support: "" };
 }
@@ -1630,6 +1837,22 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankBodyScanData();
     case "mindfulness-events":
       return blankMindfulnessEventsData();
+    case "abc-diary":
+      return blankAbcDiaryData();
+    case "er-pros-cons":
+      return blankErProsConsData();
+    case "ie-myths":
+      return blankIeMythsData();
+    case "mindfulness-pros-cons":
+      return blankMindfulnessProsConsData();
+    case "effective-rethinking":
+      return blankEffectiveRethinkingData();
+    case "reinforce-nonaddictive":
+      return blankReinforceNonaddictiveData();
+    case "burning-bridges":
+      return blankBurningBridgesData();
+    case "alternate-rebellion":
+      return blankAlternateRebellionData();
   }
 }
 
