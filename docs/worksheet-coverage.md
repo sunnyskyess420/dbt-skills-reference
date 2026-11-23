@@ -1,5 +1,13 @@
 # Worksheet coverage vs. the book
 
+> **Status note.** Thirteen families were added after this table was written:
+> `values-priorities`, `pros-cons-skills`, `reduce-vulnerability`,
+> `reality-acceptance`, `mindfulness-core`, `ie-skills-tracker`,
+> `er-troubleshooting`, `values-diary`, `emotion-functions`, `addiction-crisis`,
+> `paired-muscle`, `body-scan`, `mindfulness-events`. The tables below still show
+> them as `Missing`; treat this banner as authoritative and re-sync the rows when
+> convenient. See `devin-handoff-worksheets.md` for what is left.
+
 Compare against *DBT Skills Training Handouts and Worksheets, Second Edition*
 (Linehan, Guilford 2015). Book page numbers below are the printed page numbers,
 not PDF page numbers.

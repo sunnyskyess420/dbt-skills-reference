@@ -14,6 +14,18 @@ export type WorksheetType =
   | "crisis-survival-tracker"
   | "values-to-actions"
   | "values-priorities"
+  | "values-diary"
+  | "emotion-functions"
+  | "addiction-crisis"
+  | "paired-muscle"
+  | "body-scan"
+  | "mindfulness-events"
+  | "pros-cons-skills"
+  | "reduce-vulnerability"
+  | "reality-acceptance"
+  | "mindfulness-core"
+  | "ie-skills-tracker"
+  | "er-troubleshooting"
   | "pleasant-events-diary"
   | "emotion-diary"
   | "dialectics-practice"
@@ -659,6 +671,137 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
     reference: "Interpersonal Effectiveness Handouts 20, 21, 22, 22a / Interpersonal Effectiveness Worksheets 14, 15",
     color: "text-amber-600 dark:text-amber-400",
   },
+  {
+    id: "pros-cons-skills",
+    name: "Pros and Cons of Using Skills",
+    shortName: "Skills Pros & Cons",
+    pages: "p. 27",
+    description:
+      "Four boxes, filled in honestly: what using skills costs and buys, now and later. Filled in at the start of every module.",
+    icon: "Scale",
+    reference: "General Handout 1 / General Worksheet 1",
+    color: "text-slate-600 dark:text-slate-300",
+  },
+  {
+    id: "reduce-vulnerability",
+    name: "Steps for Reducing Vulnerability",
+    shortName: "Reduce Vulnerability",
+    pages: "p. 293",
+    description:
+      "The weekly ABC PLEASE sheet: accumulate positives, build mastery, cope ahead, look after your body. Seven days, one page.",
+    icon: "HeartPulse",
+    reference: "Emotion Regulation Handout 14 / Emotion Regulation Worksheet 9",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "reality-acceptance",
+    name: "Reality Acceptance Log",
+    shortName: "Reality Acceptance",
+    pages: "p. 391",
+    description:
+      "Weekly log for radical acceptance, turning the mind, willingness, half-smiling and mindfulness of thoughts — plus how hard you fought reality.",
+    icon: "Mountain",
+    reference: "Distress Tolerance Handouts 10-15a / Distress Tolerance Worksheet 8",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "mindfulness-core",
+    name: "Core Mindfulness Practice",
+    shortName: "Core Mindfulness",
+    pages: "p. 78",
+    description:
+      "Pick one ordinary activity a day, do it mindfully, and note which of the six core skills you actually used.",
+    icon: "Eye",
+    reference: "Mindfulness Handouts 2-5c / Mindfulness Worksheets 2, 2a, 2b, 2c",
+    color: "text-indigo-600 dark:text-indigo-400",
+  },
+  {
+    id: "ie-skills-tracker",
+    name: "IE Skills Tracker",
+    shortName: "IE Skills Tracker",
+    pages: "p. 175",
+    description:
+      "Log the interactions where you used skills on purpose: which priority you protected, which tools you used, how effective you were.",
+    icon: "MessageSquareText",
+    reference: "Interpersonal Effectiveness Handouts 5-7 / Interpersonal Effectiveness Worksheet 5",
+    color: "text-amber-600 dark:text-amber-400",
+  },
+  {
+    id: "er-troubleshooting",
+    name: "Troubleshooting Emotion Regulation",
+    shortName: "Troubleshoot ER",
+    pages: "p. 312",
+    description:
+      "For the emotion that won't come down: what you tried, why it might not be working, and the one adjustment to make next.",
+    icon: "Wrench",
+    reference: "Emotion Regulation Handout 24 / Emotion Regulation Worksheet 16",
+    color: "text-rose-600 dark:text-rose-400",
+  },  {
+    id: "values-diary",
+    name: "Diary of Daily Actions on Values",
+    shortName: "Values Diary",
+    pages: "p. 300",
+    description:
+      "One action a day, tied to a named value, rated for how far it moved you toward the life you want.",
+    icon: "Target",
+    reference: "Emotion Regulation Handouts 17-18 / Emotion Regulation Worksheet 11b",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "emotion-functions",
+    name: "What My Emotions Are Doing for Me",
+    shortName: "Emotion Functions",
+    pages: "p. 275",
+    description:
+      "Every emotion is doing a job. Name the job, then weigh what it buys against what it costs.",
+    icon: "BrainCog",
+    reference: "Emotion Regulation Handout 3 / Emotion Regulation Worksheet 2",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "addiction-crisis",
+    name: "Skills When the Crisis Is Addiction",
+    shortName: "Addiction Crisis",
+    pages: "p. 403",
+    description:
+      "For an urge that has its own momentum: what you used, what happened, and the bridge to burn before next time.",
+    icon: "Siren",
+    reference: "Distress Tolerance Handouts 16-21 / Distress Tolerance Worksheet 13",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "paired-muscle",
+    name: "Paired Muscle Relaxation",
+    shortName: "Paired Muscle",
+    pages: "p. 377",
+    description:
+      "Twelve muscle groups, tense on the in-breath, release on the out-breath. Track tension before and after.",
+    icon: "Activity",
+    reference: "Distress Tolerance Handout 6b / Distress Tolerance Worksheet 4a",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "body-scan",
+    name: "Body Scan Meditation",
+    shortName: "Body Scan",
+    pages: "p. 385",
+    description:
+      "Notice sensation from feet to head without trying to change it. Note where you noticed something and where you noticed nothing.",
+    icon: "Waves",
+    reference: "Distress Tolerance Handout 8a / Distress Tolerance Worksheet 6c",
+    color: "text-sky-600 dark:text-sky-400",
+  },
+  {
+    id: "mindfulness-events",
+    name: "Pleasant & Unpleasant Events Calendar",
+    shortName: "Events Calendar",
+    pages: "p. 101",
+    description:
+      "One event a day, caught while it's happening: senses, body, and what the mind did with it.",
+    icon: "Sun",
+    reference: "Mindfulness Handouts 9, 9a / Mindfulness Worksheets 8, 9",
+    color: "text-indigo-600 dark:text-indigo-400",
+  },
 ];
 
 export function getWorksheetTypeMeta(type: WorksheetType): WorksheetTypeMeta {
@@ -1291,6 +1434,42 @@ export function blankPositivesLongData(): Record<string, any> {
 export function blankValuesPrioritiesData(): Record<string, any> {
   return { entryDate: "", checked: {}, otherValues: "", priority1: "", priority2: "", priority3: "", priority4: "", priority5: "", notes: "" };
 }
+export function blankProsConsSkillsData(): Record<string, any> {
+  return { module: "general", prosShort: "", consShort: "", prosLong: "", consLong: "", conclusion: "", commitment: "" };
+}
+export function blankReduceVulnerabilityData(): Record<string, any> {
+  return { weekStartDate: "", entries: Array.from({ length: 7 }, () => ({ date: "" })), biggestDifference: "", nextWeekChange: "" };
+}
+export function blankRealityAcceptanceData(): Record<string, any> {
+  return { weekStartDate: "", entries: Array.from({ length: 7 }, () => ({ date: "" })), easier: "", stillFighting: "" };
+}
+export function blankMindfulnessCoreData(): Record<string, any> {
+  return { weekStartDate: "", entries: Array.from({ length: 7 }, () => ({ date: "" })), easiestSkill: "", hardestSkill: "" };
+}
+export function blankIeSkillsTrackerData(): Record<string, any> {
+  return { weekStartDate: "", entries: Array.from({ length: 7 }, () => ({ date: "" })), droppedPriority: "", needsRehearsal: "" };
+}
+export function blankValuesDiaryData(): Record<string, any> {
+  return { weekStartDate: "", entries: Array.from({ length: 7 }, () => ({ date: "" })), mostAction: "", noAction: "" };
+}
+export function blankEmotionFunctionsData(): Record<string, any> {
+  return { entryDate: "", emotion: "", actionUrge: "", functions: {}, benefit: "", cost: "", preferredFunction: "" };
+}
+export function blankAddictionCrisisData(): Record<string, any> {
+  return { entryDate: "", urge: "", intensity: 0, used: {}, outcome: "", whatWorked: "", nextBridge: "", whoTold: "" };
+}
+export function blankPairedMuscleData(): Record<string, any> {
+  return { entryDate: "", tensionBefore: 0, done: {}, rounds: "", tensionAfter: 0, noticed: "", nextUse: "" };
+}
+export function blankBodyScanData(): Record<string, any> {
+  return { entryDate: "", minutes: "", distressBefore: 0, sensations: "", mindWandering: "", distressAfter: 0, learned: "", nextTime: "" };
+}
+export function blankMindfulnessEventsData(): Record<string, any> {
+  return { kind: "pleasant", weekStartDate: "", entries: Array.from({ length: 7 }, () => ({ date: "" })), reflection: "" };
+}
+export function blankErTroubleshootingData(): Record<string, any> {
+  return { entryDate: "", emotion: "", howItShows: "", tried: {}, reasons: {}, diagnosis: "", adjustment: "", support: "" };
+}
 export function blankSleepHygieneData(): Record<string, any> {
   return { weekStartDate: "", monday: "", tuesday: "", wednesday: "", thursday: "", friday: "", saturday: "", sunday: "", hygienePractices: "", reflection: "" };
 }
@@ -1427,6 +1606,30 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankDialecticalAbstinenceData();
     case "behavior-change":
       return blankBehaviorChangeData();
+    case "pros-cons-skills":
+      return blankProsConsSkillsData();
+    case "reduce-vulnerability":
+      return blankReduceVulnerabilityData();
+    case "reality-acceptance":
+      return blankRealityAcceptanceData();
+    case "mindfulness-core":
+      return blankMindfulnessCoreData();
+    case "ie-skills-tracker":
+      return blankIeSkillsTrackerData();
+    case "er-troubleshooting":
+      return blankErTroubleshootingData();
+    case "values-diary":
+      return blankValuesDiaryData();
+    case "emotion-functions":
+      return blankEmotionFunctionsData();
+    case "addiction-crisis":
+      return blankAddictionCrisisData();
+    case "paired-muscle":
+      return blankPairedMuscleData();
+    case "body-scan":
+      return blankBodyScanData();
+    case "mindfulness-events":
+      return blankMindfulnessEventsData();
   }
 }
 
