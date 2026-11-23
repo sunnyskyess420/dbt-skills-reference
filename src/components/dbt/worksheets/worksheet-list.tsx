@@ -160,7 +160,7 @@ const WORKSHEET_GROUPS: { label: string; types: typeof WORKSHEET_TYPES }[] = [
   },
   {
     label: "Emotion Regulation",
-    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions", "emotion-model", "problem-solving", "positives-short", "positives-long", "sleep-hygiene", "extreme-emotions"].includes(t.id)),
+    types: WORKSHEET_TYPES.filter((t) => ["diary-card", "check-the-facts", "opposite-action", "values-to-actions", "values-priorities", "pleasant-events-diary", "emotion-diary", "cope-ahead", "build-mastery", "please-tracker", "nightmare-protocol", "mindfulness-emotions", "myths-emotions", "emotion-model", "problem-solving", "positives-short", "positives-long", "sleep-hygiene", "extreme-emotions"].includes(t.id)),
   },
   {
     label: "Interpersonal Effectiveness",

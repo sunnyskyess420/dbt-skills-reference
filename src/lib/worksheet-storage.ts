@@ -13,6 +13,7 @@ export type WorksheetType =
   | "radical-acceptance"
   | "crisis-survival-tracker"
   | "values-to-actions"
+  | "values-priorities"
   | "pleasant-events-diary"
   | "emotion-diary"
   | "dialectics-practice"
@@ -194,6 +195,17 @@ export const WORKSHEET_TYPES: WorksheetTypeMeta[] = [
       "Identify your top values, pick one, break it into concrete weekly action steps. Directly builds a life worth living.",
     icon: "Target",
     reference: "Emotion Regulation Handouts 17-18 / Emotion Regulation Worksheets 11, 11a, 11b",
+    color: "text-rose-600 dark:text-rose-400",
+  },
+  {
+    id: "values-priorities",
+    name: "Values and Priorities List",
+    shortName: "Values & Priorities",
+    pages: "p. 253",
+    description:
+      "What do you actually believe is important? Tick the values you hold across 14 life areas, then name the handful that matter most right now.",
+    icon: "Compass",
+    reference: "Emotion Regulation Handout 18 (Emotion Regulation Worksheets 10, 12, 13)",
     color: "text-rose-600 dark:text-rose-400",
   },
   {
@@ -687,6 +699,7 @@ export const WORKSHEET_TO_SKILL: Partial<Record<WorksheetType, string>> = {
   "problem-solving": "problem-solving",
   "positives-short": "accumulate-positive-emotions-short-term",
   "positives-long": "accumulate-positive-emotions-long-term",
+  "values-priorities": "accumulate-positive-emotions-long-term",
   "sleep-hygiene": "sleep-hygiene",
   "extreme-emotions": "managing-extreme-emotions",
   // Interpersonal Effectiveness
@@ -1275,6 +1288,9 @@ export function blankPositivesShortData(): Record<string, any> {
 export function blankPositivesLongData(): Record<string, any> {
   return { entryDate: "", valuesList: "", chosenValue: "", whyImportant: "", goal: "", actionSteps: "", thisWeekAction: "", progressNotes: "", reflection: "" };
 }
+export function blankValuesPrioritiesData(): Record<string, any> {
+  return { entryDate: "", checked: {}, otherValues: "", priority1: "", priority2: "", priority3: "", priority4: "", priority5: "", notes: "" };
+}
 export function blankSleepHygieneData(): Record<string, any> {
   return { weekStartDate: "", monday: "", tuesday: "", wednesday: "", thursday: "", friday: "", saturday: "", sunday: "", hygienePractices: "", reflection: "" };
 }
@@ -1327,6 +1343,8 @@ export function blankData(type: WorksheetType): Record<string, any> {
       return blankCrisisSurvivalTrackerData();
     case "values-to-actions":
       return blankValuesToActionsData();
+    case "values-priorities":
+      return blankValuesPrioritiesData();
     case "pleasant-events-diary":
       return blankPleasantEventsDiaryData();
     case "emotion-diary":

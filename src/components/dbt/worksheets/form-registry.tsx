@@ -44,6 +44,7 @@ export const WORKSHEET_FORMS: Record<WorksheetType, ComponentType<WorksheetFormP
   "radical-acceptance": loadForm(() => import("./radical-acceptance-form").then((m) => m.RadicalAcceptanceForm)),
   "crisis-survival-tracker": loadForm(() => import("./crisis-survival-tracker-form").then((m) => m.CrisisSurvivalTrackerForm)),
   "values-to-actions": loadForm(() => import("./values-to-actions-form").then((m) => m.ValuesToActionsForm)),
+  "values-priorities": loadForm(() => import("./values-priorities-form").then((m) => m.ValuesPrioritiesForm)),
   "pleasant-events-diary": loadForm(() => import("./pleasant-events-diary-form").then((m) => m.PleasantEventsDiaryForm)),
   "emotion-diary": loadForm(() => import("./emotion-diary-form").then((m) => m.EmotionDiaryForm)),
   "dialectics-practice": loadForm(() => import("./dialectics-practice-form").then((m) => m.DialecticsPracticeForm)),
