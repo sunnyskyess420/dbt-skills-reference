@@ -1904,6 +1904,77 @@ function notifyLocalChange(): void {
   }
 }
 
+// In-memory cache for debounced writes. Map from entry ID to pending data.
+// This prevents the expensive full-array serialize on every keystroke.
+const pendingWrites = new Map<string, {
+  entry: WorksheetEntry;
+  timer: ReturnType<typeof setTimeout>;
+}>();
+
+// Debounced write to localStorage for a single entry.
+// Instead of writing the entire array on every keystroke, we keep an in-memory
+// copy and write after a delay. This is especially important for mobile IME
+// where predictive text composition can trigger many rapid updates.
+export function debouncedUpdateEntry(
+  id: string,
+  updates: Partial<Pick<WorksheetEntry, "title" | "data">>,
+  fallback?: WorksheetEntry,
+  delayMs = 300
+): WorksheetEntry | null {
+  const all = listEntries();
+  let idx = all.findIndex((e) => e.id === id);
+  let base: WorksheetEntry;
+
+  if (idx !== -1) {
+    base = all[idx];
+  } else if (fallback) {
+    base = fallback;
+    all.unshift(base);
+    idx = 0;
+  } else {
+    return null;
+  }
+
+  const updated: WorksheetEntry = {
+    ...base,
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  };
+
+  // Cancel any pending write for this entry
+  const pending = pendingWrites.get(id);
+  if (pending) {
+    clearTimeout(pending.timer);
+  }
+
+  // Schedule a debounced write
+  const timer = setTimeout(() => {
+    try {
+      const currentAll = listEntries();
+      const currentIdx = currentAll.findIndex((e) => e.id === id);
+      if (currentIdx !== -1) {
+        currentAll[currentIdx] = updated;
+      } else {
+        currentAll.unshift(updated);
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(currentAll));
+      pendingWrites.delete(id);
+      notifyLocalChange();
+    } catch (e) {
+      pendingWrites.delete(id);
+      throw new Error(
+        e instanceof Error && e.name === "QuotaExceededError"
+          ? "Device storage full"
+          : "Failed to save"
+      );
+    }
+  }, delayMs);
+
+  pendingWrites.set(id, { entry: updated, timer });
+
+  return updated;
+}
+
 function generateId(): string {
   // Prefer crypto.randomUUID when available
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
@@ -2045,7 +2116,14 @@ export function updateEntry(
     localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
     notifyLocalChange();
   } catch (e) {
-    // ignore
+    // Quota errors or private mode — surface this to the caller
+    // so the UI can show "Not saved — device storage full" instead of
+    // falsely claiming "Saved · just now".
+    throw new Error(
+      e instanceof Error && e.name === "QuotaExceededError"
+        ? "Device storage full"
+        : "Failed to save"
+    );
   }
   return updated;
 }

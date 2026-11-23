@@ -25,7 +25,7 @@ import { CrisisResources } from "@/components/dbt/crisis-resources";
 import { AuthDialog } from "@/components/dbt/auth-dialog";
 import { incrementViewCount } from "@/lib/pinned-worksheets";
 import { useWorksheets } from "@/hooks/use-worksheets";
-import { useSync, useAutoPush } from "@/lib/sync";
+import { useSync, useAutoPush, pushNow } from "@/lib/sync";
 import { type WorksheetType, type WorksheetEntry, WORKSHEET_TYPES, getWorksheetTypeMeta, getWorksheetForSkill } from "@/lib/worksheet-storage";
 import { getFilledGoalCount, GOALS_CHANGED_EVENT } from "@/lib/goals-storage";
 import {
@@ -145,7 +145,7 @@ export default function Home() {
   const isSignedIn = authStatus === "authenticated";
   const userKey = sessionData?.user?.email ?? undefined;
   const { state: syncState, syncNow } = useSync(isSignedIn, userKey);
-  useAutoPush(isSignedIn, syncNow);
+  useAutoPush(isSignedIn, pushNow);
 
   // First-visit welcome prompt. Shows once per browser until dismissed
   // (either by signing in or by continuing as guest). localStorage flag
