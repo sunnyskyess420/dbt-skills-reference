@@ -386,6 +386,93 @@ function generateMissingLinks(doc: jsPDF, entry: WorksheetEntry) {
 
 // ============ Public API ============
 
+function humanizeKey(key: string): string {
+  return key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (s) => s.toUpperCase());
+}
+
+function isBlankPdfValue(value: any): boolean {
+  return (
+    value === undefined ||
+    value === null ||
+    value === "" ||
+    value === false ||
+    value === 0 ||
+    (typeof value === "number" && Number.isNaN(value))
+  );
+}
+
+function hasPdfContent(value: any): boolean {
+  if (Array.isArray(value)) return value.some(hasPdfContent);
+  if (value && typeof value === "object") {
+    return Object.values(value).some(hasPdfContent);
+  }
+  return !isBlankPdfValue(value);
+}
+
+// Renders a flat record: checked boxes become a comma list, scalars become
+// label/value pairs. Used both for skill-check maps (functions, tried, used)
+// and for the per-day objects inside weekly logs.
+function writeGenericRecord(
+  doc: jsPDF,
+  record: Record<string, any>,
+  headingDate?: string
+) {
+  const checked: string[] = [];
+  const pairs: [string, string][] = [];
+  for (const [key, value] of Object.entries(record)) {
+    if (key === "date" && headingDate) continue;
+    if (isBlankPdfValue(value) || typeof value === "object") continue;
+    if (value === true) checked.push(humanizeKey(key));
+    else pairs.push([humanizeKey(key), String(value)]);
+  }
+  if (checked.length) {
+    writeLabel(doc, "Checked");
+    writeValue(doc, checked.join(", "));
+    y += 4;
+  }
+  for (const [label, value] of pairs) {
+    writeKeyValue(doc, label, value);
+  }
+}
+
+function writeGenericFields(doc: jsPDF, data: Record<string, any>) {
+  for (const key of Object.keys(data)) {
+    const value = data[key];
+    if (!hasPdfContent(value)) continue;
+    writeSectionTitle(doc, undefined, humanizeKey(key));
+
+    if (Array.isArray(value)) {
+      if (value.every((item) => !item || typeof item !== "object")) {
+        const text = value
+          .filter((item) => !isBlankPdfValue(item))
+          .map((item) => (item === true ? "yes" : String(item)))
+          .join(", ");
+        writeValue(doc, text);
+      } else {
+        value.forEach((item, idx) => {
+          if (!hasPdfContent(item)) return;
+          if (item && typeof item === "object") {
+            const date =
+              typeof item.date === "string" && item.date ? item.date : undefined;
+            writeLabel(doc, date ? `Day ${idx + 1} — ${date}` : `Entry ${idx + 1}`);
+            writeGenericRecord(doc, item, date);
+          } else {
+            writeValue(doc, String(item));
+          }
+          y += 4;
+        });
+      }
+    } else if (value && typeof value === "object") {
+      writeGenericRecord(doc, value);
+    } else {
+      writeValue(doc, String(value));
+    }
+    y += 4;
+  }
+}
+
 function generateGenericWorksheet(doc: any, entry: WorksheetEntry) {
   const meta = getWorksheetTypeMeta(entry.type);
   const d = entry.data;
@@ -397,17 +484,7 @@ function generateGenericWorksheet(doc: any, entry: WorksheetEntry) {
   writeTitle(doc, entry.title);
   writeSubtitle(doc, `${meta.name} — ${meta.reference}`);
 
-  const keys = Object.keys(d).filter(
-    (k) => d[k] !== "" && d[k] !== 0 && d[k] !== false && d[k] !== undefined
-  );
-  for (const key of keys) {
-    const label = key
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (s) => s.toUpperCase());
-    writeSectionTitle(doc, undefined, label);
-    writeValue(doc, String(d[key]));
-    y += 4;
-  }
+  writeGenericFields(doc, d);
 }
 
 export function exportToPdf(entry: WorksheetEntry) {

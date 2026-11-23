@@ -238,13 +238,41 @@ function getKeyFields(ws: WorksheetEntry): string[] {
     case "myths-emotions":
       return [d.myth || "", d.truth || "", d.beliefBefore || "", d.beliefAfter || "", d.reflection || ""];
     default: {
-      const d = ws.data;
-      const stringFields = Object.entries(d)
-        .filter(([k, v]) => typeof v === "string" && v.trim() !== "")
-        .map(([k, v]) => [k, v as string]);
-      return stringFields.slice(0, 5).map(([, v]) => v);
+      const fields: string[] = [];
+      const collect = (value: any) => {
+        if (Array.isArray(value)) {
+          const firstFilled = value.find((el) => hasCsvContent(el));
+          if (firstFilled && typeof firstFilled === "object") {
+            Object.values(firstFilled).forEach(collect);
+          } else if (firstFilled !== undefined) {
+            collect(firstFilled);
+          }
+        } else if (value && typeof value === "object") {
+          Object.values(value).forEach(collect);
+        } else if (typeof value === "string" && value.trim() !== "") {
+          fields.push(value);
+        } else if (
+          typeof value === "number" &&
+          Number.isFinite(value) &&
+          value !== 0
+        ) {
+          fields.push(String(value));
+        }
+      };
+      Object.values(ws.data).forEach(collect);
+      return fields.slice(0, 5);
     }
   }
+}
+
+function hasCsvContent(value: any): boolean {
+  if (Array.isArray(value)) return value.some(hasCsvContent);
+  if (value && typeof value === "object") {
+    return Object.values(value).some(hasCsvContent);
+  }
+  return typeof value === "string"
+    ? value.trim() !== ""
+    : typeof value === "number" && Number.isFinite(value) && value !== 0;
 }
 
 function getDimeScore(data: any): number {
